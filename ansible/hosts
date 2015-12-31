@@ -3,3 +3,6 @@ segue-api.fisl16.softwarelivre.org ansible_ssh_port=2222 ansible_ssh_user=segue
 
 [vagrant]
 192.168.33.91 user=vagrant
+
+[dev]
+backend.segue.org ansible_ssh_port=22 ansible_ssh_user=segue

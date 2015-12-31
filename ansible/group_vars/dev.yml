@@ -1,0 +1,36 @@
+---
+project_dir: "~/git/segue/"
+
+loglevel: DEBUG
+debugging: True
+
+app_name: api
+app_path: /opt/segue
+app_host: http://{{ sitename }}.{{ master_host }}
+app_virtualenv: "{{app_path}}/env"
+
+storage_dir: "{{app_path}}/data"
+
+user_home: /home/segue
+jwt_secret: sshh
+
+frontend_url: http://frontend.segue.org
+backend_url: http://backend.segue.org
+certificates_url: http://certificates.segue.org
+master_host: segue.com.br
+
+dbuser: segue
+dbname: segue
+dbpass: segue
+
+mail_server: localhost
+mail_port: 1025
+mail_sender: teste@softwarelivre.org
+mail_user: ""
+mail_pass: ""
+
+pagseguro_env: sandbox
+
+redis_password: sshh
+
+printers: 'print'
