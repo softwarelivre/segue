@@ -9,6 +9,8 @@ from segue.core import config
 from segue.hasher import Hasher
 from ..factories import PaymentFactory, TransitionFactory
 
+from segue.document.services import DocumentService
+
 from models import BoletoPayment, BoletoTransition
 
 class BoletoPaymentFactory(PaymentFactory):
@@ -49,12 +51,13 @@ class BoletoTransitionFactory(TransitionFactory):
         return transition
 
 class BoletoFactory(object):
-    def __init__(self):
-        pass
+    def __init__(self, document_service=None):
+        self.document_service = document_service or DocumentService()
+        
 
     def as_pdf(self, boleto_data, document_hash, dest_dir):
         filename = "boleto-{}.pdf".format(document_hash)
-        path = os.path.join(dest_dir, filename)
+        path = self.document_service.path_for_filename(dest_dir, filename, ensure_viable=True)
 
         pdf = BoletoPDF(path)
         pdf.drawBoleto(boleto_data)
