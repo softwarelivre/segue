@@ -11,7 +11,8 @@
        update=yes
   tags: git
 
-- name: reload apache
-  tags: git
-  service: name=apache2
-           state=reloaded
+# FIX - Check if apache service exists
+#- name: reload apache
+#  tags: git
+#  service: name=apache2
+#           state=reloaded
