@@ -119,10 +119,10 @@ class BoletoFactoryTestCases(SegueApiTestCase):
             self.factory.as_pdf(boleto, 'DEADBABE1234', temp_dir.path)
 
             # file exists
-            temp_dir.check('boleto-DEADBABE1234.pdf')
+            temp_dir.check_all('boleto/DE/', 'boleto-DEADBABE1234.pdf')
 
             # and is a pdf
-            filename = temp_dir.getpath('boleto-DEADBABE1234.pdf')
+            filename = temp_dir.getpath('boleto/DE/boleto-DEADBABE1234.pdf')
             filetype = Magic().from_file(filename)
 
             # containing a single page
