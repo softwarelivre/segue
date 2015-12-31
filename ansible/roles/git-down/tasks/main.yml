@@ -2,6 +2,8 @@
 
 - apt: pkg=git
        state=installed
+       update_cache=yes
+       cache_valid_time=3600	
 
 - git: repo={{ git_repo }}
        dest={{ app_path }}
