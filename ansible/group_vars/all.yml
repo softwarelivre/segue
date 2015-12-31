@@ -20,8 +20,8 @@ storage_dir: /opt/segue/data
 
 project_dir: "{{ inventory_dir }}/.."
 
-call_for_papers_deadline: '2015-04-19 23:59:29'
-online_payment_deadline: '2015-06-30 21:59:59'
+call_for_papers_deadline: '2016-01-01 23:59:29'
+online_payment_deadline: '2016-06-30 21:59:59'
 realtime_port: 9001
 
 redis_bind: 0.0.0.0
@@ -32,6 +32,6 @@ recordings_link_pattern: 'href="(.*.ogv)"'
 recordings_file_pattern: '^sala(.*?)-.*-?(\d{12}).ogv'
 recordings_rooms: 40t,41a,41b,41c,41d,41e,41f
 
-event_dates: "2015-07-08,2015-07-09,2015-07-10,2015-07-11"
+event_dates: "2016-07-08,2016-07-09,2016-07-10,2016-07-11"
 
-default_survey: 'fisl16_survey'
+default_survey: 'fisl17_survey'
