@@ -1,0 +1,15 @@
+---
+
+- hosts: dev
+  sudo: true
+  roles:
+    - git-down
+    - server
+    - certificates
+    - recordings
+    - database
+    - segue
+    - DavidWittman.redis
+
+  vars_files:
+    - secret/dev.yml
