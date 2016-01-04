@@ -1,6 +1,7 @@
 ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
+DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
 
 signup = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,6 +10,8 @@ signup = {
         "email":        { "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
         "name":         { "type": "string", "minLength": 5,  "maxLength": 80, "pattern": NAME_PATTERN},
         "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
+        "disability":   { "type": "string", "enum": DISABILITY_TYPES },
+        "disability_info": { "type": "string" },
         "cpf":          { "type": "string", "minLength": 11, "maxLength": 14, "pattern": CPF_PATTERN },
         "document":     { "type": "string", "minLength": 5,  "maxLength": 14 },
         "passport":     { "type": "string", "minLength": 5,  "maxLength": 15 },
