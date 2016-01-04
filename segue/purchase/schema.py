@@ -1,12 +1,13 @@
 BUYER_TYPES = ['person','company','government']
 CPF_CNPJ_PATTERN = r"(^\d{3}.?\d{3}.?\d{3}.?\d{2}$)|(^\d{2}.?\d{3}.?\d{3}.?\d{4}.?\d{2}$)"
+NAME_PATTERN = r"(.*)\s(.*)"
 
 buyer = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
         "kind":            { "enum": BUYER_TYPES },
-        "name":            { "type": "string", "minLength": 5,  "maxLength": 100 },
+        "name":            { "type": "string", "minLength": 5,  "maxLength": 100, "pattern": NAME_PATTERN },
         "document":        { "type": "string", "minLength": 11, "maxLength": 20, "pattern": CPF_CNPJ_PATTERN },
         "contact":         { "type": "string", "minLength": 0,  "maxLength": 100 },
         "address_street":  { "type": "string", "minLength": 5,  "maxLength": 80  },
