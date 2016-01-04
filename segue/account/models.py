@@ -35,6 +35,8 @@ class Account(JsonSerializable, db.Model):
     name             = db.Column(db.Text)
     badge_name       = db.Column(db.Text)
     password         = db.Column(PasswordType(schemes=['pbkdf2_sha512']))
+    disability       = db.Column(db.Enum(*schema.DISABILITY_TYPES, name='disability_types'), default='none')
+    disability_info  = db.Column(db.Text)
     role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
     document         = db.Column(db.Text)
     country          = db.Column(db.Text)
