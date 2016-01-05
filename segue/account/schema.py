@@ -11,7 +11,7 @@ signup = {
         "name":         { "type": "string", "minLength": 5,  "maxLength": 80, "pattern": NAME_PATTERN},
         "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
         "disability":   { "type": "string", "enum": DISABILITY_TYPES },
-        "disability_info": { "type": "string" },
+        "disability_info": { "type": "string", "maxLenght": 200},
         "cpf":          { "type": "string", "minLength": 11, "maxLength": 14, "pattern": CPF_PATTERN },
         "document":     { "type": "string", "minLength": 5,  "maxLength": 14 },
         "passport":     { "type": "string", "minLength": 5,  "maxLength": 15 },
