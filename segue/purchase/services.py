@@ -1,8 +1,9 @@
 from datetime import datetime
-from segue.core import db, logger, config
 
+from segue.core import db, logger, config
 from segue.errors import NotAuthorized
 from segue.product.errors import NoSuchProduct, ProductExpired
+from segue.validaton import CPFValidator, CNPJValidator
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
@@ -14,6 +15,7 @@ from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
 from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale
+from errors    import InvalidCPFNumber, InvalidCNPJNumber
 
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 
@@ -66,6 +68,7 @@ class PurchaseService(object):
 
     def create(self, buyer_data, product, account, commit=True, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
+        self._validate_buyer(buyer)
         purchase = PurchaseFactory.get_or_create(buyer, product, account, **extra)
         logger.info(buyer_data)
 
@@ -134,6 +137,14 @@ class PurchaseService(object):
         db.session.add(purchase)
         if commit: db.session.commit()
         return purchase
+
+    def _validate_buyer(self, buyer):
+        if buyer.kind == 'person':
+            if not CPFValidator(buyer.document).isValid():
+                raise InvalidCPFNumber()
+        elif buyer.kind == 'company':
+            if not CNPJValidator(buyer.document).isValid():
+                raise InvalidCNPJNumber()
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
