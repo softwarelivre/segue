@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from segue.errors import SegueError, SegueFieldError
 
 class PaymentVerificationFailed(SegueError):
@@ -39,3 +41,13 @@ class MustProvideDescription(SegueFieldError):
     FIELD = 'description'
     LABEL = 'object_required'
     MESSAGE = 'please provide promocode description'
+
+class InvalidCPFNumber(SegueFieldError):
+    FIELD = 'description'
+    LABEL = 'invalid_format'
+    MESSAGE = u'por favor informe um número de CPF válido'
+
+class InvalidCNPJNumber(SegueFieldError):
+    FIELD = 'description'
+    LABEL = 'invalid_format'
+    MESSAGE = u'por favor informe um número de CNPJ válido'
