@@ -15,11 +15,14 @@ buyer = {
         "address_extra":   { "type": "string", "minLength": 0,  "maxLength": 40  },
         "address_city":    { "type": "string", "minLength": 2,  "maxLength": 60  },
         "address_country": { "type": "string", "minLength": 2,  "maxLength": 40  },
+        "address_state": { "type": "string", "minLength": 2,  "maxLength": 2  },
+        "address_neighborhood": { "type": "string", "minLength": 2,  "maxLength": 20  },
         "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 10  },
     },
     "required": [
         "kind", "name", "document",
-        "address_street", "address_number", "address_city", "address_country"
+        "address_street", "address_number", "address_city", "address_country",
+        "address_neighborhood", "address_state"
     ]
 }
 

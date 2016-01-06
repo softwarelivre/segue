@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 
 from sqlalchemy.sql import functions as func
@@ -19,6 +21,8 @@ class Buyer(JsonSerializable, db.Model):
     address_zipcode = db.Column(db.Text)
     address_city    = db.Column(db.Text)
     address_country = db.Column(db.Text)
+    address_state   = db.Column(db.Text)
+    address_neighborhood = db.Column(db.Text)
     purchases       = db.relationship('Purchase', backref='buyer')
 
     @property
