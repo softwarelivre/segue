@@ -16,4 +16,5 @@ states.cache
 .DS_*
 TODO
 *.csv
+.idea
 segue/certificate/templates/*.svg
