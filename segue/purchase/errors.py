@@ -42,12 +42,19 @@ class MustProvideDescription(SegueFieldError):
     LABEL = 'object_required'
     MESSAGE = 'please provide promocode description'
 
-class InvalidCPFNumber(SegueFieldError):
-    FIELD = 'description'
-    LABEL = 'invalid_format'
-    MESSAGE = u'por favor informe um número de CPF válido'
+class InvalidAddress(SegueError):
+    code = 400
 
-class InvalidCNPJNumber(SegueFieldError):
-    FIELD = 'description'
+    def to_json(self):
+        return {'message': u'Verifique os dados do endereço do comprador'}
+
+
+class InvalidDocumentNumber(SegueFieldError):
+
+    FIELD = 'document'
     LABEL = 'invalid_format'
-    MESSAGE = u'por favor informe um número de CNPJ válido'
+    MESSAGE = 'invalid document number'
+
+    def __init__(self, document):
+        super(InvalidDocumentNumber, self).__init__()
+        self.value = document
