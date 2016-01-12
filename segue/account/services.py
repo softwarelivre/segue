@@ -6,7 +6,7 @@ from ..core import logger
 from ..core import db
 from ..hasher import Hasher
 
-from segue.validaton import CNPJValidator, CPFValidator, DateValidator, AddressValidator, AddressFetcherError
+from segue.validation import CNPJValidator, CPFValidator, DateValidator, AddressValidator, AddressFetcherError
 from segue.mailer import MailerService
 from ..filters import FilterStrategies
 

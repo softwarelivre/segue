@@ -3,7 +3,7 @@ from datetime import datetime
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
 from segue.product.errors import NoSuchProduct, ProductExpired
-from segue.validaton import CPFValidator, CNPJValidator, AddressValidator, AddressFetcherError
+from segue.validation import CPFValidator, CNPJValidator, AddressValidator, AddressFetcherError
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
