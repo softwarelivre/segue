@@ -32,6 +32,7 @@ class Account(JsonSerializable, db.Model):
 
     id               = db.Column(db.Integer, primary_key=True)
     email            = db.Column(db.Text, unique=True)
+    dirty            = db.Column(db.Boolean, default=False)
     name             = db.Column(db.Text)
     badge_name       = db.Column(db.Text)
     password         = db.Column(PasswordType(schemes=['pbkdf2_sha512']))
@@ -39,13 +40,28 @@ class Account(JsonSerializable, db.Model):
     disability_info  = db.Column(db.Text)
     role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
     document         = db.Column(db.Text)
+    document_type    = db.Column(db.Enum('cpf', 'cnpj', 'passport', name='document_type'))
+
+    sex = db.Column(db.String(length=1))
+    occupation = db.Column(db.Text)
+    education = db.Column(db.Text)
+    born_date = db.Column(db.Date)
+
     country          = db.Column(db.Text)
     state            = db.Column(db.Text)
     city             = db.Column(db.Text)
+    address_neighborhood     = db.Column(db.Text)
+    address_state   = db.Column(db.Text)
+    address_street   = db.Column(db.Text)
+    address_number   = db.Column(db.Text)
+    address_extra    = db.Column(db.Text)
+    address_zipcode  = db.Column(db.Text)
+
     phone            = db.Column(db.Text)
     organization     = db.Column(db.Text)
     resume           = db.Column(db.Text)
     certificate_name = db.Column(db.Text)
+
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
@@ -157,7 +173,9 @@ class Account(JsonSerializable, db.Model):
         return payments
 
     @property
-    def is_brazilian(self):
+    def is_brazilian(self): #FIX ME
+        if self.country.upper() == 'BR':
+            return True
         return re.match(r"bra.*", self.country or '', re.IGNORECASE) != None
 
     @property
