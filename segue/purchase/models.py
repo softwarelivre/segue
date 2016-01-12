@@ -34,6 +34,10 @@ class Buyer(JsonSerializable, db.Model):
                 result[name] = getattr(self, field.key) or ''
         return result
 
+    def is_brazilian(self):
+        if self.address_country.upper() == 'BR':
+            return True
+
     @property
     def complete_address(self):
         return u"{street} {number} {extra} - {city} {country}".format(**self.address_fields)
