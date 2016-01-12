@@ -51,13 +51,15 @@ class NotAuthorized(SegueError):
         return { 'message': 'user is not authorized for this action' }
 
 class SegueFieldError(SegueError):
+    code = 422
+
     def __init__(self, field=None, label=None, message=None):
         self.field   = field   or getattr(self, 'FIELD', None)
         self.label   = label   or getattr(self, 'LABEL', None)
         self.message = message or getattr(self, 'MESSAGE', None)
 
     def to_json(self):
-        return self.__dict__
+        return [ self.__dict__ ]
 
 class GenericFieldErrorRecognizer(object):
     def __init__(self, validator_name, failure_label):
