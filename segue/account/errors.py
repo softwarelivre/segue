@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from segue.errors import SegueError, SegueFieldError, NotAuthorized
 
 class InvalidResetPassword(SegueError):
@@ -26,7 +28,6 @@ class CertificateNameAlreadySet(SegueError):
         return { 'message': 'cannot change certificate name' }
 
 class EmailAlreadyInUse(SegueFieldError):
-    code = 422
 
     FIELD = 'email'
     LABEL = 'already_in_use'
@@ -36,8 +37,41 @@ class EmailAlreadyInUse(SegueFieldError):
         super(EmailAlreadyInUse, self).__init__()
         self.value = email
 
+
+class InvalidDocumentNumber(SegueFieldError):
+
+    FIELD = 'document'
+    LABEL = 'invalid_format'
+    MESSAGE = 'invalid document number'
+
+    def __init__(self, document):
+        super(InvalidDocumentNumber, self).__init__()
+        self.value = document
+
+
+class InvalidDateFormat(SegueFieldError):
+
+    FIELD = 'born_date'
+    LABEL = 'invalid_format'
+    MESSAGE = 'invalid date format'
+
+    def __init__(self, born_date):
+        super(InvalidDateFormat, self).__init__()
+        self.value = born_date
+
+
+class PasswordMismatch(SegueFieldError):
+    FIELD = 'password_confirm'
+    LABEL = 'invalid_format'
+    MESSAGE = 'password mismatch'
+
+    def __init__(self, password):
+        super(PasswordMismatch, self).__init__()
+        self.value = password
+
+
+class InvalidAddress(SegueError):
+    code = 400
+
     def to_json(self):
-        return [ self.__dict__ ]
-
-
-
+        return {'message': u'Verifique os dados do endereço da conta'}

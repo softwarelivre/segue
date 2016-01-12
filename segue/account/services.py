@@ -2,9 +2,11 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import or_
 
+from ..core import logger
 from ..core import db
 from ..hasher import Hasher
 
+from segue.validaton import CNPJValidator, CPFValidator, DateValidator, AddressValidator, AddressFetcherError
 from segue.mailer import MailerService
 from ..filters import FilterStrategies
 
@@ -14,6 +16,9 @@ from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword, CertificateNameAlreadySet
+from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, InvalidAddress
+
+
 import schema
 
 class AccountService(object):
@@ -103,7 +108,11 @@ class AccountService(object):
 
     def create(self, data, rules='signup'):
         try:
+            password = data['password'] or ''
+            password_confirm = data.pop('password_confirm')
             account = AccountFactory.from_json(data, schema.whitelist[rules])
+            self._validate(account, password, password_confirm)
+
             if not account.password: account.password = self.hasher.generate()
             db.session.add(account)
             db.session.commit()
@@ -151,3 +160,32 @@ class AccountService(object):
         db.session.commit()
 
         return reset
+
+    def _validate(self, account, password, password_confirm):
+        #FIX ME
+        address = {
+            'zipcode': account.address_zipcode,
+            'country': account.country,
+            'state': account.address_state,
+            'city': account.city,
+        }
+
+        if password != password_confirm:
+            raise PasswordMismatch('password does not match')
+
+        try:
+            if not AddressValidator(address).is_valid():
+                raise InvalidAddress()
+        except AddressFetcherError:
+            pass
+
+        if not DateValidator(account.born_date).is_valid():
+            raise InvalidDateFormat(account.born_date)
+
+        if account.is_brazilian:
+            if CNPJValidator(account.document).is_valid():
+                account.document_type = 'cnpj' #FIX contant
+            elif CPFValidator(account.document).is_valid():
+                account.document_type = 'cpf' #FIX contant
+            else:
+                raise InvalidDocumentNumber(account.document)
