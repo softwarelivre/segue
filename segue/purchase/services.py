@@ -3,7 +3,7 @@ from datetime import datetime
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
 from segue.product.errors import NoSuchProduct, ProductExpired
-from segue.validaton import CPFValidator, CNPJValidator
+from segue.validaton import CPFValidator, CNPJValidator, AddressValidator, AddressFetcherError
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
@@ -15,7 +15,7 @@ from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
 from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale
-from errors    import InvalidCPFNumber, InvalidCNPJNumber
+from errors    import InvalidDocumentNumber, InvalidAddress
 
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 
@@ -139,12 +139,26 @@ class PurchaseService(object):
         return purchase
 
     def _validate_buyer(self, buyer):
-        if buyer.kind == 'person':
-            if not CPFValidator(buyer.document).isValid():
-                raise InvalidCPFNumber()
-        elif buyer.kind == 'company':
-            if not CNPJValidator(buyer.document).isValid():
-                raise InvalidCNPJNumber()
+        #FIX ME
+        address = {
+            'zipcode': buyer.address_zipcode,
+            'country': buyer.address_country,
+            'state': buyer.address_state,
+            'city': buyer.address_city,
+        }
+        try:
+            if not AddressValidator(address).is_valid():
+                raise InvalidAddress()
+        except AddressFetcherError:
+            pass
+
+        if buyer.is_brazilian():
+            if buyer.kind == 'person':
+                if not CPFValidator(buyer.document).is_valid():
+                    raise InvalidDocumentNumber(buyer.document)
+            elif buyer.kind == 'company':
+                if not CNPJValidator(buyer.document).is_valid():
+                    raise InvalidDocumentNumber(buyer.document)
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
