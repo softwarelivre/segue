@@ -2,7 +2,7 @@
 
 template: notify_slot
 language: pt
-subject: "FISL16 - notificação de horário de palestra"
+subject: "FISL17 - notificação de horário de palestra"
 
 body: |
 
@@ -29,4 +29,4 @@ body: |
     Cordialmente
 
     --
-    Coordenação do Temario FISL16
+    Coordenação do Temario FISL17

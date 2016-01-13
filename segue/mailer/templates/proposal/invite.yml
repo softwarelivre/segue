@@ -2,14 +2,14 @@
 
 template: proposal_invite
 language: pt
-subject: "{proposal.owner.name} te convidou para o FISL16"
+subject: "{proposal.owner.name} te convidou para o FISL17"
 
 body: |
 
     Olá {invite.name}!
 
     Você está sendo convidado por **{proposal.owner.name}** para
-    participar do FISL 16 na condição de co-autor
+    participar do FISL 17 na condição de co-autor
     da proposta de palestra descrita abaixo:
 
     * título: **{proposal.title}**
