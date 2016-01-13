@@ -2,14 +2,14 @@
 
 template: caravan_invite
 language: pt
-subject: "{caravan.owner.name} te convidou para o FISL16"
+subject: "{caravan.owner.name} te convidou para o FISL17"
 
 body: |
 
     Olá {invite.name}!
 
     Você está sendo convidado por **{caravan.owner.name}** para
-    participar de uma caravana para o FISL 16:
+    participar de uma caravana para o FISL 17:
 
     * nome da caravana: **{caravan.name}**
     * cidade de partida: **{caravan.city}**

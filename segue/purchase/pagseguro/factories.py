@@ -135,7 +135,7 @@ class PagSeguroSessionFactory(object):
         pg.shipping  = self.details_factory.create_shipping(payment.purchase.buyer)
         pg.items     = [ self.details_factory.create_item(payment, payment.purchase.product) ]
 
-        pg.reference_prefix = "SEGUE-FISL16-"
+        pg.reference_prefix = "SEGUE-FISL17-"
         pg.reference        = self.details_factory.reference(payment)
         pg.redirect_url     = self.details_factory.redirect_url(payment, payment.purchase)
         pg.notification_url = self.details_factory.notification_url(payment, payment.purchase)
