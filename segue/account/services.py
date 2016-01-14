@@ -91,8 +91,13 @@ class AccountService(object):
         if allow_email_change:
             self.try_to_change_email(account, data.get('email', account.email))
 
+        password = data.get('password', '')
+        password_confirm = data.pop('password_confirm', '')
         for name, value in AccountFactory.clean_for_update(data).items():
             setattr(account, name, value)
+
+        self._validate(account, password, password_confirm)
+        account.dirty = False
         db.session.add(account)
         db.session.commit()
         return account
