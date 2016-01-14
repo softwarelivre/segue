@@ -20,7 +20,7 @@ buyer = {
         "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 10  },
     },
     "required": [
-        "kind", "name", "document", "contact"
+        "kind", "name", "document", "contact",
         "address_street", "address_number", "address_city", "address_country",
         "address_neighborhood", "address_state", "address_zipcode"
     ]
