@@ -25,7 +25,7 @@ class SafeAccountJsonSerializer(AccountJsonSerializer):
 class TokenJsonSerializer(AccountJsonSerializer):
     _serializer_name = 'token'
     def hide_field(self, child):
-        return child not in [ 'id','email','role', 'name' ]
+        return child not in [ 'id','email','role', 'name', 'dirty' ]
 
 class Account(JsonSerializable, db.Model):
     _serializers = [ AccountJsonSerializer, SafeAccountJsonSerializer, TokenJsonSerializer ]
