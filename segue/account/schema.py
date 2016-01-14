@@ -1,3 +1,5 @@
+import copy
+
 ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
@@ -16,8 +18,8 @@ signup = {
         "disability_info": { "type": "string", "maxLenght": 200},
         "document":     { "type": "string", "minLength": 5,  "maxLength": 15 },
         "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "organization": { "type": "string", "minLength": 3,  "maxLength": 80 },
-        "resume":       { "type": "string", "minLength": 5,  "maxLength": 400 },
+        "organization": { "type": "string", "maxLength": 80 },
+        "resume":       { "type": "string",  "maxLength": 400 },
         "occupation":      { "type": "string", "minLength": 1,  "maxLength": 20  },
         "education":       { "type": "string", "minLength": 1,  "maxLength": 40  },
         "sex":             { "type": "string", "minLength": 1,  "maxLength": 1  },
@@ -38,8 +40,8 @@ signup = {
         "address_zipcode", "occupation", "education", "sex", "born_date"
     ],
 }
-edit_account = signup.copy()
-edit_account['required'] = ["email", "name", "country", "city", "phone" ]
+edit_account = copy.deepcopy(signup)
+edit_account['required'].remove('password')
 
 reset = {
     "$schema": "http://json-schema.org/draft-04/schema#",
