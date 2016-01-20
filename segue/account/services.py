@@ -16,7 +16,7 @@ from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword, CertificateNameAlreadySet
-from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, InvalidAddress
+from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, InvalidAddress, EmailMismatch
 
 
 import schema
@@ -115,8 +115,9 @@ class AccountService(object):
         try:
             password = data['password'] or ''
             password_confirm = data.pop('password_confirm')
+            email_confirm = data.pop('email_confirm', '')
             account = AccountFactory.from_json(data, schema.whitelist[rules])
-            self._validate(account, password, password_confirm)
+            self._validate(account, password, password_confirm, email_confirm)
 
             if not account.password: account.password = self.hasher.generate()
             db.session.add(account)
@@ -166,7 +167,7 @@ class AccountService(object):
 
         return reset
 
-    def _validate(self, account, password, password_confirm):
+    def _validate(self, account, password, password_confirm, email_confirm=None):
         #FIX ME
         address = {
             'zipcode': account.address_zipcode,
@@ -177,6 +178,9 @@ class AccountService(object):
 
         if password != password_confirm:
             raise PasswordMismatch('password does not match')
+
+        if email_confirm and (account.email != email_confirm):
+            raise EmailMismatch(email_confirm)
 
         try:
             if not AddressValidator(address).is_valid():
