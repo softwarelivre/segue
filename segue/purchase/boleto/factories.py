@@ -19,8 +19,8 @@ class BoletoPaymentFactory(PaymentFactory):
     def __init__(self, hasher=None):
         self.hasher = hasher or Hasher()
 
-    def create(self, purchase, payment_id):
-        payment = super(BoletoPaymentFactory, self).create(purchase, target_model=self.model)
+    def create(self, purchase, payment_id, data=None):
+        payment = super(BoletoPaymentFactory, self).create(purchase, target_model=self.model, extra_data=data)
         payment.due_date = purchase.product.sold_until.date()
         payment.our_number = "{:010d}".format(config.BOLETO_OFFSET + payment_id)
         payment.document_hash = self.hasher.generate()

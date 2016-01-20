@@ -18,7 +18,7 @@ class BoletoPaymentService(object):
         return BoletoPayment.query.filter(BoletoPayment.our_number == our_number).first()
 
     def create(self, purchase, data=None):
-        payment = self.factory.create(purchase, self.sequence.nextval())
+        payment = self.factory.create(purchase, self.sequence.nextval(), data)
         db.session.add(payment)
         db.session.commit()
         return payment
