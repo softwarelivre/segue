@@ -42,10 +42,20 @@ class PaymentFactory(Factory):
     def __init__(self):
         pass
 
-    def create(self, purchase, target_model=Payment):
+    def create(self, purchase, target_model=Payment, extra_data=None):
         payment = target_model()
         payment.purchase = purchase
         payment.amount   = purchase.outstanding_amount
+        #FIX ME product is from database
+        from segue.core import logger
+        product = purchase.product
+        if product.category == 'donation' and product.price == 0:
+            if extra_data and 'amount' in extra_data:
+                amount = int(extra_data['amount'])
+                if amount >= 10:
+                    payment.amount = amount
+		else:
+		    payment.amount = 10
         return payment
 
 

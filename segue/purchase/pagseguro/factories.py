@@ -18,8 +18,8 @@ class PagSeguroPaymentFactory(PaymentFactory):
     def __init__(self):
         pass
 
-    def create(self, purchase):
-        payment = super(PagSeguroPaymentFactory, self).create(purchase, target_model=self.model)
+    def create(self, purchase, data=None):
+        payment = super(PagSeguroPaymentFactory, self).create(purchase, target_model=self.model, extra_data=data)
         payment.reference = "A{0:05d}-PU{1:05d}".format(purchase.customer.id, purchase.id)
         return payment
 

@@ -11,7 +11,7 @@ class PagSeguroPaymentService(object):
         self.factory  = factory  or PagSeguroPaymentFactory()
 
     def create(self, purchase, data=None):
-        payment = self.factory.create(purchase)
+        payment = self.factory.create(purchase, data=data)
         db.session.add(payment)
         db.session.commit()
         return payment
