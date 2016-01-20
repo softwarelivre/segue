@@ -63,6 +63,16 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def notify_donation(self, purchase, payment): #FIX REVIEW
+        customer = purchase.customer
+        product  = purchase.product
+
+        message = self.message_factory.from_template('donation/confirmation')
+        message.given(customer=customer, purchase=purchase, payment=payment, product=product)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
     def caravan_invite(self, invite):
         message = self.message_factory.from_template('caravan/invite')
         message.given(invite=invite, caravan=invite.caravan, owner=invite.caravan.owner)
