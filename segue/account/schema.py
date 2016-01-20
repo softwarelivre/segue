@@ -10,6 +10,7 @@ signup = {
     "type": "object",
     "properties": {
         "email":        { "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
+	"email_confirm":{ "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
         "name":         { "type": "string", "minLength": 5,  "maxLength": 80, "pattern": NAME_PATTERN},
         "badge_name":         { "type": "string",  "maxLength": 80},
         "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
