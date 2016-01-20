@@ -40,12 +40,15 @@ class Account(JsonSerializable, db.Model):
     disability_info  = db.Column(db.Text)
     role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
     document         = db.Column(db.Text)
-    document_type    = db.Column(db.Enum('cpf', 'cnpj', 'passport', name='document_type'))
+    document_type    = db.Column(db.Enum('cpf', 'cnpj', 'passport', name='document_type')) #FIX REMOVE
 
     sex = db.Column(db.String(length=1))
     occupation = db.Column(db.Text)
     education = db.Column(db.Text)
     born_date = db.Column(db.Date)
+
+    membership = db.Column(db.Boolean, default=False)
+    student_document = db.Column(db.Text)
 
     country          = db.Column(db.Text)
     state            = db.Column(db.Text)

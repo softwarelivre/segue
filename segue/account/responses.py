@@ -31,6 +31,8 @@ class AccountResponse(BaseResponse):
         self.address_number   = account.address_number
         self.address_extra    = account.address_extra or ''
         self.address_zipcode  = account.address_zipcode
+        self.membership = account.membership
+        self.student_document = account.membership
 
 
         self.has_filled_survey = account.survey_answers.count() > 0

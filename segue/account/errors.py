@@ -75,3 +75,13 @@ class InvalidAddress(SegueError):
 
     def to_json(self):
         return {'message': u'Verifique os dados do endereço da conta'}
+
+
+class EmailMismatch(SegueFieldError):
+    FIELD = 'email_confirm'
+    LABEL = 'invalid_format'
+    MESSAGE = 'email mismatch'
+
+    def __init__(self, email):
+        super(EmailMismatch, self).__init__()
+        self.value = email
