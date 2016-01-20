@@ -119,3 +119,5 @@ class GovernmentProduct(Product):
         if not account: return False
         return account.is_government
 
+class DonationProduct(Product):
+    __mapper_args__ = {'polymorphic_identity': 'donation'}
