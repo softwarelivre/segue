@@ -17,6 +17,7 @@ signup = {
         "disability":   { "type": "string", "enum": DISABILITY_TYPES },
         "disability_info": { "type": "string", "maxLenght": 200},
         "document":     { "type": "string", "minLength": 5,  "maxLength": 15 },
+	"student_document":   { "type": "string", "maxLength": 30},
         "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
         "organization": { "type": "string", "maxLength": 80 },
         "resume":       { "type": "string",  "maxLength": 400 },
@@ -24,6 +25,7 @@ signup = {
         "education":       { "type": "string", "minLength": 1,  "maxLength": 40  },
         "sex":             { "type": "string", "minLength": 1,  "maxLength": 1  },
         "born_date":       { "type": "string", "minLength": 10, "maxLenght": 10 },
+	"membership":      { "type": "string", "enum": ["true", "false"]},
         "country":      { "type": "string", "minLength": 2,  "maxLength": 2 },
         "city":         { "type": "string", "minLength": 3,  "maxLength": 30 },
         "address_street":  { "type": "string", "minLength": 5,  "maxLength": 80  },
@@ -37,7 +39,7 @@ signup = {
     "required": [
         "email", "name", "password", "disability", "document", "country", "city", "phone",
         "address_street", "address_number", "address_state", "address_neighborhood",
-        "address_zipcode", "occupation", "education", "sex", "born_date"
+        "address_zipcode", "occupation", "education", "sex", "born_date","membership"
     ],
 }
 edit_account = copy.deepcopy(signup)
