@@ -24,6 +24,8 @@ class SurveyController(object):
     @jsoned
     def answer(self, account_id):
         answers = request.get_json().get('answers', None)
+        survey = request.get_json().get('survey', {}) #FIX
         if not answers: flask.abort(400)
-        result = self.service.save_answers(config.DEFAULT_SURVEY, answers, by_user=self.current_user)
+        survey_name = survey.get('name', None) or config.DEFAULT_SURVEY #FIX
+        result = self.service.save_answers(survey_name, answers, by_user=self.current_user)
         return {}, 200
