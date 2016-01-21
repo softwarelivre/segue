@@ -15,7 +15,7 @@ class SurveyAnswer(db.Model):
     account  = db.relationship('Account',  backref=db.backref('survey_answers', uselist=True, lazy='dynamic'))
 
     __table_args__ = (
-        db.UniqueConstraint('account_id', 'question', name='UK_account_question'),
+        db.UniqueConstraint('account_id', 'survey', 'question', name='UK_account_survey_question'),
     )
 
 class Question(object):
