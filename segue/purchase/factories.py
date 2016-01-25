@@ -54,8 +54,8 @@ class PaymentFactory(Factory):
                 amount = int(extra_data['amount'])
                 if amount >= 10:
                     payment.amount = amount
-		else:
-		    payment.amount = 10
+                else:
+                    amount = 0
         return payment
 
 
