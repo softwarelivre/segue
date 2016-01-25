@@ -1,6 +1,6 @@
 ---
 
-template: purchase_confirmation
+template: donation_confirmation
 language: pt
 subject: "#FISL17 - confirmação de pagamento"
 
@@ -8,14 +8,6 @@ body: |
 
     {customer.name},
 
-    **Ingresso confirmado!**
-
-    Seu pagamento foi recebido e processado com sucesso.
-
-    Código do ingresso: {purchase.id}
-    Tipo de ingresso: {product.description}
-    Valor do ingresso: R$ {product.price}
-
-    Saudações livres!
+    Obrigado por ter doado ...
 
     Comissão Organizadora do #FISL17
