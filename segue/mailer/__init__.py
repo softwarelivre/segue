@@ -73,6 +73,14 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def notify_promocode(self, purchase, promocode): #FIX REVIEW
+        customer = purchase.customer
+
+        message = self.message_factory.from_template('promocode/confirmation')
+        message.given(customer=customer, promocode=promocode)
+        message.to(customer.name, customer.email)
+
+
     def caravan_invite(self, invite):
         message = self.message_factory.from_template('caravan/invite')
         message.given(invite=invite, caravan=invite.caravan, owner=invite.caravan.owner)

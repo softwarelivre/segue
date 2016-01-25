@@ -1,0 +1,16 @@
+---
+
+template: promocode_confirmation
+language: pt
+subject: "#FISL17 - código promocional"
+
+body: |
+
+    {customer.name},
+
+    Parabéns você ganhou o código {promocode.hash_code} promocional
+
+    Saudações livres!
+
+    Comissão Organizadora do #FISL17
+
