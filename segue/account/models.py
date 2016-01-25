@@ -34,13 +34,13 @@ class Account(JsonSerializable, db.Model):
     email            = db.Column(db.Text, unique=True)
     dirty            = db.Column(db.Boolean, default=False)
     name             = db.Column(db.Text)
+    type             = db.Column(db.Enum(*schema.ACCOUNT_TYPES, name='account_types'), default='person')
     badge_name       = db.Column(db.Text)
     password         = db.Column(PasswordType(schemes=['pbkdf2_sha512']))
     disability       = db.Column(db.Enum(*schema.DISABILITY_TYPES, name='disability_types'), default='none')
     disability_info  = db.Column(db.Text)
     role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
     document         = db.Column(db.Text)
-    document_type    = db.Column(db.Enum('cpf', 'cnpj', 'passport', name='document_type')) #FIX REMOVE
 
     sex = db.Column(db.String(length=1))
     occupation = db.Column(db.Text)

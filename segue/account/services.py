@@ -116,6 +116,9 @@ class AccountService(object):
             password = data['password'] or ''
             password_confirm = data.pop('password_confirm')
             email_confirm = data.pop('email_confirm', '')
+            account_type = data['type'] or rules
+            if account_type == 'company':
+                rules = 'company_account'
             account = AccountFactory.from_json(data, schema.whitelist[rules])
             self._validate(account, password, password_confirm, email_confirm)
 
@@ -168,13 +171,6 @@ class AccountService(object):
         return reset
 
     def _validate(self, account, password, password_confirm, email_confirm=None):
-        #FIX ME
-        address = {
-            'zipcode': account.address_zipcode,
-            'country': account.country,
-            'state': account.address_state,
-            'city': account.city,
-        }
 
         if password != password_confirm:
             raise PasswordMismatch('password does not match')
@@ -182,19 +178,11 @@ class AccountService(object):
         if email_confirm and (account.email != email_confirm):
             raise EmailMismatch(email_confirm)
 
-        try:
-            if not AddressValidator(address).is_valid():
-                raise InvalidAddress()
-        except AddressFetcherError:
-            pass
-
-        if not DateValidator(account.born_date).is_valid():
-            raise InvalidDateFormat(account.born_date)
-
-        if account.is_brazilian:
-            if CNPJValidator(account.document).is_valid():
-                account.document_type = 'cnpj' #FIX contant
-            elif CPFValidator(account.document).is_valid():
-                account.document_type = 'cpf' #FIX contant
-            else:
+        if account.type == 'company':
+            if not CNPJValidator(account.document).is_valid():
                 raise InvalidDocumentNumber(account.document)
+        elif account.type == 'person':
+            if account.is_brazilian and not CPFValidator(account.document).is_valid():
+                raise InvalidDocumentNumber(account.document)
+            if not DateValidator(account.born_date).is_valid():
+                raise InvalidDateFormat(account.born_date)
