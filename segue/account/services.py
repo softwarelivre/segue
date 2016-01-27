@@ -16,7 +16,7 @@ from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword, CertificateNameAlreadySet
-from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, InvalidAddress, EmailMismatch
+from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, InvalidAddress, EmailMismatch, DocumentAlreadyExist
 
 
 import schema
@@ -186,3 +186,12 @@ class AccountService(object):
                 raise InvalidDocumentNumber(account.document)
             if not DateValidator(account.born_date).is_valid():
                 raise InvalidDateFormat(account.born_date)
+
+            document_query = db.session.query(Account.document)\
+                .filter(Account.document==account.document)
+
+            if account.id:
+                document_query = document_query.filter(Account.id!=account.id)
+
+            if document_query.first():
+                raise DocumentAlreadyExist(account.document)
