@@ -73,12 +73,19 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
-    def notify_promocode(self, purchase, promocode): #FIX REVIEW
-        customer = purchase.customer
+    def notify_promocode(self, customer, promocode): #FIX REVIEW
+        from segue.models import SurveyAnswer
+        survey = SurveyAnswer.query\
+            .filter(SurveyAnswer.survey=='fisl17_donation_shirt')\
+            .filter(SurveyAnswer.question=='size')\
+            .filter(SurveyAnswer.account_id==customer.id).all()
+
 
         message = self.message_factory.from_template('promocode/confirmation')
-        message.given(customer=customer, promocode=promocode)
+        message.given(customer=customer, promocode=promocode, survey=survey)
         message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
 
 
     def caravan_invite(self, invite):
