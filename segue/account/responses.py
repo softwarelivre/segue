@@ -30,7 +30,7 @@ class AccountResponse(BaseResponse):
         if account.type == 'person':
             self.born_date = account.born_date.strftime("%d/%m/%Y")
             self.disability       = account.disability
-            self.disability_info  = account.disability_info
+            self.disability_info  = account.disability_info or ''
             self.sex              = account.sex
             self.occupation       = account.occupation
             self.education        = account.education
