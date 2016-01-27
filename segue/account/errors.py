@@ -13,9 +13,14 @@ class AccountAlreadyHasPurchase(SegueError):
         return { 'message': 'this account already has a purchase' }
 
 class NoSuchAccount(SegueError):
-    code = 404
+    code = 400
     def to_json(self):
-        return { 'message': 'no such account' }
+        return { 'message': 'Esta conta de e-mail não foi encontrada no sistema!' }
+
+class DocumentAlreadyExist(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'Já existe um usuário utilizando esse documento no sistema!' }
 
 class InvalidLogin(SegueError):
     code = 400
