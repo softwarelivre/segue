@@ -139,19 +139,6 @@ class PurchaseService(object):
         return purchase
 
     def _validate_buyer(self, buyer):
-        #FIX ME
-        address = {
-            'zipcode': buyer.address_zipcode,
-            'country': buyer.address_country,
-            'state': buyer.address_state,
-            'city': buyer.address_city,
-        }
-        try:
-            if not AddressValidator(address).is_valid():
-                raise InvalidAddress()
-        except AddressFetcherError:
-            pass
-
         if buyer.is_brazilian():
             if buyer.kind == 'person':
                 if not CPFValidator(buyer.document).is_valid():
@@ -235,9 +222,22 @@ class PaymentService(object):
             db.session.commit()
 
             if purchase.satisfied:
-                # TODO: mailer should have special case for cash payments
                 logger.debug('transition is good payment! notifying customer via e-mail!')
-                self.mailer.notify_payment(purchase, payment)
+
+                if purchase.product.id == 1:#FIX OMG
+                    from segue.purchase.promocode import PromoCodeService
+                    from segue.models import Account, Product
+
+                    promo_product = Product.query.filter(Product.id==3).first()#OMG
+                    customer=purchase.customer
+                    pcs = PromoCodeService()
+                    promocode = pcs.create(promo_product, creator=customer, description='Vale ingresso doacao')[0]
+                    self.mailer.notify_promocode(customer, promocode)
+
+                if purchase.product.category == 'donation':
+                    self.mailer.notify_donation(purchase, payment)
+                else:
+                    self.mailer.notify_payment(purchase, payment)
 
                 # TODO: improve this code, caravan concerns should never live here!
                 if purchase.kind == 'caravan-rider':
