@@ -10,7 +10,8 @@ body: |
 
     Parabéns você ganhou o código {promocode.hash_code} promocional
 
+    Camisa tamanho {survey.answer}
+
     Saudações livres!
 
     Comissão Organizadora do #FISL17
-
