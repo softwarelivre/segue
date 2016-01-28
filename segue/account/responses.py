@@ -26,6 +26,7 @@ class AccountResponse(BaseResponse):
         self.address_zipcode  = account.address_zipcode
         self.student_document = account.student_document or ''
         self.type = account.type
+        self.dirty = account.dirty
 
         if account.type == 'person':
             self.born_date = account.born_date.strftime("%d/%m/%Y")
@@ -39,4 +40,8 @@ class AccountResponse(BaseResponse):
             self.organization      = account.organization or ''
             self.has_filled_survey = account.survey_answers.count() > 0
 
-
+        #REMOVE EMPTY VARIABLES
+        for v in self.__dict__.keys():
+            attr = getattr(self, v)
+            if isinstance(attr, basestring) and len(attr) == 0:
+                delattr(self, v)
