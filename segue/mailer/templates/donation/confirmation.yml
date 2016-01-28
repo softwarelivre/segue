@@ -2,12 +2,24 @@
 
 template: donation_confirmation
 language: pt
-subject: "#FISL17 - confirmação de pagamento"
+subject: "Confirmação de doação - ASL.Org"
 
 body: |
+    Caro {customer.name},
 
-    {customer.name},
+    MUITO obrigado pelo seu apoio !
 
-    Obrigado por ter doado ...
+    A Associação Software Livre.Org é a operadora através do qual viabilizamos o Projeto Software Livre Brasil, desde 2000. Uma das nossas ações mais conhecidas é o FISL, o nosso Fórum Internacional Software Livre, um dos maiores eventos mundiais da área e que este ano vai para sua 17ª edição. Também realizamos, junto com um coletivo de instituições, as duas últimas edições da Oficina de Inclusão Digital e Participação Social. Tem também a Rádio Software Livre, a TV Software Livre, a atuação no Marco Civil da Internet, além de várias ações visando a liberdade tecnológica e o compartilhamento de conhecimento, além de apoiar projetos e associações de software livre.
 
-    Comissão Organizadora do #FISL17
+    Para viabilizar tudo isso, captamos recursos junto a governos municipais, estaduais e federal, junto a empresas de grande, médio e pequeno porte e, finalmente, através de doações de pessoas como você, que reconhece a importância estratégica e a necessidade desse trabalho.
+
+    Agora chegou a vez de buscarmos a liberdade não só do software, mas do Projeto Software Livre Brasil, do Fórum Internacional Software Livre e de todas as ações promovidas pela ASL.Org, como o apoio a Startups Livres!
+
+    Por isso criamos esta campanha de doação, pois o Projeto Software Livre Brasil necessita do apoio de todos, sejam integrantes de comunidades de desenvolvimento, de usuários, de aplicativos, de grupos de robótica livre, de hackerspaces livres, da gente ligada à cultura livre, à inclusão digital, de todos e todas as pessoas engajadas na promoção da liberdade do conhecimento. Assim, poderemos ter os recursos necessários à execução desses projetos.
+
+    Engaje-se nesta campanha, convide a sua rede para participar e também apoiar a nossa causa.
+
+    Saudações livres,
+
+    Conselho Geral
+    Associação Software Livre.Org
