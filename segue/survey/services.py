@@ -22,7 +22,7 @@ class SurveyService(object):
 
         for label, answer in answers.items():
             if not answer: continue
-            if self._answer_exists(by_user, label): continue
+            if self._answer_exists(by_user, label, survey): continue
             entry = SurveyAnswer()
             entry.survey   = survey
             entry.question = label
@@ -33,5 +33,8 @@ class SurveyService(object):
         db.session.commit()
         return True
 
-    def _answer_exists(self, account, question):
-        return SurveyAnswer.query.filter(SurveyAnswer.account == account, SurveyAnswer.question == question).count() > 0
+    def _answer_exists(self, account, question, survey): #FIX
+        return SurveyAnswer.query\
+                   .filter(SurveyAnswer.account == account)\
+                   .filter(SurveyAnswer.question == question)\
+                   .filter(SurveyAnswer.survey == survey).count() > 0
