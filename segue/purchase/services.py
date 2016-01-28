@@ -69,7 +69,7 @@ class PurchaseService(object):
     def create(self, buyer_data, product, account, commit=True, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
         self._validate_buyer(buyer)
-        purchase = PurchaseFactory.get_or_create(buyer, product, account, **extra)
+        purchase = PurchaseFactory.create(buyer, product, account, **extra)
         logger.info(buyer_data)
 
         self.db.session.add(buyer)
@@ -169,6 +169,11 @@ class PaymentService(object):
 
     def create(self, purchase, method, extra_data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
+        if purchase.product_id == 2: #FIX DONATION PRODUCT WITHOUT VALUE
+            if purchase.payments.count() > 0: #SECOND TRY
+                from segue.core import logger
+                amount = purchase.payments[0].amount
+                extra_data['amount'] = amount
         processor = self.processor_for(method)
         payment = processor.create(purchase, extra_data)
         instructions = processor.process(payment)
@@ -234,7 +239,7 @@ class PaymentService(object):
                     promocode = pcs.create(promo_product, creator=customer, description='Vale ingresso doacao')[0]
                     self.mailer.notify_promocode(customer, promocode)
 
-                if purchase.product.category == 'donation':
+                elif purchase.product.category == 'donation':
                     self.mailer.notify_donation(purchase, payment)
                 else:
                     self.mailer.notify_payment(purchase, payment)
