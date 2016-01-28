@@ -43,5 +43,5 @@ class AccountResponse(BaseResponse):
         #REMOVE EMPTY VARIABLES
         for v in self.__dict__.keys():
             attr = getattr(self, v)
-            if isinstance(attr, basestring) and len(attr) == 0:
+            if isinstance(attr, basestring) and not attr:
                 delattr(self, v)
