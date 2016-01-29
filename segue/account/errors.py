@@ -20,7 +20,7 @@ class NoSuchAccount(SegueError):
 class DocumentAlreadyExist(SegueError):
     code = 400
     def to_json(self):
-        return { 'message': 'Já existe um usuário utilizando esse documento no sistema!' }
+        return { 'message': 'Já existe um usuário utilizando esse CPF ou CNPJ no sistema!' }
 
 class InvalidLogin(SegueError):
     code = 400
@@ -90,3 +90,13 @@ class EmailMismatch(SegueFieldError):
     def __init__(self, email):
         super(EmailMismatch, self).__init__()
         self.value = email
+
+
+class InvalidZipCodeNumber(SegueFieldError):
+    FIELD = 'address_zipcode'
+    LABEL = 'invalid_format'
+    MESSAGE = u'Código postal inválido'
+
+    def __init__(self, zipcode):
+        super(InvalidZipCodeNumber, self).__init__()
+        self.value = zipcode

@@ -8,6 +8,8 @@ from ..core import db
 
 from serializers import *
 
+import re
+
 class Buyer(JsonSerializable, db.Model):
     _serializers = [ BuyerJsonSerializer ]
     id              = db.Column(db.Integer, primary_key=True)
@@ -34,9 +36,11 @@ class Buyer(JsonSerializable, db.Model):
                 result[name] = getattr(self, field.key) or ''
         return result
 
-    def is_brazilian(self):
+
+    def is_brazilian(self): #FIX ME
         if self.address_country.upper() == 'BR':
             return True
+        return re.match(r"bra.*", self.address_country or '', re.IGNORECASE) != None
 
     @property
     def complete_address(self):

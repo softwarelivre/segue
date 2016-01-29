@@ -3,7 +3,7 @@ from datetime import datetime
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
 from segue.product.errors import NoSuchProduct, ProductExpired
-from segue.validation import CPFValidator, CNPJValidator, AddressValidator, AddressFetcherError
+from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
@@ -15,7 +15,7 @@ from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
 from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale
-from errors    import InvalidDocumentNumber, InvalidAddress
+from errors    import InvalidDocumentNumber, InvalidZipCodeNumber
 
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 
@@ -146,6 +146,10 @@ class PurchaseService(object):
             elif buyer.kind == 'company':
                 if not CNPJValidator(buyer.document).is_valid():
                     raise InvalidDocumentNumber(buyer.document)
+            from segue.core import logger
+            logger.error('Teste')
+            if not ZipCodeValidator(buyer.address_zipcode, 'BR').is_valid():
+                raise InvalidZipCodeNumber(buyer.address_zipcode)
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
