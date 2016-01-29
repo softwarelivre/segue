@@ -36,7 +36,7 @@ signup = {
         "address_extra":   { "type": "string", "minLength": 0,  "maxLength": 40  },
         "address_state":   { "type": "string", "minLength": 2,  "maxLength": 2  },
         "address_neighborhood": { "type": "string", "minLength": 2,  "maxLength": 20  },
-        "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 10  },
+        "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 9  },
 
     },
     "required": [

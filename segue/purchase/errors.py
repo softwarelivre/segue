@@ -58,3 +58,13 @@ class InvalidDocumentNumber(SegueFieldError):
     def __init__(self, document):
         super(InvalidDocumentNumber, self).__init__()
         self.value = document
+
+
+class InvalidZipCodeNumber(SegueFieldError):
+    FIELD = 'address_zipcode'
+    LABEL = 'invalid_format'
+    MESSAGE = u'Código postal inválido'
+
+    def __init__(self, zipcode):
+        super(InvalidZipCodeNumber, self).__init__()
+        self.value = zipcode

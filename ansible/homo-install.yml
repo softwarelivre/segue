@@ -1,0 +1,15 @@
+---
+
+- hosts: homo
+  sudo: true
+  roles:
+    - git-down
+    - server
+    - certificates
+    - recordings
+    - database
+    - segue
+    - DavidWittman.redis
+
+  vars_files:
+    - secret/homo.yml

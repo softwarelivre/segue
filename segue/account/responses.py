@@ -29,7 +29,8 @@ class AccountResponse(BaseResponse):
         self.dirty = account.dirty
 
         if account.type == 'person':
-            self.born_date = account.born_date.strftime("%d/%m/%Y")
+            if account.born_date:
+                self.born_date = account.born_date.strftime("%d/%m/%Y")
             self.disability       = account.disability
             self.disability_info  = account.disability_info or ''
             self.sex              = account.sex
@@ -45,3 +46,5 @@ class AccountResponse(BaseResponse):
             attr = getattr(self, v)
             if isinstance(attr, basestring) and not attr:
                 delattr(self, v)
+
+        self.address_extra    = account.address_extra or ''
