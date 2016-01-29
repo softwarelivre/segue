@@ -6,7 +6,7 @@ from ..core import logger
 from ..core import db
 from ..hasher import Hasher
 
-from segue.validation import CNPJValidator, CPFValidator, DateValidator, AddressValidator, AddressFetcherError
+from segue.validation import CNPJValidator, CPFValidator, DateValidator, ZipCodeValidator
 from segue.mailer import MailerService
 from ..filters import FilterStrategies
 
@@ -16,7 +16,7 @@ from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword, CertificateNameAlreadySet
-from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, InvalidAddress, EmailMismatch, DocumentAlreadyExist
+from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, EmailMismatch, DocumentAlreadyExist, InvalidZipCodeNumber
 
 
 import schema
@@ -195,3 +195,7 @@ class AccountService(object):
 
             if document_query.first():
                 raise DocumentAlreadyExist(account.document)
+
+        if account.is_brazilian:
+            if not ZipCodeValidator(account.address_zipcode, 'BR').is_valid():
+                raise InvalidZipCodeNumber(account.address_zipcode)

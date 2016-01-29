@@ -86,79 +86,48 @@ class DateValidator(object):
 
     def is_valid(self):
         try:
-            datetime.strptime(self.date, DateValidator.DATE_FORMAT)
-            return True
+            date = datetime.strptime(self.date, DateValidator.DATE_FORMAT)
+            if date >= datetime(1970, 1, 1):
+                return True
+            else:
+                return False
         except ValueError:
             return False
 
-
-class AddressFetcherError(Exception):
-    pass
-
-
 class AddressFetcher(object):
-
-    API = 'http://maps.googleapis.com/maps/api/geocode/json'
 
     def __init__(self):
         self.api = AddressFetcher.API
         self.data = {}
 
-    def fetch(self, zipcode):
-        try:
-            params = {'sensor': 'false', 'address': str(zipcode)}
-            request = requests.get(self.api, params=params)
-            response = request.json()
-            if response['status'] == 'OK':
-                self.data['zipcode'] = str(zipcode)
-                for address_compent in response['results'][0]['address_components']:
-                    if address_compent['types'][0] == u'country':
-                        self.data['country'] = address_compent['short_name']
-                    if address_compent['types'][0] == 'administrative_area_level_1':
-                        self.data['state'] = address_compent['short_name']
-                    if address_compent['types'][0] == 'administrative_area_level_2':
-                        self.data['city'] = address_compent['long_name']
-        except ValueError:
-            self.data = {}
-            raise AddressFetcherError("Error while fetching data")
 
-    @property
-    def city(self):
-        return self.data['city']
+class ZipCodeValidator(object):
 
-    @property
-    def state(self):
-        return self.data['state']
+    API = 'http://maps.googleapis.com/maps/api/geocode/json'
 
-    @property
-    def country(self):
-        return self.data['country']
-
-    @property
-    def zipcode(self):
-        return self.data['zipcode']
-
-    def has_data(self):
-        return bool(self.data)
-
-class AddressValidator(object):
-
-    """ address = {zipcode = '99999999', state = 'UF', city = 'city'} """
-    def __init__(self, address, address_fetcher=None):
-        self.address_fetcher = address_fetcher or AddressFetcher()
-        self.address = address
+    def __init__(self, zipcode, country):
+        self.zipcode = zipcode
+        self.country = country
         self.valid = False
+        self.api = ZipCodeValidator.API
 
     def is_valid(self):
         self._validate()
         return self.valid
 
     def _validate(self):
-        self.address_fetcher.fetch(self.address['zipcode'])
-        if self.address_fetcher.has_data():
-            if (self.address_fetcher.country.lower() == self.address['country'].lower() and
-                self.address_fetcher.state.lower() == self.address['state'].lower() and
-                self.address_fetcher.city.lower() == self.address['city'].lower()):
+        try:
+            componets = 'postal_code:{}|country:{}'.format(self.zipcode, self.country)
+            params = {
+                'sensor': 'false',
+                'components': componets
+            }
+            request = requests.get(self.api, params=params)
+            response = request.json()
+            if response['status'] == 'OK':
                 self.valid = True
-        else:
-            self.valid = False
+            else:
+                self.valid = False
+        except Exception as ex:
+            self.valid = True #IO EXCEPTION
+
