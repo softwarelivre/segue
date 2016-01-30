@@ -111,7 +111,12 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def outstanding_amount(self):
-        return self.product.price - self.paid_amount
+        if self.product.price: #PRODCUT WITH PRICE
+            return self.product.price - self.paid_amount
+        elif self.paid_amount: #PRODUCT WITH PRICE AND PAID
+            return 0 #ACCEPT
+        else:
+            return self.product.price - self.paid_amount
 
     @property
     def has_started_payment(self):
