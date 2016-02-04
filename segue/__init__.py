@@ -24,6 +24,7 @@ class Application(flask.Flask):
         self._register_error_handlers()
         self._init_deps()
         self._load_cors()
+        self._load_babel()
 
     def _load_configs(self, settings_override):
         try:
@@ -47,6 +48,14 @@ class Application(flask.Flask):
 
     def _load_cors(self):
         self.cors = CORS(self)
+
+    def _load_babel(self):
+        def get_locale():
+            return flask.request.\
+                accept_languages.best_match(core.config.LANGUAGES or 'pt')
+
+        core.babel.init_app(self)
+        core.babel.locale_selector_func = get_locale
 
     def _register_error_handlers(self):
         def handler(e):
