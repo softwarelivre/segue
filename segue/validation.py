@@ -87,7 +87,7 @@ class DateValidator(object):
     def is_valid(self):
         try:
             date = datetime.strptime(self.date, DateValidator.DATE_FORMAT)
-            if date >= datetime(1970, 1, 1):
+            if date >= datetime(1900, 1, 1):
                 return True
             else:
                 return False
