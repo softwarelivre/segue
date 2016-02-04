@@ -1,5 +1,5 @@
 import os.path
-from datetime import date
+from datetime import date, timedelta
 
 from pyboleto.bank.bancodobrasil import BoletoBB
 from pyboleto.pdf import BoletoPDF
@@ -79,7 +79,7 @@ class BoletoFactory(object):
         boleto.cedente_endereco  = config.BOLETO_ENDERECO
         boleto.cedente           = config.BOLETO_EMPRESA
 
-        boleto.data_vencimento    = payment.due_date
+        boleto.data_vencimento    = date.today() + timedelta(days=3)
         boleto.data_documento     = date.today()
         boleto.data_processamento = date.today()
 
