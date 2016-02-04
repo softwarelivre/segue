@@ -1,7 +1,9 @@
 import flask_sqlalchemy
 import flask_jwt
 import flask_mail
+from flask_babel import Babel
 from flask.ext.cache import Cache
+
 
 def log(*args):
     with open("/tmp/segue.log", "a+") as logfile:
@@ -33,6 +35,7 @@ mailer = flask_mail.Mail()
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 config = Config()
 logger = Logger()
+babel = Babel(configure_jinja=False)
 
 jwt_required = flask_jwt.jwt_required
 
