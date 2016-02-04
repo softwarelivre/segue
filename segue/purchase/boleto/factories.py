@@ -79,6 +79,7 @@ class BoletoFactory(object):
         boleto.cedente_endereco  = config.BOLETO_ENDERECO
         boleto.cedente           = config.BOLETO_EMPRESA
 
+        #TODO: REMOVE HARD CODING PAYMENT LIMIT DATE
         boleto.data_vencimento    = date.today() + timedelta(days=3)
         boleto.data_documento     = date.today()
         boleto.data_processamento = date.today()
