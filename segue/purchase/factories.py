@@ -23,6 +23,9 @@ class PurchaseFactory(Factory):
         result = effective_class(**extra_fields)
         result.buyer = buyer
         result.product = product
+        #TODO: IMPROVE CALCULATE THE AMOUNT OF THE PURCHASE
+        if not result.amount:
+            result.amount = product.price
         result.customer = account
         return result
 
