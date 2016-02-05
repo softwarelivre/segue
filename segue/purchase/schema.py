@@ -2,6 +2,7 @@ BUYER_TYPES = ['person','company','government']
 CPF_CNPJ_PATTERN = r"(^\d{3}.?\d{3}.?\d{3}.?\d{2}$)|(^\d{2}.?\d{3}.?\d{3}.?\d{4}.?\d{2}$)"
 NAME_PATTERN = r"(.*)\s(.*)"
 
+#TODO: ADD AMOUNT FIELD FOR PRODUCTS WITHOUT PRICE
 buyer = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",

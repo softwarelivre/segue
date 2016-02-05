@@ -122,3 +122,13 @@ class GovernmentProduct(Product):
 
 class DonationProduct(Product):
     __mapper_args__ = {'polymorphic_identity': 'donation'}
+
+
+    def extra_purchase_fields_for(self, buyer_data):
+        """ Used in service.purchase for get the data from the request and send to the model"""
+
+        #A donation without a fixed price
+        if not self.price:
+            if 'amount' in buyer_data:
+                return {'amount': buyer_data['amount']}
+        return {}
