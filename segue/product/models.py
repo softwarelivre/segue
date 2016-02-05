@@ -2,9 +2,10 @@ from datetime import datetime
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
-from errors import ProductExpired
+from errors import ProductExpired, MinimumAmount
 from segue.corporate.models import CorporatePurchase
 from segue.purchase.promocode.models import PromoCode
+
 
 class ProductJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
@@ -123,12 +124,14 @@ class GovernmentProduct(Product):
 class DonationProduct(Product):
     __mapper_args__ = {'polymorphic_identity': 'donation'}
 
-
     def extra_purchase_fields_for(self, buyer_data):
         """ Used in service.purchase for get the data from the request and send to the model"""
 
         #A donation without a fixed price
         if not self.price:
             if 'amount' in buyer_data:
+                amount = float(buyer_data['amount'])
+                if amount < 10:
+                    raise MinimumAmount()
                 return {'amount': buyer_data['amount']}
         return {}
