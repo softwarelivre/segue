@@ -53,7 +53,9 @@ class Purchase(JsonSerializable, db.Model):
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
     customer_id    = db.Column(db.Integer, db.ForeignKey('account.id'))
     buyer_id       = db.Column(db.Integer, db.ForeignKey('buyer.id'))
+    #TODO: Create a enum for status. Status from database an old database ( pending, paid, reimbursed, stale)
     status         = db.Column(db.Text, default='pending')
+    amount         = db.Column(db.Float(precision=3))
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.now)
     kind           = db.Column(db.Text, server_default='single')
@@ -111,16 +113,11 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def outstanding_amount(self):
-        if self.product.price: #PRODCUT WITH PRICE
-            return self.product.price - self.paid_amount
-        elif self.paid_amount: #PRODUCT WITH PRICE AND PAID
-            return 0 #ACCEPT
-        else:
-            return self.product.price - self.paid_amount
+        return self.amount - self.paid_amount
 
     @property
     def has_started_payment(self):
-        return self.outstanding_amount < self.product.price
+        return self.outstanding_amount < self.amount
 
     @property
     def satisfied(self):
