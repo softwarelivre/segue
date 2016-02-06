@@ -58,6 +58,23 @@ class PurchaseController(object):
         result = self.service.check_promocode(hash, by=self.current_user) or flask.abort(404)
         return PromoCodeResponse(result), 200
 
+    @jsoned
+    def donations_count(self):
+        #TODO: FIX
+        from segue.core import db
+        from segue.models import Purchase
+        from segue.models import Product
+        from sqlalchemy import func
+
+        result = db.session.query(func.count(Purchase.id))\
+            .join(Product).filter(Purchase.status=='paid')\
+            .filter(Product.category=='donation')\
+            .scalar() or 0
+
+        return {'total': result}
+
+
+
 class PaymentController(object):
     def __init__(self, service=None):
         self.service = service or PaymentService()
