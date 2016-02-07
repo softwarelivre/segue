@@ -146,8 +146,6 @@ class PurchaseService(object):
             elif buyer.kind == 'company':
                 if not CNPJValidator(buyer.document).is_valid():
                     raise InvalidDocumentNumber(buyer.document)
-            from segue.core import logger
-            logger.error('Teste')
             if not ZipCodeValidator(buyer.address_zipcode, 'BR').is_valid():
                 raise InvalidZipCodeNumber(buyer.address_zipcode)
 
