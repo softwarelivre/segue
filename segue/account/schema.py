@@ -1,10 +1,9 @@
 import copy
 
-ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier"]
+ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "coporate"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
 DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
-ACCOUNT_TYPES = ["person", "company"]
 
 signup = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -13,7 +12,6 @@ signup = {
         "email":        { "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
 	"email_confirm":{ "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
         "name":         { "type": "string", "minLength": 5,  "maxLength": 80, "pattern": NAME_PATTERN},
-        "type":   { "type": "string", "enum": ACCOUNT_TYPES },
         "badge_name":         { "type": "string",  "maxLength": 80},
         "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
         "password_confirm":     { "type": "string", "minLength": 5,  "maxLength": 80 },
@@ -48,21 +46,21 @@ signup = {
 edit_account = copy.deepcopy(signup)
 edit_account['required'].remove('password')
 
-company_account = copy.deepcopy(signup)
-company_account['required'].remove('occupation')
-company_account['required'].remove('education')
-company_account['required'].remove('sex')
-company_account['required'].remove('born_date')
-company_account['required'].remove('membership')
+corporate = copy.deepcopy(signup)
+corporate['required'].remove('occupation')
+corporate['required'].remove('education')
+corporate['required'].remove('sex')
+corporate['required'].remove('born_date')
+corporate['required'].remove('membership')
 
-del company_account['properties']['occupation']
-del company_account['properties']['education']
-del company_account['properties']['sex']
-del company_account['properties']['born_date']
-del company_account['properties']['membership']
+del corporate['properties']['occupation']
+del corporate['properties']['education']
+del corporate['properties']['sex']
+del corporate['properties']['born_date']
+del corporate['properties']['membership']
 
-edit_company_account = copy.deepcopy(company_account)
-edit_company_account['required'].remove('password')
+edit_corporate = copy.deepcopy(corporate)
+edit_corporate['required'].remove('password')
 
 reset = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -89,9 +87,9 @@ admin_edit = admin_create.copy()
 
 whitelist = dict(
   signup=signup,
-  company_account=company_account,
+  corporate=corporate,
   edit_account=edit_account,
-  edit_company_account=edit_company_account,
+  edit_corporate=edit_corporate,
   reset=reset,
   admin_create=admin_create,
   admin_edit=admin_edit
