@@ -116,10 +116,12 @@ class AccountService(object):
             password = data['password'] or ''
             password_confirm = data.pop('password_confirm')
             email_confirm = data.pop('email_confirm', '')
-            account_type = data['type'] or rules
-            if account_type == 'company':
-                rules = 'company_account'
+            account_type = data.pop('type', None)
+            if account_type == 'corporate':
+                rules = 'corporate'
             account = AccountFactory.from_json(data, schema.whitelist[rules])
+            if account_type == 'corporate':
+                account.role = 'corporate'
             self._validate(account, password, password_confirm, email_confirm)
 
             if not account.password: account.password = self.hasher.generate()
@@ -178,10 +180,10 @@ class AccountService(object):
         if email_confirm and (account.email != email_confirm):
             raise EmailMismatch(email_confirm)
 
-        if account.type == 'company':
+        if account.role == 'corporate':
             if not CNPJValidator(account.document).is_valid():
                 raise InvalidDocumentNumber(account.document)
-        elif account.type == 'person':
+        else:
             if account.is_brazilian and not CPFValidator(account.document).is_valid():
                 raise InvalidDocumentNumber(account.document)
             if not DateValidator(account.born_date).is_valid():
