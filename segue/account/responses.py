@@ -25,10 +25,9 @@ class AccountResponse(BaseResponse):
         self.address_extra    = account.address_extra or ''
         self.address_zipcode  = account.address_zipcode
         self.student_document = account.student_document or ''
-        self.type = account.type
         self.dirty = account.dirty
 
-        if account.type == 'person':
+        if account.role != 'corporate':
             if account.born_date:
                 self.born_date = account.born_date.strftime("%d/%m/%Y")
             self.disability       = account.disability
