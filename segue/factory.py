@@ -7,7 +7,7 @@ from errors import SegueValidationError
 class Factory(object):
     @classmethod
     def clean_for_insert(cls, data):
-        return data;
+        return data
 
     @classmethod
     def from_json(cls, data, schema):
