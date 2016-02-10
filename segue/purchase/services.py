@@ -171,11 +171,6 @@ class PaymentService(object):
 
     def create(self, purchase, method, extra_data):
         if purchase.satisfied: raise PurchaseAlreadySatisfied()
-        if purchase.product_id == 2: #FIX DONATION PRODUCT WITHOUT VALUE
-            if purchase.payments.count() > 0: #SECOND TRY
-                from segue.core import logger
-                amount = purchase.payments[0].amount
-                extra_data['amount'] = amount
         processor = self.processor_for(method)
         payment = processor.create(purchase, extra_data)
         instructions = processor.process(payment)
