@@ -2,7 +2,7 @@ from werkzeug.wrappers import Response
 from functools import wraps
 import flask
 
-from segue.errors import NotAuthorized
+from segue.errors import NotAuthorized, SegueError
 from segue.core import jwt_required, logger
 
 def admin_only(fn):
@@ -53,12 +53,16 @@ def jsoned(f):
         result = f(*args, **kwargs)
         if isinstance(result, Response):
             return result
+
         if isinstance(result, tuple):
             result, status = result
+
         if isinstance(result, list):
             return flask.jsonify(dict(count=len(result),items=result)), status
         elif isinstance(result, dict):
             return flask.jsonify(dict(**result)), status
+        elif isinstance(result, SegueError):
+            return flask.jsonify(dict(error=result)), status
         elif hasattr(result, 'to_json'):
             return flask.jsonify(dict(resource=result.to_json())), status
         else:
