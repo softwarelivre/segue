@@ -1,12 +1,12 @@
 import flask
 import decimal
 import datetime
+from speaklater import _LazyString
 
 import core
 
-
-
 class JSONEncoder(flask.json.JSONEncoder):
+
     def default(self, obj):
         if isinstance(obj, decimal.Decimal):
             return "{0:0.2f}".format(obj)
@@ -18,6 +18,9 @@ class JSONEncoder(flask.json.JSONEncoder):
             return obj.serialize()
         if isinstance(obj, SimpleJson):
             return obj.to_json()
+        if isinstance(obj, _LazyString):
+            return unicode(obj)
+        print type(obj)
         return super(JSONEncoder, self).default(obj)
 
 class SimpleJson(object):
