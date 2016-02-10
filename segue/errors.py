@@ -56,8 +56,8 @@ class SchemaValidationError(SegueError):
         :param message: default error message Eg: 'Validation Error'
         """
         self.errors = errors
-        self.message = message or SegueSchemaError.message
-        super(SegueSchemaError, self).__init__()
+        self.message = message or SchemaValidationError.message
+        super(SchemaValidationError, self).__init__()
 
     def to_json(self):
         return {'message': self.message, 'errors': self.errors }
