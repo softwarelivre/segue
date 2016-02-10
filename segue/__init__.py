@@ -76,6 +76,7 @@ class Application(flask.Flask):
         core.jwt.init_app(self)
         core.mailer.init_app(self)
         core.cache.init_app(self)
+        core.ma.init_app(self)
 
     def _set_json_encoder(self):
         self.json_encoder = json.JSONEncoder
