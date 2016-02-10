@@ -1,7 +1,7 @@
 import flask_sqlalchemy
 import flask_jwt
 import flask_mail
-from flask_babel import Babel
+from flask.ext.babelex import Babel
 from flask_marshmallow import Marshmallow
 from flask.ext.cache import Cache
 
