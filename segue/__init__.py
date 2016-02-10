@@ -2,6 +2,7 @@ from werkzeug.utils import ImportStringError
 import logging, logging.handlers
 import flask
 from flask.ext.cors import CORS
+from decorators import jsoned
 
 import core
 import api
@@ -58,8 +59,9 @@ class Application(flask.Flask):
         core.babel.locale_selector_func = get_locale
 
     def _register_error_handlers(self):
+        @jsoned
         def handler(e):
-            return flask.jsonify(dict(errors=e)), getattr(e, 'code', 400)
+            return e, getattr(e, 'code', 400)
         self.errorhandler(errors.SegueError)(handler)
 
     def _set_debug(self):
