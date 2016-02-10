@@ -1,5 +1,6 @@
 -e git+https://github.com/avelino/pycorreios@c3476174073ec888afbafb690de097dae6ce121e#egg=pycorreios-master
 -e git+https://github.com/dwolff/python-pagseguro@f7ab95c492a1a6dbfbee1798bf7b8c07cb72e9f9#egg=pagseguro-with_sandbox
+-e git+https://github.com/rgerhardt/pyboleto.git@93172cf0b63fe5aac8aed022101ffaf45302ef87#egg=pyboleto-master
 redis==2.10.3
 rq==0.5.3
 BeautifulSoup==3.2.1
@@ -36,7 +37,6 @@ nosecomplete==0.1.0
 passlib==1.6.2
 psycopg2==2.5.4
 pyPdf==1.13
-pyboleto==0.2.14
 python-dateutil==2.4.2
 python-magic==0.4.6
 reportlab==3.1.44
