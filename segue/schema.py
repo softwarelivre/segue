@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import fields, schema, validate
-from flask_babel import gettext, lazy_gettext
+from flask.ext.babelex import lazy_gettext
 from segue.core import ma
 
 
@@ -36,21 +36,15 @@ class Field(object):
     def int(*args, **kwargs):
         return Field.create(fields.Integer, *args, **kwargs)
 
-    @classmethod
+    @staticmethod
     def create(cls, *args, **kwargs):
 
         msgs = Field.DEFAULT_MSGS.copy()
         msgs.update(Field.CLS_MSGS.get(cls.__name__, {}))
         msgs.update(kwargs.get('error_messages', {}))
+        kwargs['error_messages'] = msgs
 
-        # evaluate lazy messages
-        error_messages = {}
-        for k, v in msgs.items():
-            error_messages[k] = unicode(v)
-
-        kwargs['error_messages'] = error_messages
-
-        return cls(kwargs, *args, **kwargs)
+        return cls(*args, **kwargs)
 
 
 #class Validator(object):
