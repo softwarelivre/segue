@@ -113,8 +113,8 @@ class AccountService(object):
 
     def create(self, data, rules='signup'):
         try:
-            password = data['password'] or ''
-            password_confirm = data.pop('password_confirm')
+            password = data.get('password', '')
+            password_confirm = data.pop('password_confirm', None)
             email_confirm = data.pop('email_confirm', '')
             account_type = data.pop('type', None)
             if account_type == 'corporate':
