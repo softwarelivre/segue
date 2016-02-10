@@ -45,6 +45,23 @@ class SegueValidationError(SegueError):
                     break
         return result
 
+class SchemaValidationError(SegueError):
+    code = 422
+    #TODO: Translate
+    message = 'Validation error'
+
+    def __init__(self, errors, message=''):
+        """
+        :param erros: expected format: {'field_1':['erro'],'field_2':['erro']}
+        :param message: default error message Eg: 'Validation Error'
+        """
+        self.errors = errors
+        self.message = message or SegueSchemaError.message
+        super(SegueSchemaError, self).__init__()
+
+    def to_json(self):
+        return {'message': self.message, 'errors': self.errors }
+
 class NotAuthorized(SegueError):
     code = 403
     def to_json(self):
