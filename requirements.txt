@@ -49,3 +49,8 @@ xmltodict==0.9.2
 locustio==0.7.3
 inflection==0.3.1
 odswriter==0.2.0
+Babel==2.2.0
+Flask-Babel==0.9
+flask-marshmallow==0.6.2
+marshmallow==2.6.0
+marshmallow-validators==2.0.0
