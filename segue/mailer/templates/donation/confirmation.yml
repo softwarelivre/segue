@@ -5,7 +5,7 @@ language: pt
 subject: "Confirmação de doação - ASL.Org"
 
 body: |
-    Caro {customer.name},
+    Car@ {customer.name},
 
     MUITO obrigado pelo seu apoio !
 
