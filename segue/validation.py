@@ -117,6 +117,10 @@ class ZipCodeValidator(object):
 
     def _validate(self):
         try:
+            # TODO: ZIPCODE NOT FOUND BY GOOGLE
+            if self.zipcode == '80520-176':
+                self.valid = True
+                return
             componets = 'postal_code:{}|country:{}'.format(self.zipcode, self.country)
             params = {
                 'sensor': 'false',
