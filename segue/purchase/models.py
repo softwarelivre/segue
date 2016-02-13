@@ -55,7 +55,7 @@ class Purchase(JsonSerializable, db.Model):
     buyer_id       = db.Column(db.Integer, db.ForeignKey('buyer.id'))
     #TODO: Create a enum for status. Status from database an old database ( pending, paid, reimbursed, stale)
     status         = db.Column(db.Text, default='pending')
-    amount         = db.Column(db.Float(precision=3))
+    amount         = db.Column(db.Numeric)
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.now)
     kind           = db.Column(db.Text, server_default='single')
