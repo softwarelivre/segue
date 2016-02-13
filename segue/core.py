@@ -36,7 +36,7 @@ mailer = flask_mail.Mail()
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 config = Config()
 logger = Logger()
-babel = Babel(configure_jinja=False)
+babel = Babel(default_locale='pt', configure_jinja=False)
 ma = Marshmallow()
 
 jwt_required = flask_jwt.jwt_required
