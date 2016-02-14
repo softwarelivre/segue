@@ -102,10 +102,15 @@ class AccountService(object):
         db.session.commit()
         return account
 
-    def lookup(self, needle, by=None):
+    def lookup(self, needle, by=None, limit=0):
+        #TODO: IMPROVE THIS FUNCTION
         base    = self.filters.all_joins(Account.query, needle)
         filters = self.filters.needle(needle, by)
-        return base.filter(or_(*filters)).all()
+        queryset = base.filter(or_(*filters))
+        if limit:
+            return queryset.limit(limit).all()
+        else:
+            return queryset.all()
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)

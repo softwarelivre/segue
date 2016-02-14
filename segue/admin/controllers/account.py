@@ -36,7 +36,7 @@ class AdminAccountController(object):
     @admin_only
     def list(self):
         criteria = request.args.get('q')
-        result = self.accounts.lookup(criteria)[:20]
+        result = self.accounts.lookup(criteria, limit=20)
         return AccountDetailResponse.create(result), 200
 
     @jsoned
