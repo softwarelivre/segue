@@ -12,6 +12,7 @@ ansible/secret/files
 *.bbt
 migrations/manual/fisl16/s*.sql
 src
+scripts
 states.cache
 .DS_*
 TODO
