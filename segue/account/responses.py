@@ -45,5 +45,3 @@ class AccountResponse(BaseResponse):
             attr = getattr(self, v)
             if isinstance(attr, basestring) and not attr:
                 delattr(self, v)
-
-        self.address_extra    = account.address_extra or ''
