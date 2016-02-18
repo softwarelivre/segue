@@ -1,7 +1,9 @@
 from segue.factory import Factory
+from segue.hasher import Hasher
 
 import schema
-from models import Buyer, Purchase, Payment, Transition, ExemptPurchase
+from datetime import datetime
+from models import Buyer, Purchase, Payment, Transition, ExemptPurchase, ClaimCheck
 
 class BuyerFactory(Factory):
     model = Buyer
@@ -62,3 +64,13 @@ class TransitionFactory(Factory):
         transition.source = source
         transition.old_status = payment.status
         return transition
+
+class DonationClaimCheckFactory(Factory):
+
+    def __init__(self, hasher=None):
+        self.hasher = hasher or Hasher(10)
+
+    def create(self, purchase):
+        date = datetime.now()
+        hash_code = self.hasher.generate()
+        return ClaimCheck(purchase, date=date, hash_code=hash_code)

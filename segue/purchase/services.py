@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
@@ -18,6 +19,8 @@ from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, P
 from errors    import InvalidDocumentNumber, InvalidZipCodeNumber
 
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
+from segue.purchase.factories import DonationClaimCheckFactory
+from segue.document.services import DocumentService
 
 import schema
 
@@ -237,7 +240,18 @@ class PaymentService(object):
                     self.mailer.notify_promocode(customer, promocode)
 
                 elif purchase.product.category == 'donation':
-                    self.mailer.notify_donation(purchase, payment)
+                    document = DocumentService()
+                    claim_check = DonationClaimCheckFactory().create(purchase)
+                    #TODO: svg_to_pdf return the full path or a tuple
+                    doc = document.svg_to_pdf(
+                        claim_check.template_file,
+                        'claimcheck',
+                        claim_check.hash_code,
+                        variables=claim_check.template_vars)
+
+                    file_path = document.path_for_filename(os.path.join(config.APP_PATH, 'data'), doc)
+
+                    self.mailer.notify_donation(purchase, payment, file_path)
                 else:
                     self.mailer.notify_payment(purchase, payment)
 
