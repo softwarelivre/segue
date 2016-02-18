@@ -1,30 +1,40 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import fields, schema, validate
-from flask.ext.babelex import lazy_gettext
+
+from segue.babel import _l
 from segue.core import ma
+from segue.core import config
 
 
 class BaseSchema(ma.Schema):
-    pass
 
+    class Meta:
+        dateformat="%d/%m/%Y"
 
 class Field(object):
     """A factory for create marshmallow fields with internationalization messages"""
 
     DEFAULT_MSGS = {
-        'required': lazy_gettext('Missing data for required field.'),
-        'type': lazy_gettext('Invalid input type.'),
-        'null': lazy_gettext('Field may not be null.'),
-        'validator_failed': lazy_gettext('Invalid value.')
+        'required': _l('Missing data for required field.'),
+        'type': _l('Invalid input type.'),
+        'null': _l('Field may not be null.'),
+        'validator_failed': _l('Invalid value.')
     }
 
     CLS_MSGS = {
         'Integer': {
-            'invalid': lazy_gettext('Not a valid integer.')
+            'invalid': _l('Not a valid integer.')
         },
         'String': {
-            'invalid': lazy_gettext('Not a valid string.')
+            'invalid': _l('Not a valid string.')
+        },
+        'Boolean': {
+            'invalid': _l('Not a valid boolean.'),
+        },
+        'Date': {
+            'invalid': _l('Not a valid date.'),
+            'format': _l('"{input}" cannot be formatted as a date.'),
         }
     }
 
@@ -37,6 +47,14 @@ class Field(object):
         return Field.create(fields.Integer, *args, **kwargs)
 
     @staticmethod
+    def date(*args, **kwargs):
+        return Field.create(fields.Date, *args, **kwargs)
+
+    @staticmethod
+    def bool(*args, **kwargs):
+        return Field.create(fields.Boolean, *args, **kwargs)
+
+    @staticmethod
     def create(cls, *args, **kwargs):
 
         msgs = Field.DEFAULT_MSGS.copy()
@@ -47,12 +65,34 @@ class Field(object):
         return cls(*args, **kwargs)
 
 
-#class Validator(object):
-#
-#    @staticmethod
-#    def OneOf(*args, **kwargs):
-#        pass
-#
-#    @staticmethod
-#    def create(cls, *args, **kwargs):
-#        return cls(min=4, error=gettext('Must be at least {min}.'))
+class Validator(object):
+
+    MSGS = {
+        'oneOf': _l('Not a valid choice.'),
+        'email': _l('Not a valid email address.'),
+        'length_min': _l('Shorter than minimum length {min}.'),
+        'length_max': _l('Longer than maximum length {max}.'),
+        'length_all': _l('Length must be between {min} and {max}.'),
+        'length_equal': _l('Length must be {equal}.')
+    }
+
+    @staticmethod
+    def email():
+        return validate.Email(error=Validator.MSGS['email'])
+
+    @staticmethod
+    def length(min=None, max=None, equal=None):
+        error = None
+        if equal:
+            error = Validator.MSGS['length_equal']
+        elif min and max:
+            error = Validator.MSGS['length_all']
+        elif min:
+            error = Validator.MSGS['length_min']
+        elif max:
+            error = Validator.MSGS['length_max']
+        return validate.Length(min=min, max=max, equal=equal, error=error)
+
+    @staticmethod
+    def one_of(choices=None):
+        return validate.OneOf(choices, error=Validator.MSGS['oneOf'])
