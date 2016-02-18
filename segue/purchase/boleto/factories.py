@@ -21,7 +21,8 @@ class BoletoPaymentFactory(PaymentFactory):
 
     def create(self, purchase, payment_id, data=None):
         payment = super(BoletoPaymentFactory, self).create(purchase, target_model=self.model, extra_data=data)
-        payment.due_date = purchase.product.sold_until.date()
+        #TODO: CREATE A PRODUCT PAYMENT LIMIT
+        payment.due_date = date.today() + timedelta(days=3)
         payment.our_number = "{:010d}".format(config.BOLETO_OFFSET + payment_id)
         payment.document_hash = self.hasher.generate()
         return payment
@@ -79,8 +80,8 @@ class BoletoFactory(object):
         boleto.cedente_endereco  = config.BOLETO_ENDERECO
         boleto.cedente           = config.BOLETO_EMPRESA
 
-        #TODO: REMOVE HARD CODING PAYMENT LIMIT DATE
-        boleto.data_vencimento    = date.today() + timedelta(days=3)
+
+        boleto.data_vencimento    = payment.due_date
         boleto.data_documento     = date.today()
         boleto.data_processamento = date.today()
 
