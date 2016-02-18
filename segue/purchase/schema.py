@@ -9,7 +9,7 @@ buyer = {
     "properties": {
         "kind":            { "enum": BUYER_TYPES },
         "name":            { "type": "string", "minLength": 5,  "maxLength": 100, "pattern": NAME_PATTERN },
-        "document":        { "type": "string", "minLength": 11, "maxLength": 20 }, #FIX
+        "document":        { "type": "string", "minLength": 4, "maxLength": 20 }, #FIX
         "contact":         { "type": "string", "minLength": 5,  "maxLength": 100 },
         "address_street":  { "type": "string", "minLength": 5,  "maxLength": 80  },
         "address_number":  { "type": "string", "minLength": 1,  "maxLength": 20  },
