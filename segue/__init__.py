@@ -8,6 +8,7 @@ import core
 import api
 import json
 import errors
+import babel
 
 
 class NullApplication(flask.Flask):
@@ -51,12 +52,8 @@ class Application(flask.Flask):
         self.cors = CORS(self)
 
     def _load_babel(self):
-        def get_locale():
-            return flask.request.\
-                accept_languages.best_match(core.config.LANGUAGES or 'pt')
-
         core.babel.init_app(self)
-        core.babel.locale_selector_func = get_locale
+        core.babel.locale_selector_func = babel.get_locale
 
     def _register_error_handlers(self):
         @jsoned
