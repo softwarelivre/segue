@@ -5,7 +5,7 @@ import codecs
 
 from segue.errors import SegueError
 from segue.core import mailer, config
-from flask_mail import Message
+from flask_mail import Message, Attachment
 
 class EmailIsNotValid(SegueError): pass
 
@@ -14,6 +14,7 @@ class TemplatedMessage(object):
         self.template = template
         self.variables = { 'backend_url': config.BACKEND_URL, 'frontend_url': config.FRONTEND_URL }
         self.recipients = []
+        self.attachments = []
 
     def given(self, **args):
         self.variables.update(**args)
@@ -21,12 +22,17 @@ class TemplatedMessage(object):
     def to(self, name, email):
         self.recipients.append((name, email,))
 
+    def append_attachment(self, attachment_name, file_path, mine_type):
+        with open(file_path, 'r') as fp:
+            attachment = Attachment(attachment_name, mine_type, fp.read())
+            self.attachments.append(attachment)
+
     def build(self):
         subject = unicode(self.template['subject']).format(**self.variables)
         body    = unicode(self.template['body']).format(**self.variables)
         bcc     = list(config.MAIL_BCC)
 
-        return Message(subject, body=body, recipients=self.recipients, bcc=bcc)
+        return Message(subject, body=body, recipients=self.recipients, bcc=bcc, attachments=self.attachments)
 
 class MessageFactory(object):
     def __init__(self):
@@ -63,14 +69,14 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
-    def notify_donation(self, purchase, payment): #FIX REVIEW
+    def notify_donation(self, purchase, payment, claim_check_file_path):
         customer = purchase.customer
         product  = purchase.product
 
         message = self.message_factory.from_template('donation/confirmation')
         message.given(customer=customer, purchase=purchase, payment=payment, product=product)
         message.to(customer.name, customer.email)
-
+        message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
         return mailer.send(message.build())
 
     def notify_promocode(self, customer, promocode): #FIX REVIEW
