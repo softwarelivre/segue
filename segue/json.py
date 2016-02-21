@@ -20,7 +20,6 @@ class JSONEncoder(flask.json.JSONEncoder):
             return obj.to_json()
         if isinstance(obj, _LazyString):
             return unicode(obj)
-        print type(obj)
         return super(JSONEncoder, self).default(obj)
 
 class SimpleJson(object):
