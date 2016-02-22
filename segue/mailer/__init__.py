@@ -101,7 +101,7 @@ class MailerService(object):
             message.to(customer.name, customer.email)
             message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
 
-            return mailer.send(message.build()
+            return mailer.send(message.build())
 
 
     def caravan_invite(self, invite):
