@@ -1,5 +1,6 @@
 import re
 from json import JsonSerializable
+from marshmallow import ValidationError
 
 class SegueError(JsonSerializable, Exception):
     code = 400
@@ -61,6 +62,32 @@ class SchemaValidationError(SegueError):
 
     def to_json(self):
         return {'message': self.message, 'errors': self.errors }
+
+class FieldError(ValidationError):
+
+    MESSAGE = None
+    FIELD = None
+
+    def __init__(self, message=None, field=None):
+        self.message = message or self.__class__.MESSAGE
+        self.field = field or self.__class__.FIELD
+        super(FieldError, self).__init__(message=self.message, field_names=field)
+
+
+class SegueGenericError(SegueError):
+    CODE = 400
+    MESSAGE = 'Segue generic Error'
+
+    def __init__(self, message=None, code=400,):
+        self.code = code or self.__class__.CODE
+        self.message = message or self.__class__.MESSAGE
+        super(SegueGenericError, self).__init__()
+
+    def to_json(self):
+        return {'message': self.message}
+
+    def __str__(self):
+        return "<{}:args={}>".format(self.__class__.__name__, self.__class__.MESSAGE)
 
 class NotAuthorized(SegueError):
     code = 403
