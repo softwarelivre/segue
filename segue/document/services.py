@@ -51,14 +51,15 @@ class DocumentService(object):
             for key, value in variables.items():
                 content = content.replace("%%{}%%".format(key), escape(value))
 
-        temp_path = os.path.join(self.tmp_dir, "{}-{}.svg".format(kind, hash_code))
+        file_name = "{}-{}.svg".format(kind, hash_code)
+        temp_path = os.path.join(self.tmp_dir, file_name)
         with codecs.open(temp_path, "wb", "utf8") as temp_file:
             temp_file.write(content)
 
         logger.info("created %s with length of %d ", temp_path, len(content))
 
         output_root = self.override_root or config.STORAGE_DIR
-        output_path = self.path_for_filename(output_root, "{}-{}.pdf".format(kind, hash_code), ensure_viable=True)
+        output_path = self.path_for_filename(output_root, file_name, ensure_viable=True)
 
         logger.info("attempting to convert %s to %s", temp_path, output_path)
 
@@ -73,4 +74,4 @@ class DocumentService(object):
             logger.info(process.stdout.read())
             raise DocumentGenerationFailed()
 
-        return "{}-{}.pdf".format(kind, hash_code)
+        return output_root, file_name
