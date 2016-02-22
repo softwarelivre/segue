@@ -2,6 +2,8 @@
 from datetime import datetime
 import requests
 
+from segue.core import logger
+
 class DocumentValidator(object):
 
     def __init__(self, data, number_of_digits):
@@ -103,13 +105,11 @@ class AddressFetcher(object):
 
 class ZipCodeValidator(object):
 
-    API = 'http://maps.googleapis.com/maps/api/geocode/json'
+    API = 'https://viacep.com.br/ws/{}/json/'
 
-    def __init__(self, zipcode, country):
+    def __init__(self, zipcode):
         self.zipcode = zipcode
-        self.country = country
         self.valid = False
-        self.api = ZipCodeValidator.API
 
     def is_valid(self):
         self._validate()
@@ -117,21 +117,12 @@ class ZipCodeValidator(object):
 
     def _validate(self):
         try:
-            # TODO: ZIPCODE NOT FOUND BY GOOGLE
-            if self.zipcode == '80520-176':
-                self.valid = True
-                return
-            componets = 'postal_code:{}|country:{}'.format(self.zipcode, self.country)
-            params = {
-                'sensor': 'false',
-                'components': componets
-            }
-            request = requests.get(self.api, params=params)
-            response = request.json()
-            if response['status'] == 'OK':
-                self.valid = True
-            else:
-                self.valid = False
+            url = ZipCodeValidator.API.format(self.zipcode)
+            request = requests.get(url)
+            if request.status_code == 200:
+                response = request.json()
+                if 'erro' not in response:
+                    self.valid = True
         except Exception as ex:
+            logger.error('Error while validating CEP. Message: {}'.format(ex.message))
             self.valid = True #IO EXCEPTION
-
