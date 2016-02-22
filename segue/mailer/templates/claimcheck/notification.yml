@@ -1,0 +1,17 @@
+---
+
+template: claimcheck_notification
+language: pt
+subject: "Recibo da confirmação de doação - ASL.Org"
+
+body: |
+    Car@ {customer.name},
+
+    Segue anexo seu recibo referente à Campanha de Doação da Associação Software Livre.Org 2016.
+
+    Muito obrigado por seu apoio!
+
+    Saudações Livres,
+
+    Sady Jacques
+    Coordenador Geral da ASL.Org
