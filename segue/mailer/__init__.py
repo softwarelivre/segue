@@ -93,6 +93,16 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def notify_claimcheck(self, purchase, claim_check_file_path):
+            customer = purchase.customer
+
+            message = self.message_factory.from_template('claimcheck/notification')
+            message.given(customer=customer)
+            message.to(customer.name, customer.email)
+            message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
+
+            return mailer.send(message.build()
+
 
     def caravan_invite(self, invite):
         message = self.message_factory.from_template('caravan/invite')
