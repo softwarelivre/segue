@@ -18,9 +18,11 @@ from models    import Purchase, Payment
 from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale
 from errors    import InvalidDocumentNumber, InvalidZipCodeNumber
 
+from segue.document.services import DocumentService
+from segue.models import Account, Product
+from segue.purchase.promocode import PromoCodeService
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 from segue.purchase.factories import DonationClaimCheckFactory
-from segue.document.services import DocumentService
 
 import schema
 
@@ -230,28 +232,33 @@ class PaymentService(object):
                 logger.debug('transition is good payment! notifying customer via e-mail!')
 
                 if purchase.product.id == 1:#FIX OMG
-                    from segue.purchase.promocode import PromoCodeService
-                    from segue.models import Account, Product
 
                     promo_product = Product.query.filter(Product.id==3).first()#OMG
-                    customer=purchase.customer
+                    customer = purchase.customer
                     pcs = PromoCodeService()
                     promocode = pcs.create(promo_product, creator=customer, description='Vale ingresso doacao')[0]
-                    self.mailer.notify_promocode(customer, promocode)
 
-                elif purchase.product.category == 'donation':
                     document = DocumentService()
                     claim_check = DonationClaimCheckFactory().create(purchase)
-                    #TODO: svg_to_pdf return the full path or a tuple
                     doc = document.svg_to_pdf(
                         claim_check.template_file,
                         'claimcheck',
                         claim_check.hash_code,
-                        variables=claim_check.template_vars)
+                        variables=claim_check.template_vars)[0]
 
-                    file_path = document.path_for_filename(os.path.join(config.APP_PATH, 'data'), doc)
+                    self.mailer.notify_promocode(customer, promocode, doc)
 
-                    self.mailer.notify_donation(purchase, payment, file_path)
+                elif purchase.product.category == 'donation':
+                    document = DocumentService()
+                    claim_check = DonationClaimCheckFactory().create(purchase)
+
+                    doc = document.svg_to_pdf(
+                        claim_check.template_file,
+                        'claimcheck',
+                        claim_check.hash_code,
+                        variables=claim_check.template_vars)[0]
+
+                    self.mailer.notify_donation(purchase, payment, doc)
                 else:
                     self.mailer.notify_payment(purchase, payment)
 
