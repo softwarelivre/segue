@@ -18,7 +18,7 @@ class DocumentValidator(object):
         return self.valid
 
     def _parse(self, data):
-        if len(data) == self.number_of_digits:
+        if data and len(data) == self.number_of_digits:
             for c in data:
                 if c.isdigit():
                     self.digits.append(int(c))
