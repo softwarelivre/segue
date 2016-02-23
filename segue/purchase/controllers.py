@@ -4,18 +4,30 @@ from flask import request
 
 from segue.json import JsonFor
 from segue.core import config
-from segue.decorators import jsoned, jwt_only
+from segue.decorators import jsoned, jwt_only, admin_only
 
 from services import PurchaseService, PaymentService
 from factories import PurchaseFactory
 from responses import GuideResponse, PromoCodeResponse
-
+from segue.purchase.services import ProcessBoletosService
 import schema
 
 class PurchaseController(object):
     def __init__(self, service=None):
         self.service = service or PurchaseService()
         self.current_user = current_user
+
+    @jsoned
+    @jwt_only
+    @admin_only
+    def process_boletos(self):
+        file = request.files['file']
+        if file:
+            processor = ProcessBoletosService()
+            result = processor.process(file.read())
+            return dict(payments=result), 200
+
+        return 200
 
     @jsoned
     def current_mode(self):
