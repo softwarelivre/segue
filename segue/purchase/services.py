@@ -19,10 +19,10 @@ from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, P
 from errors    import InvalidDocumentNumber, InvalidZipCodeNumber
 
 from segue.document.services import DocumentService
-from segue.models import Account, Product
-from segue.purchase.promocode import PromoCodeService
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
 from segue.purchase.factories import DonationClaimCheckFactory
+from segue.purchase.boleto import BoletoPaymentService
+from segue.purchase.boleto.parsers  import BoletoFileParser
 
 import schema
 
@@ -278,3 +278,41 @@ class PaymentService(object):
         if method in self.DEFAULT_PROCESSORS:
             return self.DEFAULT_PROCESSORS[method]()
         raise NotImplementedError(method+' is not a valid payment method')
+
+
+class ProcessBoletosService(object):
+
+    def __init__(self, boleto_service=None, boleto_parser=None, payment_service=None):
+        self.boleto_service = boleto_service or BoletoPaymentService()
+        self.payment_service = payment_service or PaymentService()
+        self.boleto_parser = boleto_parser or BoletoFileParser()
+
+    def process(self, data):
+        good_payments = []
+        late_payments = []
+        bad_payments = []
+        unknown_payments = []
+
+        for entry in self.boleto_parser.parse(data):
+
+            payment = self.boleto_service.get_by_our_number(entry.get('our_number'))
+            if not payment:
+                unknown_payments.append(entry)
+                continue
+
+            print payment.purchase
+            if entry['payment_date'] > payment.legal_due_date:
+                late_payments.append(dict(entry=entry, payment=payment))
+            else:
+                purchase, transition = self.payment_service.notify(payment.purchase.id, payment.id, entry, 'script')
+
+                if transition.errors:
+                    bad_payments.append(dict(entry=entry, payment=payment, errors=transition.errors))
+                else:
+                    good_payments.append(dict(entry=entry, payment=payment, purchase=purchase))
+
+        #TODO: MAKE A RESPONSE
+        return {'good': good_payments,
+                'late': late_payments,
+                'bad': bad_payments,
+                'unknown': unknown_payments}
