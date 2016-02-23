@@ -1,6 +1,29 @@
 from flask import url_for
 from segue.json import SimpleJson
 
+
+from flask_sqlalchemy import Model
+from flask_sqlalchemy import Pagination
+
+class Response(object):
+
+    def __init__(self, data, schema):
+        self.data = data
+        self.schema = schema
+
+    def create(self):
+        if isinstance(self.data, Model) or isinstance(self.data, dict):
+            result = self.schema().dump(self.data).data
+            return {'resource': result}
+        elif isinstance(self.data, list):
+            result = self.schema(many=True).dump(self.data).data
+            return {'count': len(result), 'items': result}
+        elif isinstance(self.data, Pagination):
+            #TODO: IMPLEMENT PAGINATION
+            return {}
+        else:
+            raise ValueError("Invalid data type")
+
 class BaseResponse(SimpleJson):
     @classmethod
     def create(cls, list_or_entity, *args, **kw):
