@@ -9,6 +9,9 @@ from segue.purchase.services import PurchaseService
 
 from ..responses import AccountDetailResponse, ProposalDetailResponse
 
+from segue.responses import Response
+from schemas import AccountDetail
+
 class AdminAccountController(object):
     def __init__(self, accounts=None, purchases=None):
         self.accounts     = accounts or AccountService()
@@ -19,9 +22,9 @@ class AdminAccountController(object):
     @admin_only
     @jsoned
     def create(self):
-        data = json.loads(request.data)
+        data = request.get_json()
         result = self.accounts.create(data, rules='admin_create')
-        return AccountDetailResponse.create(result), 200
+        return Response(result, AccountDetail).create(), 200
 
     @jwt_only
     @admin_only
@@ -37,14 +40,14 @@ class AdminAccountController(object):
     def list(self):
         criteria = request.args.get('q')
         result = self.accounts.lookup(criteria, limit=20)
-        return AccountDetailResponse.create(result), 200
+        return Response(result, AccountDetail).create(), 200
 
     @jsoned
     @jwt_only
     @admin_only
     def get_one(self, account_id=None):
         result = self.accounts.get_one(account_id, check_ownership=False) or abort(404)
-        return AccountDetailResponse(result), 200
+        return Response(result, AccountDetail).create(), 200
 
     @jsoned
     @jwt_only
