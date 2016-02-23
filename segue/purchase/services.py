@@ -151,7 +151,7 @@ class PurchaseService(object):
             elif buyer.kind == 'company':
                 if not CNPJValidator(buyer.document).is_valid():
                     raise InvalidDocumentNumber(buyer.document)
-            if not ZipCodeValidator(buyer.address_zipcode, 'BR').is_valid():
+            if not ZipCodeValidator(buyer.address_zipcode).is_valid():
                 raise InvalidZipCodeNumber(buyer.address_zipcode)
 
 class PaymentService(object):
