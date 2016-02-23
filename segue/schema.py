@@ -4,13 +4,37 @@ from marshmallow import fields, schema, validate
 
 from segue.babel import _l
 from segue.core import ma
-from segue.core import config
+
+from flask_marshmallow.fields import Hyperlinks, URLFor
+
+from marshmallow import SchemaOpts
+from marshmallow import post_dump
+
+
+class BaseOpts(SchemaOpts):
+    """
+        This allows you to define class Meta options without having to subclass BaseSchema.Meta.
+    """
+    def __init__(self, meta):
+        if not hasattr(meta, 'dateformat'):
+            #TODO: GET DATEFORMAT FROM CONFIG
+            meta.dateformat = "%d/%m/%Y"
+        if not hasattr(meta, 'ordered'):
+            meta.ordered = True
+        super(BaseOpts, self).__init__(meta)
 
 
 class BaseSchema(ma.Schema):
+    OPTIONS_CLASS = BaseOpts
 
-    class Meta:
-        dateformat="%d/%m/%Y"
+    @post_dump()
+    def clear_empty_attr(self, data):
+        for k, v in data.items():
+            if isinstance(data[k], basestring) and len(data[k]) == 0:
+                del data[k]
+            elif data[k] is None:
+                del data[k]
+        return data
 
 class Field(object):
     """A factory for create marshmallow fields with internationalization messages"""
@@ -48,11 +72,19 @@ class Field(object):
 
     @staticmethod
     def date(*args, **kwargs):
-        return Field.create(fields.Date, *args, **kwargs)
+        return Field.create(fields.DateTime, *args, **kwargs)
 
     @staticmethod
     def bool(*args, **kwargs):
         return Field.create(fields.Boolean, *args, **kwargs)
+
+    @staticmethod
+    def links(*args, **kwargs):
+        return Hyperlinks(*args, **kwargs)
+
+    @staticmethod
+    def url(*args, **kwargs):
+        return URLFor(*args, **kwargs)
 
     @staticmethod
     def create(cls, *args, **kwargs):
