@@ -1,9 +1,152 @@
 import copy
+from marshmallow import validates_schema, validates
+
+
+from errors import EmailAddressMisMatch, PasswordsMisMatch, InvalidCNPJ, InvalidCPF
+from segue.schema import BaseSchema, Field, Validator
+from segue.validation import CPFValidator
+from segue.validation import CNPJValidator
+
 
 ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "coporate"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
 DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
+
+
+class AccountSchema(BaseSchema):
+
+        id = Field.int(dump_only=True)
+        email = Field.str(
+            required=True,
+            validate=[Validator.length(min=5, max=40), Validator.email()]
+        )
+        email_confirm = Field.str(
+            required=True,
+            validate=[Validator.length(min=5, max=40), Validator.email()]
+        )
+        name = Field.str(
+            required=True,
+            validate=[Validator.length(min=5, max=40)]
+        )
+        badge_name = Field.str()
+        password = Field.str(
+            required=True,
+            validate=[Validator.length(min=8, max=20)]
+        )
+        password_confirm = Field.str(
+            required=True,
+            validate=[Validator.length(min=8, max=20)]
+        )
+        disability = Field.str(
+            validate=[Validator.one_of(choices=DISABILITY_TYPES)]
+        )
+        disability_info = Field.str(
+            validate=[Validator.length(max=400)]
+        )
+        passport = Field.str(
+            validate=[Validator.length(min=5, max=20)]
+        )
+
+        cpf = Field.str()
+        cnpj = Field.str()
+        passport = Field.str()
+        document = Field.str(dump_only=True)
+
+        student_document = Field.str()
+        phone = Field.str(
+            required=True,
+            validate=[Validator.length(min=5, max=30)]
+        )
+        organization = Field.str()
+        resume = Field.str(
+            validate=[Validator.length(max=400)]
+        )
+        occupation = Field.str(
+            required=True,
+            validate=[Validator.length(min=1, max=20)]
+        )
+        education = Field.str(
+            required=True,
+            validate=[Validator.length(min=1, max=40)]
+        )
+        sex = Field.str(
+            required=True,
+            validate=[Validator.length(equal=1)]
+        )
+        born_date = Field.date(required=True)
+        membership = Field.bool(required=True)
+        country = Field.str(
+            required=True,
+            validate=[Validator.length(min=3, max=20)]
+        )
+        city = Field.str(
+            required=True,
+            validate=[Validator.length(min=3, max=30)]
+        )
+        address_street = Field.str(
+            required=True,
+            validate=[Validator.length(min=5, max=80)]
+        )
+        address_number = Field.str(
+            required=True,
+            validate=[Validator.length(min=1, max=20)]
+        )
+        address_extra = Field.str(
+            validate=[Validator.length(max=40)]
+        )
+        address_state = Field.str(
+            required=True,
+            validate=[Validator.length(equal=2)]
+        )
+        address_neighborhood = Field.str(
+            required=True,
+            validate=[Validator.length(min=3, max=30)]
+        )
+        address_zipcode = Field.str(
+            required=True,
+            validate=[Validator.length(min=3, max=15)]
+        )
+
+        @validates('cpf')
+        def validate_cpf(self, data):
+            if not CPFValidator(data).is_valid():
+                raise InvalidCPF()
+
+        @validates('cnpj')
+        def validate_cnpj(self, data):
+            if not CNPJValidator(data).is_valid():
+                raise InvalidCNPJ()
+
+        @validates_schema()
+        def validate(self, data):
+            if 'password' or 'password_confirm' in data:
+                if data.get('password', None) != data.get('password_confirm', None):
+                    raise PasswordsMisMatch()
+
+            if 'email' in data and 'email_confirm' in data:
+                if data.get['email'] != data.get['email_confirm']:
+                    raise EmailAddressMisMatch()
+
+
+class CreateAccountSchema(AccountSchema):
+    pass
+
+
+class AdminCreateAccount(AccountSchema):
+
+    def __init__(self, *args, **kwargs):
+        super(AdminCreateAccount, self).__init__(*args, **kwargs)
+        del self.fields['email_confirm']
+
+class AdminEditAccount(AccountSchema):
+
+    def __init__(self, *args, **kwargs):
+        super(AdminEditAccount, self).__init__(*args, **kwargs)
+        self.fields['password'].required = False
+        del self.fields['password_confirm']
+        del self.fields['email']
+        del self.fields['email_confirm']
 
 signup = {
     "$schema": "http://json-schema.org/draft-04/schema#",
@@ -35,7 +178,6 @@ signup = {
         "address_state":   { "type": "string", "minLength": 2,  "maxLength": 2  },
         "address_neighborhood": { "type": "string", "minLength": 2,  "maxLength": 20  },
         "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 9  },
-
     },
     "required": [
         "email", "name", "password", "document", "country", "city", "phone",
