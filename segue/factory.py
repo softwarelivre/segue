@@ -11,13 +11,30 @@ class Factory(object):
         return data
 
     @classmethod
+    def clean_for_update(cls, data):
+        return data
+
+    @classmethod
+    def parse(cls, data, schema):
+        parsed_data, errors = schema.load(data)
+        if errors:
+            raise SchemaValidationError(errors)
+        return parsed_data
+
+    @classmethod
+    def update_model(cls, model, data, schema):
+        if isinstance(model, cls.model):
+            parsed_data = cls.parse(data, schema)
+            for name, value in cls.clean_for_update(parsed_data).items():
+                setattr(model, name, value)
+            return model
+
+    @classmethod
     def from_json(cls, data, schema):
         data.pop('$type', None)
         # TODO: REMOVE LATER
         if isinstance(schema, BaseSchema):
-            parsed_data, errors = schema.load(data)
-            if errors:
-                raise SchemaValidationError(errors)
+            parsed_data = cls.parse(data, schema)
             cleaned_data = cls.clean_for_insert(parsed_data)
             return cls.model(**cleaned_data)
         else:
