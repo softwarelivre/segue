@@ -39,7 +39,7 @@ class Account(JsonSerializable, db.Model):
     disability       = db.Column(db.Enum(*schema.DISABILITY_TYPES, name='disability_types'), default='none')
     disability_info  = db.Column(db.Text)
     role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
-    document         = db.Column(db.Text)
+    document         = db.Column(db.Text, unique=True)
 
     sex = db.Column(db.String(length=1))
     occupation = db.Column(db.Text)

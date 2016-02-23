@@ -180,7 +180,7 @@ signup = {
         "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 9  },
     },
     "required": [
-        "email", "name", "password", "document", "country", "city", "phone",
+        "email", "name", "password", "country", "city", "phone",
         "address_street", "address_number", "address_state", "address_neighborhood",
         "address_zipcode", "occupation", "education", "sex", "born_date","membership"
     ],
@@ -214,25 +214,12 @@ reset = {
     "required": ["hash_code", "password" ],
 }
 
-admin_create = {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "properties": {
-        "email":        { "type": "string", "minLength": 5, "maxLength": 80, "format": "email" },
-        "name":         { "type": "string", "minLength": 5, "maxLength": 80 },
-        "document":     { "type": "string", "minLength": 5, "maxLength": 14 },
-        "country":      { "type": "string", "minLength": 5, "maxLength": 30 },
-    },
-    "required": ["email", "name", "country", "document" ],
-}
-admin_edit = admin_create.copy()
-
 whitelist = dict(
   signup=signup,
   corporate=corporate,
   edit_account=edit_account,
   edit_corporate=edit_corporate,
   reset=reset,
-  admin_create=admin_create,
-  admin_edit=admin_edit
+  admin_create=AdminCreateAccount(),
+  admin_edit=AdminEditAccount()
 )

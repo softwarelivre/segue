@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from segue.errors import SegueError, SegueFieldError, NotAuthorized
+from segue.errors import SegueError, SegueFieldError, NotAuthorized, FieldError
+from segue.babel import _l
 
 class InvalidResetPassword(SegueError):
     code = 400
@@ -21,6 +22,11 @@ class DocumentAlreadyExist(SegueError):
     code = 400
     def to_json(self):
         return { 'message': 'Já existe um usuário utilizando esse CPF ou CNPJ no sistema!' }
+
+class DocumentIsNotDefined(SegueError):
+    code = 400
+    def to_json(self):
+        return { 'message': 'Por favor defina um documento!' }
 
 class InvalidLogin(SegueError):
     code = 400
@@ -100,3 +106,21 @@ class InvalidZipCodeNumber(SegueFieldError):
     def __init__(self, zipcode):
         super(InvalidZipCodeNumber, self).__init__()
         self.value = zipcode
+
+
+class InvalidCPF(FieldError):
+    FIELD = 'cpf'
+    MESSAGE = _l('Invalid CPF number')
+
+class InvalidCNPJ(FieldError):
+    FIELD = 'cnpj'
+    MESSAGE = _l('Invalid CNPJ number')
+
+class EmailAddressMisMatch(FieldError):
+    FIELD = 'email_confirm'
+    MESSAGE = _l('Email does not match')
+
+class PasswordsMisMatch(FieldError):
+    FIELD = 'password_confim'
+    MESSAGE = _l('Password does not match')
+
