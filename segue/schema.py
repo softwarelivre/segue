@@ -59,6 +59,9 @@ class Field(object):
         'Date': {
             'invalid': _l('Not a valid date.'),
             'format': _l('"{input}" cannot be formatted as a date.'),
+        },
+        'Decimal': {
+            'invalid': _l('Not a valid number.')
         }
     }
 
@@ -77,6 +80,10 @@ class Field(object):
     @staticmethod
     def bool(*args, **kwargs):
         return Field.create(fields.Boolean, *args, **kwargs)
+
+    @staticmethod
+    def decimal(*args, **kwargs):
+        return Field.create(fields.Decimal, *args, **kwargs)
 
     @staticmethod
     def links(*args, **kwargs):
