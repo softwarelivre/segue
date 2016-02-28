@@ -121,6 +121,6 @@ class EmailAddressMisMatch(FieldError):
     MESSAGE = _l('Email does not match')
 
 class PasswordsMisMatch(FieldError):
-    FIELD = 'password_confim'
+    FIELD = 'password_confirm'
     MESSAGE = _l('Password does not match')
 
