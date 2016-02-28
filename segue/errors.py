@@ -71,7 +71,7 @@ class FieldError(ValidationError):
     def __init__(self, message=None, field=None):
         self.message = message or self.__class__.MESSAGE
         self.field = field or self.__class__.FIELD
-        super(FieldError, self).__init__(message=self.message, field_names=field)
+        super(FieldError, self).__init__(self.message, self.field)
 
 
 class SegueGenericError(SegueError):
