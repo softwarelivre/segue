@@ -98,15 +98,9 @@ class EmailMismatch(SegueFieldError):
         self.value = email
 
 
-class InvalidZipCodeNumber(SegueFieldError):
+class InvalidZipCodeNumber(FieldError):
     FIELD = 'address_zipcode'
-    LABEL = 'invalid_format'
-    MESSAGE = u'Código postal inválido'
-
-    def __init__(self, zipcode):
-        super(InvalidZipCodeNumber, self).__init__()
-        self.value = zipcode
-
+    MESSAGE = _l('Invalid Zip Code number')
 
 class InvalidCPF(FieldError):
     FIELD = 'cpf'

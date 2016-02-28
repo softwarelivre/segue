@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-22 21:49-0300\n"
+"POT-Creation-Date: 2016-02-28 18:46-0300\n"
 "PO-Revision-Date: 2016-02-15 19:32-0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -55,53 +55,59 @@ msgstr "A data informada não é válida"
 msgid "\"{input}\" cannot be formatted as a date."
 msgstr "\"{input}\" não é um formato de data válido."
 
-#: segue/schema.py:106
+#: segue/schema.py:64
+#, fuzzy
+msgid "Not a valid number."
+msgstr "Número inválido."
+
+#: segue/schema.py:110
 msgid "Not a valid choice."
 msgstr "Está não é uma escolha válida."
 
-#: segue/schema.py:107
+#: segue/schema.py:111
 msgid "Not a valid email address."
 msgstr "Este não é um endereço de e-mail válido."
 
-#: segue/schema.py:108
+#: segue/schema.py:112
 msgid "Shorter than minimum length {min}."
 msgstr "Este campo deve ter no mínimo {min} caracteres."
 
-#: segue/schema.py:109
+#: segue/schema.py:113
 msgid "Longer than maximum length {max}."
 msgstr "Este campo deve ter no máximo {max} caracteres."
 
-#: segue/schema.py:110
+#: segue/schema.py:114
 msgid "Length must be between {min} and {max}."
 msgstr "Este campo deve ter entre {min} e {max} caracteres."
 
-#: segue/schema.py:111
+#: segue/schema.py:115
 msgid "Length must be {equal}."
 msgstr "Este campo deve ter {equal} caracteres."
 
-#: segue/account/errors.py:113
+#: segue/account/errors.py:103
+#, fuzzy
+msgid "Invalid Zip Code number"
+msgstr "CEP inválido"
+
+#: segue/account/errors.py:107
 msgid "Invalid CPF number"
 msgstr "Número do CPF inválido"
 
-#: segue/account/errors.py:117
+#: segue/account/errors.py:111
 msgid "Invalid CNPJ number"
 msgstr "Número do CNPJ inválido"
 
-#: segue/account/errors.py:121
+#: segue/account/errors.py:115
 msgid "Email does not match"
 msgstr "Os e-mails não são iguais"
 
-#: segue/account/errors.py:125
+#: segue/account/errors.py:119
 msgid "Password does not match"
 msgstr "As senhas não são iguais"
 
-#: segue/account/services.py:116 segue/account/services.py:144
-#: segue/account/services.py:184
 msgid "This e-mail is already in use"
 msgstr "Esta conta de e-mail já está sendo usada"
 
-#: segue/account/services.py:118 segue/account/services.py:146
-#: segue/account/services.py:186
 msgid "This number document is already in use"
 msgstr "Este número de documento já está sendo usado"
 
