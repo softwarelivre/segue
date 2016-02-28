@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-22 21:49-0300\n"
+"POT-Creation-Date: 2016-02-28 18:46-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,53 +53,51 @@ msgstr ""
 msgid "\"{input}\" cannot be formatted as a date."
 msgstr ""
 
-#: segue/schema.py:106
-msgid "Not a valid choice."
-msgstr ""
-
-#: segue/schema.py:107
-msgid "Not a valid email address."
-msgstr ""
-
-#: segue/schema.py:108
-msgid "Shorter than minimum length {min}."
-msgstr ""
-
-#: segue/schema.py:109
-msgid "Longer than maximum length {max}."
+#: segue/schema.py:64
+msgid "Not a valid number."
 msgstr ""
 
 #: segue/schema.py:110
-msgid "Length must be between {min} and {max}."
+msgid "Not a valid choice."
 msgstr ""
 
 #: segue/schema.py:111
+msgid "Not a valid email address."
+msgstr ""
+
+#: segue/schema.py:112
+msgid "Shorter than minimum length {min}."
+msgstr ""
+
+#: segue/schema.py:113
+msgid "Longer than maximum length {max}."
+msgstr ""
+
+#: segue/schema.py:114
+msgid "Length must be between {min} and {max}."
+msgstr ""
+
+#: segue/schema.py:115
 msgid "Length must be {equal}."
 msgstr ""
 
-#: segue/account/errors.py:113
+#: segue/account/errors.py:103
+msgid "Invalid Zip Code number"
+msgstr ""
+
+#: segue/account/errors.py:107
 msgid "Invalid CPF number"
 msgstr ""
 
-#: segue/account/errors.py:117
+#: segue/account/errors.py:111
 msgid "Invalid CNPJ number"
 msgstr ""
 
-#: segue/account/errors.py:121
+#: segue/account/errors.py:115
 msgid "Email does not match"
 msgstr ""
 
-#: segue/account/errors.py:125
+#: segue/account/errors.py:119
 msgid "Password does not match"
-msgstr ""
-
-#: segue/account/services.py:116 segue/account/services.py:144
-#: segue/account/services.py:184
-msgid "This e-mail is already in use"
-msgstr ""
-
-#: segue/account/services.py:118 segue/account/services.py:146
-#: segue/account/services.py:186
-msgid "This number document is already in use"
 msgstr ""
 
