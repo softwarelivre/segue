@@ -62,6 +62,10 @@ class AccountController(object):
         query_string = "?customer_id={}".format(account_id)
         return redirect(url_for('purchases.list') + query_string)
 
+    def list_promocodes(self, account_id):
+        query_string = "?creator_id={}".format(account_id)
+        return redirect(url_for('promocodes.list') + query_string)
+
     def get_caravan(self, account_id):
         query_string = "?owner_id={}".format(account_id)
         return redirect(url_for('caravans.get_one') + query_string)

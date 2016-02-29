@@ -8,7 +8,7 @@ def load_blueprints():
     from certificate import CertificateBlueprint
     from survey import SurveyBlueprint
     from judge import JudgeBlueprint, MatchBlueprint
-    from purchase import PurchaseBlueprint, PaymentBlueprint
+    from purchase import PurchaseBlueprint, PaymentBlueprint, PromocodeBlueprint
     from account import AccountBlueprint, SessionBlueprint
     from proposal import ProposalBlueprint, NonSelectionBlueprint, ProposalInviteBluePrint, TalkBlueprint
     from product import ProductBlueprint
@@ -23,6 +23,7 @@ def load_blueprints():
         ProposalInviteBluePrint(),
         ProductBlueprint(),
         PurchaseBlueprint(),
+        PromocodeBlueprint(),
         PaymentBlueprint(),
         DocumentBlueprint(),
         CaravanBlueprint(),
