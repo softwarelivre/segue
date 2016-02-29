@@ -6,11 +6,14 @@ class ProposalFactory(Factory):
     model = Proposal
 
     QUERY_WHITELIST = ('owner_id', 'coauthor_id')
-    UPDATE_WHITELIST = schema.edit_proposal["properties"].keys()
 
-    @classmethod
-    def clean_for_update(self, data):
-        return { c:v for c,v in data.items() if c in ProposalFactory.UPDATE_WHITELIST }
+    #TODO: REMOVE
+    #UPDATE_WHITELIST = schema.edit_proposal["properties"].keys()
+
+    #TODO: REMOVE
+    #@classmethod
+    #def clean_for_update(self, data):
+    #    return { c:v for c,v in data.items() if c in ProposalFactory.UPDATE_WHITELIST }
 
 class InviteFactory(Factory):
     model = ProposalInvite
