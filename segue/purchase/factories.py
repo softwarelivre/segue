@@ -8,12 +8,10 @@ from models import Buyer, Purchase, Payment, Transition, ExemptPurchase, ClaimCh
 class BuyerFactory(Factory):
     model = Buyer
 
-    CREATE_WHITELIST = schema.buyer["properties"].keys()
-
     @classmethod
     def clean_for_insert(cls, data):
-        data = { c:v for c,v in data.items() if c in BuyerFactory.CREATE_WHITELIST }
-        return data;
+        data['document'] = data.pop('cpf', None) or data.pop('passport', None) or data.pop('cnpj', None)
+        return data
 
 class PurchaseFactory(Factory):
     QUERY_WHITELIST = ('customer_id',)
