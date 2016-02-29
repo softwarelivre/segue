@@ -5,6 +5,7 @@ from flask.ext.jwt import current_user
 from segue.core import db, config
 from segue.factory import Factory
 from segue.decorators import jsoned, jwt_only
+from segue.responses import Response
 
 from jwt import Signer
 from models import Account, ResetPassword
@@ -23,7 +24,7 @@ class AccountController(object):
     @jsoned
     def get_one(self, account_id):
         result = self.service.get_one(account_id, by=self.current_user) or flask.abort(404)
-        return AccountResponse.create(result), 200
+        return Response(result, AccountResponse).create(), 200
 
     @jwt_only
     @jsoned
