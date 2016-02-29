@@ -10,7 +10,6 @@ from ..hasher import Hasher
 
 from segue.errors import SegueGenericError
 from segue.babel import _l
-from segue.validation import CNPJValidator, CPFValidator, DateValidator, ZipCodeValidator
 from segue.mailer import MailerService
 from ..filters import FilterStrategies
 
@@ -20,7 +19,7 @@ from models import Account, ResetPassword
 from factories import AccountFactory, ResetPasswordFactory
 from filters import AccountFilterStrategies
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized, NoSuchAccount, InvalidResetPassword, CertificateNameAlreadySet
-from errors import InvalidDocumentNumber, InvalidDateFormat, PasswordMismatch, EmailMismatch, DocumentAlreadyExist, DocumentIsNotDefined, InvalidZipCodeNumber
+from errors import DocumentAlreadyExist, DocumentIsNotDefined
 
 
 import schema
@@ -88,62 +87,23 @@ class AccountService(object):
 
         return self.get_one(account_id, strict=True, check_ownership=False)
 
-    #TODO: REMOVE
     def modify(self, account_id, data, by=None, allow_email_change=False):
-        try:
-            account = self._get_account(account_id)
-            if not self.check_ownership(account, by): raise NotAuthorized
+        account = self._get_account(account_id)
+        if not self.check_ownership(account, by): raise NotAuthorized
+        #TODO: IMPROVE RULE SELECTION
+        rule = 'edit_account'
+        if account.role == 'corporate':
+            rule = 'edit_corporate'
 
-            if allow_email_change:
-                self.try_to_change_email(account, data.get('email', account.email))
+        if allow_email_change:
+            self.try_to_change_email(account, data.get('email', account.email))
 
-            password = data.get('password', '')
-            password_confirm = data.pop('password_confirm', '')
-            for name, value in AccountFactory.clean_for_update(data).items():
-                setattr(account, name, value)
+        account = AccountFactory.update_model(account, data, schema.whitelist[rule])
+        account.dirty = False
 
-            self._validate(account, password, password_confirm)
-            account.dirty = False
+        if not account.document: raise DocumentIsNotDefined()
 
-            if not account.document: raise DocumentIsNotDefined()
-            db.session.add(account)
-            db.session.commit()
-            return account
-        except IntegrityError as e:
-            #TODO: IMPROVE psycopg2.IntegrityError
-            if 'account_email_UK' in e.orig.pgerror:
-                #TODO: CREATE EXCEPTION
-                raise SegueGenericError(_l('This e-mail is already in use'))
-            if 'account_document_UK' in e.orig.pgerror:
-                raise SegueGenericError(_l('This number document is already in use'))
-
-    #TODO: RENAME
-    def modify_from_admin(self, account_id, data, by=None, allow_email_change=False):
-        try:
-            account = self._get_account(account_id)
-            if not self.check_ownership(account, by):
-                raise NotAuthorized
-
-            if allow_email_change:
-                self.try_to_change_email(account, data.get('email', account.email))
-
-            account = AccountFactory.update_model(
-                account,
-                data,
-                schema.whitelist['admin_edit'])
-
-            account.dirty = False
-            if not account.document: raise DocumentIsNotDefined()
-            db.session.add(account)
-            db.session.commit()
-            return account
-        except IntegrityError as e:
-            #TODO: IMPROVE psycopg2.IntegrityError
-            if 'account_email_UK' in e.orig.pgerror:
-                #TODO: CREATE EXCEPTION
-                raise SegueGenericError(_l('This e-mail is already in use'))
-            if 'account_document_UK' in e.orig.pgerror:
-                raise SegueGenericError(_l('This number document is already in use'))
+        return self._create_or_update(account)
 
 
     def lookup(self, needle, by=None, limit=0):
@@ -160,61 +120,34 @@ class AccountService(object):
         if isinstance(account, int): account = self._get_account(id)
         return account and account.can_be_acessed_by(alleged)
 
-    #TODO: RENAME
-    def create_from_admin(self, data, rules='signup'):
+    def create(self, data, rules='create_account'):
+        #TODO: IMPROVE ROLE AND RULES SELECTION
+        role = 'user'
+        if 'cnpj' in data:
+            role = 'corporate'
+            rules = 'create_corporate'
+        if 'passport' in data:
+            role = 'foreign'
+
+        account = AccountFactory.from_json(data, schema.whitelist[rules])
+        account.role = role
+
+        if not account.document: raise DocumentIsNotDefined()
+        if not account.password: account.password = self.hasher.generate()
+
+        return self._create_or_update(account)
+
+    def _create_or_update(self, account):
         try:
-            role = 'user'
-            if 'cnpj' in data:
-                role = 'corporate'
-            if 'passport' in data:
-                role = 'foreign'
-
-            account = AccountFactory.from_json(data, schema.whitelist[rules])
-            account.role = role
-
-            if not account.document: raise DocumentIsNotDefined()
-            if not account.password: account.password = self.hasher.generate()
-            db.session.add(account)
-            db.session.commit()
-            return account
-        except IntegrityError as e:
-            #TODO: IMPROVE psycopg2.IntegrityError
-            #TODO: CREATE EXCEPTION
-            if 'account_email_UK' in e.orig.pgerror:
-                raise SegueGenericError(_l('This e-mail is already in use'))
-            if 'account_document_UK' in e.orig.pgerror:
-                raise SegueGenericError(_l('This number document is already in use'))
-
-    #TODO: REMOVE
-    def create(self, data, rules='signup'):
-        try:
-            password = data.get('password', '')
-            password_confirm = data.pop('password_confirm', None)
-            email_confirm = data.pop('email_confirm', '')
-
-
-            role = 'user'
-            if 'cnpj' in data:
-                role = 'corporate'
-                rules = 'corporate'
-            if 'passport' in data:
-                role = 'foreign'
-
-            account = AccountFactory.from_json(data, schema.whitelist[rules])
-            account.role = role
-
-            self._validate(account, password, password_confirm, email_confirm)
-
-            if not account.password: account.password = self.hasher.generate()
             db.session.add(account)
             db.session.commit()
             return account
         except IntegrityError as e:
             #TODO: IMPROVE psycopg2.IntegrityError
             if 'account_email_UK' in e.orig.pgerror:
-                raise EmailAlreadyInUse(account.email)
+                raise EmailAlreadyInUse()
             if 'account_document_UK' in e.orig.pgerror:
-                raise DocumentAlreadyExist(account.email)
+                raise DocumentAlreadyExist()
 
     def login(self, email=None, password=None, acceptable_roles=None):
         try:
@@ -256,25 +189,3 @@ class AccountService(object):
         db.session.commit()
 
         return reset
-
-    #TODO: REMOVE
-    def _validate(self, account, password, password_confirm, email_confirm=None):
-
-        if password != password_confirm:
-            raise PasswordMismatch('password does not match')
-
-        if email_confirm and (account.email != email_confirm):
-            raise EmailMismatch(email_confirm)
-
-        if account.role == 'corporate':
-            if not CNPJValidator(account.document).is_valid():
-                raise InvalidDocumentNumber(account.document)
-        else:
-            if account.is_brazilian and not CPFValidator(account.document).is_valid():
-                raise InvalidDocumentNumber(account.document)
-            if not DateValidator(account.born_date).is_valid():
-                raise InvalidDateFormat(account.born_date)
-
-        if account.is_brazilian:
-            if not ZipCodeValidator(account.address_zipcode).is_valid():
-                raise InvalidZipCodeNumber(account.address_zipcode)

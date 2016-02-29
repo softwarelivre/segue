@@ -1,14 +1,13 @@
-import copy
+import re
 from marshmallow import validates_schema, validates
 
 
-from errors import EmailAddressMisMatch, PasswordsMisMatch, InvalidCNPJ, InvalidCPF
+from errors import EmailAddressMisMatch, PasswordsMisMatch, InvalidCNPJ, InvalidCPF, InvalidZipCodeNumber
 from segue.schema import BaseSchema, Field, Validator
-from segue.validation import CPFValidator
-from segue.validation import CNPJValidator
+from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
 
-ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "coporate"]
+ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "coporate", "foreign"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
 DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
@@ -17,19 +16,22 @@ DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
 class AccountSchema(BaseSchema):
 
         id = Field.int(dump_only=True)
+        role = Field.str(dump_only=True)
         email = Field.str(
             required=True,
-            validate=[Validator.length(min=5, max=40), Validator.email()]
+            validate=[Validator.length(min=5, max=60), Validator.email()]
         )
         email_confirm = Field.str(
             required=True,
-            validate=[Validator.length(min=5, max=40), Validator.email()]
+            validate=[Validator.length(min=5, max=60), Validator.email()]
         )
         name = Field.str(
             required=True,
-            validate=[Validator.length(min=5, max=40)]
+            validate=[Validator.length(min=5, max=80)]
         )
-        badge_name = Field.str()
+        badge_name = Field.str(
+            validate=[Validator.length(max=20)]
+        )
         password = Field.str(
             required=True,
             validate=[Validator.length(min=8, max=20)]
@@ -43,9 +45,6 @@ class AccountSchema(BaseSchema):
         )
         disability_info = Field.str(
             validate=[Validator.length(max=400)]
-        )
-        passport = Field.str(
-            validate=[Validator.length(min=5, max=20)]
         )
 
         cpf = Field.str()
@@ -125,85 +124,27 @@ class AccountSchema(BaseSchema):
                     raise PasswordsMisMatch()
 
             if 'email' in data and 'email_confirm' in data:
-                if data.get['email'] != data.get['email_confirm']:
+                if data.get('email') != data.get('email_confirm'):
                     raise EmailAddressMisMatch()
 
+            #TODO: IMPROVE
+            if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):
+                if not ZipCodeValidator(data.get('address_zipcode', None)).is_valid():
+                    raise InvalidZipCodeNumber()
 
 class CreateAccountSchema(AccountSchema):
     pass
 
 
-class AdminCreateAccount(AccountSchema):
-
+class EditAccountSchema(AccountSchema):
     def __init__(self, *args, **kwargs):
-        super(AdminCreateAccount, self).__init__(*args, **kwargs)
-        del self.fields['email_confirm']
-
-class AdminEditAccount(AccountSchema):
-
-    def __init__(self, *args, **kwargs):
-        super(AdminEditAccount, self).__init__(*args, **kwargs)
+        super(EditAccountSchema, self).__init__(*args, **kwargs)
         self.fields['password'].required = False
-        del self.fields['password_confirm']
+        self.fields['password_confirm'].required = False
         del self.fields['email']
         del self.fields['email_confirm']
 
-signup = {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "properties": {
-        "email":        { "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
-	"email_confirm":{ "type": "string", "minLength": 5,  "maxLength": 80, "format": "email" },
-        "name":         { "type": "string", "minLength": 5,  "maxLength": 80, "pattern": NAME_PATTERN},
-        "badge_name":         { "type": "string",  "maxLength": 80},
-        "password":     { "type": "string", "minLength": 5,  "maxLength": 80 },
-        "password_confirm":     { "type": "string", "minLength": 5,  "maxLength": 80 },
-        "disability":   { "type": "string", "enum": DISABILITY_TYPES },
-        "disability_info": { "type": "string", "maxLength": 200},
-        "document":     { "type": "string", "minLength": 5,  "maxLength": 15 },
-	    "student_document":   { "type": "string", "maxLength": 30},
-        "phone":        { "type": "string", "minLength": 5,  "maxLength": 30 },
-        "organization": { "type": "string", "maxLength": 80 },
-        "resume":       { "type": "string",  "maxLength": 400 },
-        "occupation":      { "type": "string", "minLength": 1,  "maxLength": 20  },
-        "education":       { "type": "string", "minLength": 1,  "maxLength": 40  },
-        "sex":             { "type": "string", "minLength": 1,  "maxLength": 1  },
-        "born_date":       { "type": "string", "minLength": 10, "maxLength": 10 },
-	    "membership":      { "type": "boolean"},
-        "country":      { "type": "string", "minLength":1,  "maxLength": 20 },
-        "city":         { "type": "string", "minLength": 3,  "maxLength": 30 },
-        "address_street":  { "type": "string", "minLength": 5,  "maxLength": 80  },
-        "address_number":  { "type": "string", "minLength": 1,  "maxLength": 20  },
-        "address_extra":   { "type": "string", "minLength": 0,  "maxLength": 40  },
-        "address_state":   { "type": "string", "minLength": 2,  "maxLength": 2  },
-        "address_neighborhood": { "type": "string", "minLength": 2,  "maxLength": 20  },
-        "address_zipcode": { "type": "string", "minLength": 2,  "maxLength": 9  },
-    },
-    "required": [
-        "email", "name", "password", "country", "city", "phone",
-        "address_street", "address_number", "address_state", "address_neighborhood",
-        "address_zipcode", "occupation", "education", "sex", "born_date","membership"
-    ],
-}
-edit_account = copy.deepcopy(signup)
-edit_account['required'].remove('password')
-
-corporate = copy.deepcopy(signup)
-corporate['required'].remove('occupation')
-corporate['required'].remove('education')
-corporate['required'].remove('sex')
-corporate['required'].remove('born_date')
-corporate['required'].remove('membership')
-
-del corporate['properties']['occupation']
-del corporate['properties']['education']
-del corporate['properties']['sex']
-del corporate['properties']['born_date']
-del corporate['properties']['membership']
-
-edit_corporate = copy.deepcopy(corporate)
-edit_corporate['required'].remove('password')
-
+#TODO: CREATE A SCHEMA
 reset = {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
@@ -214,12 +155,12 @@ reset = {
     "required": ["hash_code", "password" ],
 }
 
+exclude_from_corporate = ['occupation', 'education', 'sex', 'born_date', 'membership']
+
 whitelist = dict(
-  signup=signup,
-  corporate=corporate,
-  edit_account=edit_account,
-  edit_corporate=edit_corporate,
-  reset=reset,
-  admin_create=AdminCreateAccount(),
-  admin_edit=AdminEditAccount()
+  create_corporate=CreateAccountSchema(exclude=exclude_from_corporate),
+  edit_corporate=EditAccountSchema(exclude=exclude_from_corporate),
+  create_account=CreateAccountSchema(),
+  edit_account=EditAccountSchema(),
+  reset=reset
 )
