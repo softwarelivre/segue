@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from segue.errors import SegueError, SegueFieldError, NotAuthorized, FieldError
+from segue.errors import SegueError, SegueFieldError, NotAuthorized, FieldError, SegueGenericError
 from segue.babel import _l
 
 class InvalidResetPassword(SegueError):
@@ -18,10 +18,8 @@ class NoSuchAccount(SegueError):
     def to_json(self):
         return { 'message': 'Esta conta de e-mail não foi encontrada no sistema!' }
 
-class DocumentAlreadyExist(SegueError):
-    code = 400
-    def to_json(self):
-        return { 'message': 'Já existe um usuário utilizando esse CPF ou CNPJ no sistema!' }
+class DocumentAlreadyExist(SegueGenericError):
+    MESSAGE = _l('This document is already registered')
 
 class DocumentIsNotDefined(SegueError):
     code = 400
@@ -38,16 +36,8 @@ class CertificateNameAlreadySet(SegueError):
     def to_json(self):
         return { 'message': 'cannot change certificate name' }
 
-class EmailAlreadyInUse(SegueFieldError):
-
-    FIELD = 'email'
-    LABEL = 'already_in_use'
-    MESSAGE = 'this e-mail address is already registered'
-
-    def __init__(self, email):
-        super(EmailAlreadyInUse, self).__init__()
-        self.value = email
-
+class EmailAlreadyInUse(SegueGenericError):
+    MESSAGE = _l('This e-mail address is already registered')
 
 class InvalidZipCodeNumber(FieldError):
     FIELD = 'address_zipcode'
