@@ -23,7 +23,7 @@ class AdminAccountController(object):
     @jsoned
     def create(self):
         data = request.get_json()
-        result = self.accounts.create_from_admin(data, rules='admin_create')
+        result = self.accounts.create(data)
         return Response(result, AccountDetail).create(), 200
 
     @jwt_only
@@ -31,7 +31,7 @@ class AdminAccountController(object):
     @jsoned
     def modify(self, account_id):
         data = request.get_json()
-        result = self.accounts.modify_from_admin(account_id, data, by=self.current_user, allow_email_change=True) or flask.abort(404)
+        result = self.accounts.modify(account_id, data, by=self.current_user, allow_email_change=True) or flask.abort(404)
         return result, 200
 
     @jsoned
