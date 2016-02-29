@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 import os
 
@@ -224,7 +225,7 @@ class PaymentService(object):
                     promo_product = Product.query.filter(Product.id==3).first()#OMG
                     customer = purchase.customer
                     pcs = PromoCodeService()
-                    promocode = pcs.create(promo_product, creator=customer, description='Vale ingresso doacao')[0]
+                    promocode = pcs.create(promo_product, creator=customer, description='Vale ingresso doação')[0]
 
                     document = DocumentService()
                     claim_check = DonationClaimCheckFactory().create(purchase)

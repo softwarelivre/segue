@@ -6,10 +6,12 @@ from segue.json import JsonFor
 from segue.core import config
 from segue.decorators import jsoned, jwt_only, admin_only
 
-from services import PurchaseService, PaymentService
+from services import PurchaseService, PaymentService, PromoCodeService
 from factories import PurchaseFactory
-from responses import GuideResponse, PromoCodeResponse
+from responses import GuideResponse, PromoCodeResponse, PromoCodeListResponse
 from segue.purchase.services import ProcessBoletosService
+from segue.responses import Response
+from promocode.factories import PromoCode
 import schema
 
 class PurchaseController(object):
@@ -111,3 +113,16 @@ class PaymentController(object):
         self.service.conclude(purchase_id, payment_id, payload) or flask.abort(404)
         path = '/#/purchase/{}/payment/{}/conclude'.format(purchase_id, payment_id)
         return flask.redirect(config.FRONTEND_URL + path)
+
+
+class PromocodeController(object):
+    def __init__(self, service=None):
+        self.service = service or PromoCodeService()
+
+    @jsoned
+    @jwt_only
+    def list(self):
+        #TODO: CHECK PARAMETERS
+        parms = {c: request.args.get(c) for c in ['creator_id'] if c in request.args}
+        result = self.service.query(**parms)
+        return Response(result, PromoCodeListResponse).create(), 200

@@ -16,6 +16,7 @@ class AccountBlueprint(flask.Blueprint):
 
         self.add_url_rule('/<int:account_id>/proposals',    methods=['GET'], view_func=self.controller.list_proposals)
         self.add_url_rule('/<int:account_id>/purchases',    methods=['GET'], view_func=self.controller.list_purchases)
+        self.add_url_rule('/<int:account_id>/promocodes',    methods=['GET'], view_func=self.controller.list_promocodes)
         self.add_url_rule('/<int:account_id>/caravan',      methods=['GET'], view_func=self.controller.get_caravan)
 
         self.add_url_rule('/<int:account_id>/reset/<string:hash_code>', methods=['GET'],  view_func=self.controller.get_reset)
