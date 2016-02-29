@@ -117,12 +117,13 @@ class ProposalService(object):
         proposal = self.get_one(proposal_id)
         if not self.check_ownership(proposal, by): raise NotAuthorized
 
+        #TODO: VERIFY THIS allow_modify_owner NOT USED
         new_owner_id = data.get('owner_id',None)
         if new_owner_id and new_owner_id != proposal.owner.id:
             proposal.owner = self.accounts.get_one(data.get('owner_id',None), check_ownership=False, strict=True)
 
-        for name, value in ProposalFactory.clean_for_update(data).items():
-            setattr(proposal, name, value)
+        proposal = ProposalFactory.update_model(proposal, data, schema.edit_proposal)
+
         db.session.add(proposal)
         db.session.commit()
         return proposal
