@@ -4,7 +4,6 @@ import os
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
 from segue.product.errors import NoSuchProduct, ProductExpired
-from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
@@ -15,8 +14,7 @@ from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
-from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale
-from errors    import InvalidDocumentNumber, InvalidZipCodeNumber
+from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale, DocumentIsNotDefined
 
 from segue.document.services import DocumentService
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
@@ -73,7 +71,8 @@ class PurchaseService(object):
 
     def create(self, buyer_data, product, account, commit=True, **extra):
         buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
-        self._validate_buyer(buyer)
+        if not buyer.document: raise DocumentIsNotDefined()
+
         purchase = PurchaseFactory.create(buyer, product, account, **extra)
         logger.info(buyer_data)
 
@@ -142,17 +141,6 @@ class PurchaseService(object):
         db.session.add(purchase)
         if commit: db.session.commit()
         return purchase
-
-    def _validate_buyer(self, buyer):
-        if buyer.is_brazilian():
-            if buyer.kind == 'person':
-                if not CPFValidator(buyer.document).is_valid():
-                    raise InvalidDocumentNumber(buyer.document)
-            elif buyer.kind == 'company':
-                if not CNPJValidator(buyer.document).is_valid():
-                    raise InvalidDocumentNumber(buyer.document)
-            if not ZipCodeValidator(buyer.address_zipcode).is_valid():
-                raise InvalidZipCodeNumber(buyer.address_zipcode)
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from segue.errors import SegueError, SegueFieldError
+from segue.babel import _l
+from segue.errors import SegueError, SegueFieldError, FieldError
 
 class PaymentVerificationFailed(SegueError):
     code = 500
@@ -42,29 +43,20 @@ class MustProvideDescription(SegueFieldError):
     LABEL = 'object_required'
     MESSAGE = 'please provide promocode description'
 
-class InvalidAddress(SegueError):
-    code = 400
 
-    def to_json(self):
-        return {'message': u'Verifique os dados do endereço do comprador'}
-
-
-class InvalidDocumentNumber(SegueFieldError):
-
-    FIELD = 'document'
-    LABEL = 'invalid_format'
-    MESSAGE = 'invalid document number'
-
-    def __init__(self, document):
-        super(InvalidDocumentNumber, self).__init__()
-        self.value = document
-
-
-class InvalidZipCodeNumber(SegueFieldError):
+class InvalidZipCodeNumber(FieldError):
     FIELD = 'address_zipcode'
-    LABEL = 'invalid_format'
-    MESSAGE = u'Código postal inválido'
+    MESSAGE = _l('Invalid Zip Code number')
 
-    def __init__(self, zipcode):
-        super(InvalidZipCodeNumber, self).__init__()
-        self.value = zipcode
+class InvalidCPF(FieldError):
+    FIELD = 'cpf'
+    MESSAGE = _l('Invalid CPF number')
+
+class InvalidCNPJ(FieldError):
+    FIELD = 'cnpj'
+    MESSAGE = _l('Invalid CNPJ number')
+
+class DocumentIsNotDefined(SegueError):
+    code = 400
+    def to_json(self):
+        return {'message': _l('You must define a document number') }
