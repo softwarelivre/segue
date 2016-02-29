@@ -1,5 +1,6 @@
 from segue.responses import BaseResponse
 from segue.purchase.promocode.models import PromoCodePayment
+from segue.schema import BaseSchema, Field
 
 class GuideResponse(BaseResponse):
     def __init__(self, payment):
@@ -14,6 +15,7 @@ class GuideResponse(BaseResponse):
                 self.promocode = PromoCodeResponse.create(p.promocode)
                 break
 
+#TODO: REMOVE
 class PromoCodeResponse(BaseResponse):
     def __init__(self, promocode):
         self.id          = promocode.id
@@ -23,3 +25,12 @@ class PromoCodeResponse(BaseResponse):
         self.discount    = promocode.discount
         self.description = promocode.description
         self.hash_code   = promocode.hash_code
+
+#TODO: RENAME
+class PromoCodeListResponse(BaseSchema):
+
+    class Meta:
+        fields = ('hash_code', 'description', 'discount', 'used')
+
+
+

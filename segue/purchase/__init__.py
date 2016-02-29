@@ -1,6 +1,6 @@
 import flask
 
-from controllers import PurchaseController, PaymentController
+from controllers import PurchaseController, PaymentController, PromocodeController
 
 class PurchaseBlueprint(flask.Blueprint):
     def __init__(self):
@@ -24,3 +24,9 @@ class PaymentBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:payment_id>/guide',    methods=['GET'],  view_func=self.controller.guide)
         self.add_url_rule('/<int:payment_id>/notify',   methods=['POST'], view_func=self.controller.notify)
         self.add_url_rule('/<int:payment_id>/conclude', methods=['GET'],  view_func=self.controller.conclude)
+
+class PromocodeBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(PromocodeBlueprint, self).__init__('promocodes', __name__, url_prefix='/promocodes')
+        self.controller = PromocodeController()
+        self.add_url_rule('',                                       methods=['GET'],  view_func=self.controller.list)
