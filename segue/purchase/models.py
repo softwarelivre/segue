@@ -56,6 +56,7 @@ class Purchase(JsonSerializable, db.Model):
     #TODO: Create a enum for status. Status from database an old database ( pending, paid, reimbursed, stale)
     status         = db.Column(db.Text, default='pending')
     amount         = db.Column(db.Numeric)
+    due_date       = db.Column(db.Date)
     created        = db.Column(db.DateTime, default=func.now())
     last_updated   = db.Column(db.DateTime, onupdate=datetime.now)
     kind           = db.Column(db.Text, server_default='single')
@@ -93,7 +94,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def payable(self):
-        return not self.satisfied and datetime.now() < self.product.sold_until
+        return not self.satisfied and datetime.now().date() <= self.due_date
 
     @property
     def stale(self):
@@ -105,7 +106,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def could_be_stale(self):
-        return not self.reimbursed and not self.stale and not self.satisfied and datetime.now() > self.product.sold_until
+        return not self.reimbursed and not self.stale and not self.satisfied and datetime.now().date() > self.due_date
 
     @property
     def paid_amount(self):
@@ -129,7 +130,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def can_start_payment(self):
-        return self.product.sold_until >= datetime.now()
+        return self.due_date >= datetime.now().date()
 
     def recalculate_status(self):
         self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
@@ -157,6 +158,7 @@ class Payment(JsonSerializable, db.Model):
     purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'))
     status      = db.Column(db.Text, default='pending')
     amount      = db.Column(db.Numeric)
+    due_date    = db.Column(db.Date)
     description = db.Column(db.Text)
 
     transitions = db.relationship('Transition', backref='payment', lazy='dynamic')
