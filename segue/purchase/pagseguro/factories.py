@@ -1,4 +1,5 @@
 import re
+import datetime
 
 from xml.etree import ElementTree
 from pagseguro import PagSeguro
@@ -100,6 +101,17 @@ class PagSeguroDetailsFactory(object):
             "weight":      0
         }
 
+    def max_age(self, payment):
+        """
+        :param payment: the payment
+        :return: max age in seconds
+        """
+        one_day_in_seconds = 86400
+        days_left = payment.due_date - datetime.datetime.now().date()
+        if days_left.days == 0:
+            return one_day_in_seconds
+        return days_left.days * one_day_in_seconds
+
     def reference(self, payment):
         return "{0}-PA{1:05d}".format(payment.reference, payment.id)
 
@@ -134,10 +146,12 @@ class PagSeguroSessionFactory(object):
         pg.sender    = self.details_factory.create_sender(payment.purchase.customer, payment.purchase.buyer)
         pg.shipping  = self.details_factory.create_shipping(payment.purchase.buyer)
         pg.items     = [ self.details_factory.create_item(payment, payment.purchase.product) ]
+        pg.max_age   = self.details_factory.max_age(payment)
 
         pg.reference_prefix = "SEGUE-FISL17-"
         pg.reference        = self.details_factory.reference(payment)
         pg.redirect_url     = self.details_factory.redirect_url(payment, payment.purchase)
         pg.notification_url = self.details_factory.notification_url(payment, payment.purchase)
+
 
         return pg

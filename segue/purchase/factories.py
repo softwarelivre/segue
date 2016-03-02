@@ -2,7 +2,7 @@ from segue.factory import Factory
 from segue.hasher import Hasher
 
 import schema
-from datetime import datetime
+from datetime import datetime, timedelta
 from models import Buyer, Purchase, Payment, Transition, ExemptPurchase, ClaimCheck
 
 class BuyerFactory(Factory):
@@ -23,6 +23,7 @@ class PurchaseFactory(Factory):
         result = effective_class(**extra_fields)
         result.buyer = buyer
         result.product = product
+        result.due_date = datetime.today() + timedelta(days=int(product.payment_days))
         #TODO: IMPROVE CALCULATE THE AMOUNT OF THE PURCHASE
         if not result.amount:
             result.amount = product.price
@@ -49,6 +50,7 @@ class PaymentFactory(Factory):
         payment = target_model()
         payment.purchase = purchase
         payment.amount   = purchase.outstanding_amount
+        payment.due_date = purchase.due_date
         return payment
 
 
