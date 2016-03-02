@@ -110,9 +110,15 @@ class PaymentController(object):
 
     def conclude(self, purchase_id, payment_id):
         payload = request.args.to_dict(True)
-        self.service.conclude(purchase_id, payment_id, payload) or flask.abort(404)
-        path = '/#/purchase/{}/payment/{}/conclude'.format(purchase_id, payment_id)
-        return flask.redirect(config.FRONTEND_URL + path)
+        purchase = self.service.conclude(purchase_id, payment_id, payload)
+        if not purchase:
+            flask.abort(404)
+        else:
+            base_path = 'purchase'
+            if purchase.product.category == 'donation':
+                base_path = 'donation'
+            path = '/#/{}/{}/payment/{}/conclude'.format(base_path, purchase_id, payment_id)
+            return flask.redirect(config.FRONTEND_URL + path)
 
 
 class PromocodeController(object):
