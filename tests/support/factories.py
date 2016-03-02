@@ -2,7 +2,7 @@ from datetime import datetime, date
 
 import factory
 from factory import Sequence, LazyAttribute, SubFactory
-from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyNaiveDateTime, FuzzyDecimal
+from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyNaiveDateTime, FuzzyDecimal, FuzzyInteger
 from factory.alchemy import SQLAlchemyModelFactory
 
 from segue.core import db
@@ -51,7 +51,7 @@ class ValidAccountFactory(SegueFactory):
     name     = _Sequence('Joaozinho {0}')
     role     = "user"
     password = "password"
-    document     = "123.456.789-20"
+    document     = _Sequence('123.456.789-2{0}')
     country      = "Brazil"
     state        = "RS"
     city         = "Porto Alegre"
@@ -141,6 +141,7 @@ class ValidProductFactory(SegueFactory):
     sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2025,12,1,0,0,0))
     public      = True
     price       = FuzzyDecimal(70, 400, 2)
+    payment_days = FuzzyInteger(1, 50)
     description = "ingresso fisl16 - lote 1 - muggles"
 
 class ValidCaravanProductFactory(ValidProductFactory):
@@ -171,6 +172,7 @@ class ValidBuyerFactory(SegueFactory):
     address_number  = _Sequence("#{0}")
     address_extra   = _Sequence("apto #{0}")
     address_zipcode = _Sequence("90909-#{0:03}")
+    address_neighborhood = "Menino de deus"
     address_city    = "Porto Alegre"
     address_country = "Brasil"
 
@@ -192,6 +194,8 @@ class ValidPurchaseFactory(SegueFactory):
     product  = SubFactory(ValidProductFactory)
     customer = SubFactory(ValidAccountFactory)
     status   = "pending"
+    amount   = FuzzyDecimal(70, 400, 2)
+    due_date = FuzzyDate(date.today())
 
 class ValidPurchaseByPersonFactory(ValidPurchaseFactory):
     buyer = SubFactory(ValidBuyerPersonFactory)
@@ -205,6 +209,7 @@ class ValidPaymentFactory(SegueFactory):
 
     purchase = SubFactory(ValidPurchaseFactory)
     amount   = FuzzyDecimal(70, 400, 2)
+    due_date = FuzzyDate(date.today())
     status   = "pending"
 
 class ValidPagSeguroPaymentFactory(ValidPaymentFactory):

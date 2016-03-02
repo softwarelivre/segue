@@ -60,7 +60,7 @@ class PagSeguroPaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.__class__, PagSeguroPayment)
         self.assertEquals(result.status, 'pending')
         self.assertEquals(result.reference, 'A00333-PU00666')
-        self.assertEquals(result.amount, purchase.product.price)
+        self.assertEquals(result.amount, purchase.amount)
 
     def test_processes_a_pagseguro_checkout(self):
         payment = self.create_from_factory(ValidPagSeguroPaymentFactory)
@@ -93,7 +93,7 @@ class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
 
     def _build_payment(self):
         product  = self.build_from_factory(ValidProductFactory, price=200)
-        purchase = self.build_from_factory(ValidPurchaseByPersonFactory, id=444, product=product)
+        purchase = self.build_from_factory(ValidPurchaseByPersonFactory, id=444, product=product, amount=200)
         payment  = self.build_from_factory(ValidPagSeguroPaymentFactory, id=999, amount=200, purchase=purchase)
         return payment, purchase, product
 
@@ -101,7 +101,7 @@ class PagSeguroSessionFactoryTestCases(SegueApiTestCase):
         payment, _, _ = self._build_payment()
         result = self.factory.payment_session(payment)
 
-        self.assertEquals(result.reference,          'SEGUE-FISL16-A00555-PU00444-PA00999')
+        self.assertEquals(result.reference,          'SEGUE-FISL17-A00555-PU00444-PA00999')
         self.assertEquals(result.redirect_url,       'http://192.168.33.91:9001/api/purchases/444/payments/999/conclude')
         self.assertEquals(result.notification_url,   'http://192.168.33.91:9001/api/purchases/444/payments/999/notify')
 
