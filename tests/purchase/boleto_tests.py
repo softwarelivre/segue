@@ -26,7 +26,8 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
 
     def test_creates_a_payment_on_db(self):
         account = self.create_from_factory(ValidAccountFactory, id=333)
-        purchase = self.create_from_factory(ValidPurchaseFactory, id=666, customer=account)
+        product  = self.create_from_factory(ValidProductFactory, price=200)
+        purchase = self.create_from_factory(ValidPurchaseFactory, id=666, customer=account, product=product, amount=product.price)
         mockito.when(self.sequence).nextval().thenReturn(5678)
         mockito.when(self.hasher).generate().thenReturn('1111ABCD')
 
@@ -35,8 +36,8 @@ class BoletoPaymentServiceTestCases(SegueApiTestCase):
         self.assertEquals(result.type, 'boleto')
         self.assertEquals(result.__class__, BoletoPayment)
         self.assertEquals(result.status, 'pending')
-        self.assertEquals(result.amount, purchase.product.price)
-        self.assertEquals(result.due_date, purchase.product.sold_until.date())
+        self.assertEquals(result.amount, purchase.amount)
+        self.assertEquals(result.due_date, purchase.due_date)
         self.assertEquals(result.our_number, 105678)
         self.assertEquals(result.document_hash, '1111ABCD')
 

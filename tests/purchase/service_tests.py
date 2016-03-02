@@ -140,9 +140,10 @@ class PaymentServiceTestCases(SegueApiTestCase):
 
     def test_notification_that_pays_the_balance_of_purchase(self):
         payload    = mockito.Mock()
-        product    = self.create_from_factory(ValidProductFactory, price=200)
-        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
-        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
+        product_price = 200
+        product    = self.create_from_factory(ValidProductFactory, price=product_price)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product, amount=product_price)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=product_price)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
 
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
@@ -175,7 +176,7 @@ class PaymentServiceTestCases(SegueApiTestCase):
     def test_notification_that_does_not_pay_the_balance_of_purchase(self):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
-        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product, amount=200)
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
 
@@ -191,9 +192,14 @@ class PaymentServiceTestCases(SegueApiTestCase):
     def test_notification_that_is_not_to_a_paid_state(self):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
-        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product)
+        purchase   = self.create_from_factory(ValidPurchaseFactory, product=product, amount=200)
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
+
+        print product.price
+        print purchase.amount
+        print payment.amount
+
 
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
 
@@ -249,7 +255,7 @@ class PaymentFactoryTestCases(SegueApiTestCase):
 
     def test_payment_has_outstanding_amount_of_purchase_by_default(self):
         product  = self.create_from_factory(ValidProductFactory, price=200)
-        purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
+        purchase = self.create_from_factory(ValidPurchaseFactory, product=product, amount=200)
         payment1 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=50)
         payment2 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=12.5, status='paid')
         payment3 = self.create_from_factory(ValidPaymentFactory, purchase=purchase, amount=12.5, status='confirmed')
