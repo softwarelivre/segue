@@ -17,6 +17,7 @@ class Product(JsonSerializable, db.Model):
     category          = db.Column(db.Text)
     public            = db.Column(db.Boolean, default=True)
     price             = db.Column(db.Numeric)
+    payment_days      = db.Column(db.Numeric)
     sold_until        = db.Column(db.DateTime)
     description       = db.Column(db.Text)
     information       = db.Column(db.Text)

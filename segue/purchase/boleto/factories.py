@@ -21,8 +21,6 @@ class BoletoPaymentFactory(PaymentFactory):
 
     def create(self, purchase, payment_id, data=None):
         payment = super(BoletoPaymentFactory, self).create(purchase, target_model=self.model, extra_data=data)
-        #TODO: CREATE A PRODUCT PAYMENT LIMIT
-        payment.due_date = date.today() + timedelta(days=3)
         payment.our_number = "{:010d}".format(config.BOLETO_OFFSET + payment_id)
         payment.document_hash = self.hasher.generate()
         return payment

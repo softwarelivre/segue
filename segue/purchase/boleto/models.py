@@ -15,12 +15,11 @@ class BoletoPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'boleto' }
 
     our_number    = db.Column(db.BigInteger, name='bo_our_number')
-    due_date      = db.Column(db.Date,       name='bo_due_date')
     document_hash = db.Column(db.String(32), name='bo_document_hash')
 
     @property
     def extra_fields(self):
-        return dict(our_number=self.our_number, due_date=self.due_date, document_hash=self.document_hash)
+        return dict(our_number=self.our_number, document_hash=self.document_hash)
 
     @property
     def legal_due_date(self):
