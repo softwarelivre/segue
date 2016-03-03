@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from segue.core import db
 from ..models import Payment, Transition
 from segue.json import JsonSerializable
