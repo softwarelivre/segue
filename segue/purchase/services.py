@@ -11,6 +11,7 @@ from filters import PurchaseFilterStrategies, PaymentFilterStrategies
 
 from segue.mailer import MailerService
 
+from paypal    import PayPalPaymentService
 from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
@@ -148,6 +149,7 @@ class PaymentService(object):
         pagseguro = PagSeguroPaymentService,
         boleto    = BoletoPaymentService,
         cash      = CashPaymentService,
+        paypal    = PayPalPaymentService,
         promocode = PromoCodePaymentService
     )
 
@@ -221,6 +223,8 @@ class PaymentService(object):
                 logger.debug('transition is good payment! notifying customer via e-mail!')
 
                 if purchase.product.id == 1:#FIX OMG
+                    #TODO: REMOVE
+                    from segue.product.models import Product
 
                     promo_product = Product.query.filter(Product.id==3).first()#OMG
                     customer = purchase.customer

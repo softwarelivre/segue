@@ -23,6 +23,7 @@ class PaymentBlueprint(flask.Blueprint):
         self.controller = PaymentController()
         self.add_url_rule('/<int:payment_id>/guide',    methods=['GET'],  view_func=self.controller.guide)
         self.add_url_rule('/<int:payment_id>/notify',   methods=['POST'], view_func=self.controller.notify)
+        self.add_url_rule('/<int:payment_id>/paypal/notify',   methods=['GET'], view_func=self.controller.paypal_notify)
         self.add_url_rule('/<int:payment_id>/conclude', methods=['GET'],  view_func=self.controller.conclude)
 
 class PromocodeBlueprint(flask.Blueprint):

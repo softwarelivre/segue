@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import flask
 from flask.ext.jwt import current_user
 from flask import request
@@ -12,6 +14,7 @@ from responses import GuideResponse, PromoCodeResponse, PromoCodeListResponse
 from segue.purchase.services import ProcessBoletosService
 from segue.responses import Response
 from promocode.factories import PromoCode
+from flask import request, url_for, redirect
 import schema
 
 class PurchaseController(object):
@@ -107,6 +110,14 @@ class PaymentController(object):
         payload = request.form.to_dict(True)
         result = self.service.notify(purchase_id, payment_id, payload) or flask.abort(404)
         return result[0], 200
+
+    @jsoned
+    def paypal_notify(self, purchase_id=None, payment_id=None):
+        payload = request.args.to_dict(True)
+        result = self.service.notify(purchase_id, payment_id, payload) or flask.abort(404)
+        conclude = url_for('purchase_payments.conclude', purchase_id=purchase_id, payment_id=payment_id)
+        conclude_url = conclude + '?token={}'.format(payload.get('token', ''))
+        return redirect(conclude_url)
 
     def conclude(self, purchase_id, payment_id):
         payload = request.args.to_dict(True)
