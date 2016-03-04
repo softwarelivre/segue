@@ -2,7 +2,7 @@
 
 from segue.errors import ExternalServiceError
 from segue.purchase.errors import InvalidPaymentNotification
-from segue.core import db, logger
+from segue.core import db, logger, config
 
 from .factories import PayPalPaymentFactory, PayPalTransitionFactory, PaypalDetailsFactory
 
@@ -73,17 +73,17 @@ class PayPalPaymentService(object):
 
 class PayPalSession(object):
 
-    def __init__(self, config=None, factory=None):
-        self.config = config or PayPalSession.default_config()
-        self.interface = PayPalInterface(config=self.config)
-        self.factory = factory or PaypalDetailsFactory()
+    def __init__(self, paypal_config=None, details_factory=None):
+        self.paypal_config = paypal_config or PayPalSession.default_config()
+        self.interface = PayPalInterface(config=self.paypal_config)
+        self.factory = details_factory or PaypalDetailsFactory()
 
     @staticmethod
     def default_config():
         return PayPalConfig(
-                    API_USERNAME='ricardo_api1.solis.com.br',
-                    API_PASSWORD='RNLSNU5JWQDWDKM6',
-                    API_SIGNATURE='AqN13tyjDtysZCKkGvl39UWd5SXMAJ9cb8XU8wmgZx5xX7.BQw8E4Q0V')
+                    API_USERNAME=config.PAYPAL_API_USERNAME,
+                    API_PASSWORD=config.PAYPAL_API_PASSWORD,
+                    API_SIGNATURE=config.PAYPAL_API_SIGNATURE)
 
     def start_express_checkout(self, payment):
         checkout = self.factory.create_set_express_checkout(payment)
