@@ -28,13 +28,12 @@ class PaypalDetailsFactory(object):
     PAYMENTACTION = 'Sale'
     CURRENCYCODE = 'BRL'
 
-    @classmethod
-    def create_item_details(self, product):
+    def create_item_details(self, purchase):
         return {
-            'L_PAYMENTREQUEST_0_NAME0': product.description,
+            'L_PAYMENTREQUEST_0_NAME0': purchase.product.description,
             'L_PAYMENTREQUEST_0_QTY0': 1,
-            'L_PAYMENTREQUEST_0_AMT0': product.price,
-            'L_PAYMENTREQUEST_0_NUMBER0': product.id
+            'L_PAYMENTREQUEST_0_AMT0': purchase.amount,
+            'L_PAYMENTREQUEST_0_NUMBER0': purchase.product.id
         }
 
     def create_payment_details(self, payment):
@@ -70,7 +69,7 @@ class PaypalDetailsFactory(object):
         return '{}/#/home'.format(config.FRONTEND_URL)
 
     def create_set_express_checkout(self, payment):
-        item_details = self.create_item_details(payment.purchase.product)
+        item_details = self.create_item_details(payment.purchase)
         payment_details = self.create_payment_details(payment)
         request_details = self.create_request_details(payment)
 
@@ -86,7 +85,7 @@ class PayPalTransitionFactory(TransitionFactory):
 
     PAYPAL_STATUSES = {
         'PaymentActionNotInitiated': 'pending', 'PaymentActionFailed': 'failed',
-        'PaymentActionInProgress': 'in analysis', 'PaymentActionCompleted': 'confirmed'
+        'PaymentActionInProgress': 'in analysis', 'PaymentActionCompleted': 'paid'
     }
 
     @classmethod
