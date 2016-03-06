@@ -195,6 +195,9 @@ class PaymentService(object):
             db.session.add(transition)
             db.session.add(purchase)
             db.session.commit()
+
+            self._notify_user(purchase, payment, transition)
+
             return purchase
         except KeyError, e:
             logger.error('Exception was thrown while processing payment conclusion! %s', e)
@@ -219,46 +222,7 @@ class PaymentService(object):
             db.session.add(purchase)
             db.session.commit()
 
-            if purchase.satisfied:
-                logger.debug('transition is good payment! notifying customer via e-mail!')
-
-                if purchase.product.id == 1:#FIX OMG
-                    #TODO: REMOVE
-                    from segue.product.models import Product
-
-                    promo_product = Product.query.filter(Product.id==3).first()#OMG
-                    customer = purchase.customer
-                    pcs = PromoCodeService()
-                    promocode = pcs.create(promo_product, creator=customer, description='Vale ingresso doação')[0]
-
-                    document = DocumentService()
-                    claim_check = DonationClaimCheckFactory().create(purchase)
-                    doc = document.svg_to_pdf(
-                        claim_check.template_file,
-                        'claimcheck',
-                        claim_check.hash_code,
-                        variables=claim_check.template_vars)[0]
-
-                    self.mailer.notify_promocode(customer, promocode, doc)
-
-                elif purchase.product.category == 'donation':
-                    document = DocumentService()
-                    claim_check = DonationClaimCheckFactory().create(purchase)
-
-                    doc = document.svg_to_pdf(
-                        claim_check.template_file,
-                        'claimcheck',
-                        claim_check.hash_code,
-                        variables=claim_check.template_vars)[0]
-
-                    self.mailer.notify_donation(purchase, payment, doc)
-                else:
-                    self.mailer.notify_payment(purchase, payment)
-
-                # TODO: improve this code, caravan concerns should never live here!
-                if purchase.kind == 'caravan-rider':
-                    logger.debug('attempting to exempt the leader of a caravan')
-                    self.caravans.update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
+            self._notify_user(purchase, payment, transition)
 
             return purchase, transition
         except Exception, e:
@@ -272,6 +236,47 @@ class PaymentService(object):
             return self.DEFAULT_PROCESSORS[method]()
         raise NotImplementedError(method+' is not a valid payment method')
 
+    def _notify_user(self, purchase, payment, transition):
+        if purchase.satisfied and transition.old_status != 'paid' and transition.new_status == 'paid':
+            logger.debug('transition is good payment! notifying customer via e-mail!')
+
+            if purchase.product.id == 1:#FIX OMG
+                #TODO: REMOVE
+                from segue.product.models import Product
+
+                promo_product = Product.query.filter(Product.id==3).first()#OMG
+                customer = purchase.customer
+                pcs = PromoCodeService()
+                promocode = pcs.create(promo_product, creator=customer, description=u'Vale ingresso doação')[0]
+
+                document = DocumentService()
+                claim_check = DonationClaimCheckFactory().create(purchase)
+                doc = document.svg_to_pdf(
+                    claim_check.template_file,
+                    'claimcheck',
+                    claim_check.hash_code,
+                    variables=claim_check.template_vars)[0]
+
+                self.mailer.notify_promocode(customer, promocode, doc)
+
+            elif purchase.product.category == 'donation':
+                document = DocumentService()
+                claim_check = DonationClaimCheckFactory().create(purchase)
+
+                doc = document.svg_to_pdf(
+                    claim_check.template_file,
+                    'claimcheck',
+                    claim_check.hash_code,
+                    variables=claim_check.template_vars)[0]
+
+                self.mailer.notify_donation(purchase, payment, doc)
+            else:
+                self.mailer.notify_payment(purchase, payment)
+
+            # TODO: improve this code, caravan concerns should never live here!
+            if purchase.kind == 'caravan-rider':
+                logger.debug('attempting to exempt the leader of a caravan')
+                self.caravans.update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
 
 class ProcessBoletosService(object):
 

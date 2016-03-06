@@ -79,7 +79,7 @@ class MailerService(object):
         message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
         return mailer.send(message.build())
 
-    def notify_promocode(self, customer, promocode): #FIX REVIEW
+    def notify_promocode(self, customer, promocode, claim_check_file_path):
         from segue.models import SurveyAnswer
         survey = SurveyAnswer.query\
             .filter(SurveyAnswer.survey=='fisl17_donation_shirt')\
@@ -90,7 +90,7 @@ class MailerService(object):
         message = self.message_factory.from_template('promocode/confirmation')
         message.given(customer=customer, promocode=promocode, survey=survey)
         message.to(customer.name, customer.email)
-
+        message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
         return mailer.send(message.build())
 
     def notify_claimcheck(self, purchase, claim_check_file_path):

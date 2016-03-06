@@ -7,7 +7,7 @@ from segue.schema import BaseSchema, Field, Validator
 from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
 
-ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "coporate", "foreign"]
+ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "corporate", "foreign"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
 DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
