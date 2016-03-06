@@ -74,4 +74,4 @@ class DocumentService(object):
             logger.info(process.stdout.read())
             raise DocumentGenerationFailed()
 
-        return output_root, file_name
+        return output_path, file_name

@@ -6,7 +6,7 @@ from segue.schema import BaseSchema, Field, Validator
 from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
 
-BUYER_TYPES = ['person','company','government']
+BUYER_TYPES = ['person','company','government', 'foreign']
 
 class BuyerSchema(BaseSchema):
 

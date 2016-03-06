@@ -10,7 +10,10 @@ class BuyerFactory(Factory):
 
     @classmethod
     def clean_for_insert(cls, data):
-        data['document'] = data.pop('cpf', None) or data.pop('passport', None) or data.pop('cnpj', None)
+        cpf = data.pop('cpf', None)
+        cnpj = data.pop('cnpj', None)
+        passport = data.pop('passport', None)
+        data['document'] = cpf or cnpj or passport
         return data
 
 class PurchaseFactory(Factory):
