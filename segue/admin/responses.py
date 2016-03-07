@@ -191,10 +191,14 @@ class TrackDetailResponse(BaseResponse):
 class ProposalDetailResponse(BaseResponse):
     def __init__(self, proposal, links=True, embeds=True):
         self.id           = proposal.id
+        self.type         = proposal.type
         self.title        = proposal.title
         self.full         = proposal.full
         self.level        = proposal.level
         self.language     = proposal.language
+        self.restrictions = proposal.restrictions
+        self.demands      = proposal.demands
+        self.expected_duration = proposal.expected_duration
         self.created      = proposal.created
         self.last_updated = proposal.last_updated
         self.tags         = proposal.tag_names
