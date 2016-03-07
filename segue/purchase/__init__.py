@@ -13,7 +13,7 @@ class PurchaseBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
         self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
         self.add_url_rule('/promocode/<string:hash>',               methods=['GET'],  view_func=self.controller.check_promocode)
-        self.add_url_rule('/processboletos',                        methods=['POST'],  view_func=self.controller.process_boletos)
+        self.add_url_rule('/process-boletos',                        methods=['POST'],  view_func=self.controller.process_boletos)
         #TODO: REMOVE
         self.add_url_rule('/donations/count',                       methods=['GET'],  view_func=self.controller.donations_count)
 
