@@ -94,6 +94,10 @@ class Field(object):
         return URLFor(*args, **kwargs)
 
     @staticmethod
+    def raw(*args, **kwargs):
+        return fields.Raw(*args, **kwargs)
+
+    @staticmethod
     def create(cls, *args, **kwargs):
 
         msgs = Field.DEFAULT_MSGS.copy()
