@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from segue.babel import _l
 from segue.errors import SegueError
 
 class NoSuchProduct(SegueError):
@@ -24,3 +25,7 @@ class MinimumAmount(SegueError):
         return { 'message': 'Valor mínimo para doação é de R$ 10,00.' }
 
 
+class MaxPurchaseReached(SegueError):
+    code = 400
+    def to_json(self):
+        return {'message': _l('Max purchased reached')}
