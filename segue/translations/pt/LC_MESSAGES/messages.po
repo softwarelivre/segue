@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-28 18:46-0300\n"
+"POT-Creation-Date: 2016-03-09 09:49-0300\n"
 "PO-Revision-Date: 2016-02-15 19:32-0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -60,54 +60,86 @@ msgstr "\"{input}\" não é um formato de data válido."
 msgid "Not a valid number."
 msgstr "Número inválido."
 
-#: segue/schema.py:110
+#: segue/schema.py:114
 msgid "Not a valid choice."
 msgstr "Está não é uma escolha válida."
 
-#: segue/schema.py:111
+#: segue/schema.py:115
 msgid "Not a valid email address."
 msgstr "Este não é um endereço de e-mail válido."
 
-#: segue/schema.py:112
+#: segue/schema.py:116
 msgid "Shorter than minimum length {min}."
 msgstr "Este campo deve ter no mínimo {min} caracteres."
 
-#: segue/schema.py:113
+#: segue/schema.py:117
 msgid "Longer than maximum length {max}."
 msgstr "Este campo deve ter no máximo {max} caracteres."
 
-#: segue/schema.py:114
+#: segue/schema.py:118
 msgid "Length must be between {min} and {max}."
 msgstr "Este campo deve ter entre {min} e {max} caracteres."
 
-#: segue/schema.py:115
+#: segue/schema.py:119
 msgid "Length must be {equal}."
 msgstr "Este campo deve ter {equal} caracteres."
 
-#: segue/account/errors.py:103
+#: segue/account/errors.py:22
+msgid "This document is already registered"
+msgstr "Este documento já foi cadastrado no sistema"
+
+#: segue/account/errors.py:40
+msgid "This e-mail address is already registered"
+msgstr "Este endereço de e-mail já está em uso"
+
+#: segue/account/errors.py:44 segue/purchase/errors.py:49
 #, fuzzy
 msgid "Invalid Zip Code number"
 msgstr "CEP inválido"
 
-#: segue/account/errors.py:107
+#: segue/account/errors.py:48 segue/purchase/errors.py:53
 msgid "Invalid CPF number"
 msgstr "Número do CPF inválido"
 
-#: segue/account/errors.py:111
+#: segue/account/errors.py:52 segue/purchase/errors.py:57
 msgid "Invalid CNPJ number"
 msgstr "Número do CNPJ inválido"
 
-#: segue/account/errors.py:115
+#: segue/account/errors.py:56
 msgid "Email does not match"
 msgstr "Os e-mails não são iguais"
 
-#: segue/account/errors.py:119
+#: segue/account/errors.py:60
 msgid "Password does not match"
 msgstr "As senhas não são iguais"
 
-msgid "This e-mail is already in use"
-msgstr "Esta conta de e-mail já está sendo usada"
+#: segue/document/errors.py:13
+msgid "Invalid document format."
+msgstr "O formato do documento parece estar inválido"
 
-msgid "This number document is already in use"
-msgstr "Este número de documento já está sendo usado"
+#: segue/document/errors.py:19
+msgid "Document could not be generated."
+msgstr "Não foi possível gerar o documento"
+
+#: segue/document/errors.py:25
+msgid "Document could not be saved."
+msgstr "Nào foi possível salvar o documento"
+
+#: segue/purchase/errors.py:62
+msgid "You must define a document number"
+msgstr "Você precisa fornecer um documento válido"
+
+#: segue/purchase/errors.py:67
+msgid "You must define a student document"
+msgstr "Você precisa definir um documento que comprove o seu vínculo estudantil"
+
+#: segue/purchase/errors.py:77
+msgid "The student document {} is not valid"
+msgstr "O documento de estudante {} não parece ser válido"
+
+#~ msgid "This e-mail is already in use"
+#~ msgstr "Esta conta de e-mail já está sendo usada"
+
+#~ msgid "This number document is already in use"
+#~ msgstr "Este número de documento já está sendo usado"
 
