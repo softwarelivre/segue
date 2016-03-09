@@ -1,11 +1,12 @@
 from datetime import datetime
+from sqlalchemy import func
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
-from errors import ProductExpired, MinimumAmount
+from errors import ProductExpired, MinimumAmount, MaxPurchaseReached
 from segue.corporate.models import CorporatePurchase
 from segue.purchase.promocode.models import PromoCode
-
+from segue.purchase.models import Purchase
 
 class ProductJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
@@ -16,6 +17,7 @@ class Product(JsonSerializable, db.Model):
     kind              = db.Column(db.Enum('worker', 'public', 'speaker', name="product_kinds"))
     category          = db.Column(db.Text)
     public            = db.Column(db.Boolean, default=True)
+    max_purchases     = db.Column(db.Integer, default=0)
     price             = db.Column(db.Numeric)
     payment_days      = db.Column(db.Numeric)
     sold_until        = db.Column(db.DateTime)
@@ -38,6 +40,8 @@ class Product(JsonSerializable, db.Model):
     def check_eligibility(self, buyer_data, account=None):
         if self.sold_until < datetime.now():
             raise ProductExpired()
+        if self.is_limited() and self.purchase_limit_reachead():
+            raise MaxPurchaseReached()
         return True
 
     def extra_purchase_fields_for(self, buyer_data):
@@ -45,6 +49,20 @@ class Product(JsonSerializable, db.Model):
 
     def special_purchase_class(self):
         return None
+
+    def is_limited(self):
+        return self.max_purchases > 0
+
+    def purchase_limit_reachead(self):
+        count = db.session.query(func.count(Purchase.id))\
+            .filter(Purchase.product_id == self.id)\
+            .scalar()
+        if not count:
+            return False
+        if count >= self.max_purchases:
+            return True
+        else:
+            return False
 
     def similar_products(self):
         return Product.query.filter(

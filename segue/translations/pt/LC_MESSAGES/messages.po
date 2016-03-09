@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-09 09:49-0300\n"
+"POT-Creation-Date: 2016-03-09 11:28-0300\n"
 "PO-Revision-Date: 2016-02-15 19:32-0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -113,6 +113,11 @@ msgstr "Os e-mails não são iguais"
 msgid "Password does not match"
 msgstr "As senhas não são iguais"
 
+#: segue/document/errors.py:7
+#, fuzzy
+msgid "could not find document {}"
+msgstr "Você precisa fornecer um documento válido"
+
 #: segue/document/errors.py:13
 msgid "Invalid document format."
 msgstr "O formato do documento parece estar inválido"
@@ -124,6 +129,10 @@ msgstr "Não foi possível gerar o documento"
 #: segue/document/errors.py:25
 msgid "Document could not be saved."
 msgstr "Nào foi possível salvar o documento"
+
+#: segue/product/errors.py:31
+msgid "Max purchased reached"
+msgstr "O limite de compras para esse produto foi atingido"
 
 #: segue/purchase/errors.py:62
 msgid "You must define a document number"
