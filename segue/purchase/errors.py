@@ -59,4 +59,19 @@ class InvalidCNPJ(FieldError):
 class DocumentIsNotDefined(SegueError):
     code = 400
     def to_json(self):
-        return {'message': _l('You must define a document number') }
+        return {'message': _l('You must define a document number')}
+
+class StudentDocumentIsNotDefined(SegueError):
+    code = 400
+    def to_json(self):
+        return {'message': _l('You must define a student document')}
+
+
+class StudentDocumentIsInvalid(SegueError):
+    code = 400
+
+    def __init__(self, document):
+        self.document = document
+
+    def to_json(self):
+        return {'message': _l('The student document {} is not valid'.format(self.document))}
