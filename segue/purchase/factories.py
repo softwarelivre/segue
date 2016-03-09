@@ -1,5 +1,6 @@
 from segue.factory import Factory
 from segue.hasher import Hasher
+from segue.document.services import DocumentService
 
 import schema
 from datetime import datetime, timedelta
@@ -8,8 +9,24 @@ from models import Buyer, Purchase, Payment, Transition, ExemptPurchase, ClaimCh
 class BuyerFactory(Factory):
     model = Buyer
 
+    def __init__(self, document_service=None, hash=None):
+        self.document_service = document_service or DocumentService()
+        self.hash = hash or Hasher(10)
+
+    def create(self, data, schema):
+        #TODO: CREATE A CONSTANT FOR DOCUMENT KIND
+        file_payload = data.get('document_file', None)
+        document_file_hash = None
+        if file_payload:
+            document_file_hash = self.hash.generate()
+            self.document_service.base64_to_pdf('buyer-document', document_file_hash, file_payload)
+        buyer = BuyerFactory.from_json(data, schema)
+        buyer.document_file_hash = document_file_hash
+        return buyer
+
     @classmethod
     def clean_for_insert(cls, data):
+        data.pop('document_file', None)
         cpf = data.pop('cpf', None)
         cnpj = data.pop('cnpj', None)
         passport = data.pop('passport', None)

@@ -5,6 +5,7 @@ import os
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
 from segue.product.errors import NoSuchProduct, ProductExpired
+from segue.validation import StudentDocumentValidator
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
@@ -16,7 +17,7 @@ from pagseguro import PagSeguroPaymentService
 from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
-from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale, DocumentIsNotDefined
+from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale, DocumentIsNotDefined, StudentDocumentIsInvalid, StudentDocumentIsNotDefined
 
 from segue.document.services import DocumentService
 from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
@@ -72,11 +73,18 @@ class PurchaseService(object):
         return Purchase.query.filter(*filter_list).all()
 
     def create(self, buyer_data, product, account, commit=True, **extra):
-        buyer    = BuyerFactory.from_json(buyer_data, schema.buyer)
+        buyer    = BuyerFactory().create(buyer_data, schema.buyer)
         if not buyer.document: raise DocumentIsNotDefined()
+        if product.category == 'student':
+            if not buyer.extra_document and not buyer.document_file_hash:
+                raise StudentDocumentIsNotDefined()
+            elif buyer.extra_document:
+                if not StudentDocumentValidator(buyer.extra_document, account.born_date).is_valid():
+                    raise StudentDocumentIsInvalid(buyer.extra_document)
+
+        logger.info("Create buyer: %s", buyer)
 
         purchase = PurchaseFactory.create(buyer, product, account, **extra)
-        logger.info(buyer_data)
 
         self.db.session.add(buyer)
         self.db.session.add(purchase)

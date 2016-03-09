@@ -16,6 +16,8 @@ class Buyer(JsonSerializable, db.Model):
     kind            = db.Column(db.Enum('person','company','government', name="buyer_kinds"))
     name            = db.Column(db.Text)
     document        = db.Column(db.Text)
+    extra_document  = db.Column(db.String(length=80))
+    document_file_hash = db.Column(db.String(length=80))
     contact         = db.Column(db.Text)
     address_street  = db.Column(db.Text)
     address_number  = db.Column(db.Text)
