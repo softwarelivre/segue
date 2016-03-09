@@ -212,7 +212,7 @@ class ClaimCheck(object):
     @property
     def template_vars(self):
         # CAST INT AND YEAR TO STR TO AVOID PROBLEMS WITH METHOD ESCAPE FROM svg_to_pdf
-        return {'ID': str(self.purchase.id),
+        return {'PURCHASE_ID': str(self.purchase.id),
                 'NAME': self.purchase.customer.name,
                 'DOCUMENT': self.purchase.customer.document,
                 'AMOUNT': '{:.02f}'.format(float(self.purchase.amount)),
