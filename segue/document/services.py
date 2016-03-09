@@ -2,14 +2,18 @@ import re
 import codecs
 import os.path
 import magic
+import base64
 
 from subprocess import Popen, PIPE
 from xml.sax.saxutils import escape
 
 from segue.core import config, logger
-from segue.document.errors import DocumentNotFound
+from segue.document.errors import DocumentNotFound, InvalidDocument, DocumentSaveFailed
 
 class DocumentService(object):
+
+    EXPECTED_BASE64_HEADER = '^data:.*base64,'
+
     def __init__(self, override_root=None, template_root=None, magic_impl=None, tmp_dir=None):
         self.template_root = template_root or os.path.join(config.APP_PATH, 'segue')
         self.override_root = override_root
@@ -42,6 +46,31 @@ class DocumentService(object):
             if not files: continue
             result.extend([ f for f in files if f.startswith(kind) ])
         return sorted(result)
+
+    def base64_to_pdf(self, kind, hash_code, payload):
+
+        match = re.search(self.__class__.EXPECTED_BASE64_HEADER, payload)
+        if not match:
+            raise InvalidDocument()
+
+        header = match.group(0)
+        file_name = "{}-{}.pdf".format(kind, hash_code)
+
+        output_root = self.override_root or config.STORAGE_DIR
+        output_path = self.path_for_filename(output_root, file_name, ensure_viable=True)
+
+        logger.info("creating file %s for save buyer document", output_path)
+        try:
+            f = open(output_path, 'wb')
+            f.write(base64.decodestring(payload[len(header):]))
+        except IOError as ex:
+            logger.info("error while creating file %s for save buyer document: %s", output_path, ex)
+            raise DocumentSaveFailed()
+        else:
+            logger.info("file %s has been created", output_path)
+            f.close()
+
+        return output_path, file_name
 
     def svg_to_pdf(self, template, kind, hash_code, variables=dict()):
         template_path = os.path.join(self.template_root, template)
