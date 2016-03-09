@@ -26,6 +26,9 @@ class BuyerSchema(BaseSchema):
     cnpj = Field.str()
     passport = Field.str()
     document = Field.str(dump_only=True)
+    extra_document = Field.str()
+    document_file_hash = Field.str(dump_only=True)
+    document_file = Field.raw()
 
     address_country = Field.str(
         required=True,
