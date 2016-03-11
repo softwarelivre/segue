@@ -13,6 +13,13 @@ def log(*args):
 class Config():
     def __init__(self):
         self._data = {}
+
+    def __contains__(self, item):
+        return item in self._data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
     def __getattr__(self, name):
         return self._data.get(name, None)
 
