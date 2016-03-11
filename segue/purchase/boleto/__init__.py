@@ -38,4 +38,3 @@ class BoletoPaymentService(object):
         return dict(
             redirectUserTo='{}/api/documents/{}'.format(config.BACKEND_URL, filename)
         )
-
