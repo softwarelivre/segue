@@ -5,23 +5,25 @@ from pyboleto.bank.bancodobrasil import BoletoBB
 from pyboleto.pdf import BoletoPDF
 
 from segue.factory import Factory
-from segue.core import config
 from segue.hasher import Hasher
 from ..factories import PaymentFactory, TransitionFactory
 
 from segue.document.services import DocumentService
 
 from models import BoletoPayment, BoletoTransition
+from helpers import BoletoConfig
 
 class BoletoPaymentFactory(PaymentFactory):
     model = BoletoPayment
 
-    def __init__(self, hasher=None):
+    def __init__(self, hasher=None, boleto_config=None):
         self.hasher = hasher or Hasher()
+        self.config = boleto_config or BoletoConfig()
 
     def create(self, purchase, payment_id, data=None):
         payment = super(BoletoPaymentFactory, self).create(purchase, target_model=self.model, extra_data=data)
-        payment.our_number = "{:010d}".format(config.BOLETO_OFFSET + payment_id)
+        self.config.category = purchase.product.category
+        payment.our_number = "{:010d}".format(self.config.OFFSET + payment_id)
         payment.document_hash = self.hasher.generate()
         return payment
 
@@ -50,8 +52,9 @@ class BoletoTransitionFactory(TransitionFactory):
         return transition
 
 class BoletoFactory(object):
-    def __init__(self, document_service=None):
+    def __init__(self, document_service=None, boleto_config=None):
         self.document_service = document_service or DocumentService()
+        self.config = boleto_config or BoletoConfig()
         
 
     def as_pdf(self, boleto_data, document_hash, dest_dir):
@@ -64,19 +67,21 @@ class BoletoFactory(object):
         return filename
 
     def create(self, payment):
-        boleto = BoletoBB(config.BOLETO_TIPO_CONVENIO, None)
+        self.config.category = payment.purchase.product.category
+
+        boleto = BoletoBB(self.config.TIPO_CONVENIO, None)
 
         boleto.nosso_numero      = payment.our_number
-        boleto.convenio          = config.BOLETO_CONVENIO
+        boleto.convenio          = self.config.CONVENIO
         boleto.numero_documento  = "{}{}".format(boleto.convenio, boleto.nosso_numero)
         boleto.especie_documento = 'DM'
 
-        boleto.carteira          = config.BOLETO_CARTEIRA
-        boleto.agencia_cedente   = config.BOLETO_AGENCIA
-        boleto.conta_cedente     = config.BOLETO_CONTA # TODO: what about digito-verificador?
-        boleto.cedente_documento = config.BOLETO_CNPJ
-        boleto.cedente_endereco  = config.BOLETO_ENDERECO
-        boleto.cedente           = config.BOLETO_EMPRESA
+        boleto.carteira          = self.config.CARTEIRA
+        boleto.agencia_cedente   = self.config.AGENCIA
+        boleto.conta_cedente     = self.config.CONTA # TODO: what about digito-verificador?
+        boleto.cedente_documento = self.config.CNPJ
+        boleto.cedente_endereco  = self.config.ENDERECO
+        boleto.cedente           = self.config.EMPRESA
 
 
         boleto.data_vencimento    = payment.due_date
