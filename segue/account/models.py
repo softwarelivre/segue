@@ -22,13 +22,12 @@ class SafeAccountJsonSerializer(AccountJsonSerializer):
     def hide_field(self, child):
         return child in [ 'password','email', 'role', 'phone', 'city', 'document', 'certificates' ]
 
-class TokenJsonSerializer(AccountJsonSerializer):
-    _serializer_name = 'token'
-    def hide_field(self, child):
-        return child not in [ 'id','email','role', 'name', 'dirty' ]
+roles_account = db.Table('roles_accounts',
+        db.Column('account_id', db.Integer(), db.ForeignKey('account.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
 class Account(JsonSerializable, db.Model):
-    _serializers = [ AccountJsonSerializer, SafeAccountJsonSerializer, TokenJsonSerializer ]
+    _serializers = [AccountJsonSerializer, SafeAccountJsonSerializer]
 
     id               = db.Column(db.Integer, primary_key=True)
     email            = db.Column(db.Text, unique=True)
@@ -73,6 +72,8 @@ class Account(JsonSerializable, db.Model):
     purchases       = db.relationship("Purchase", backref="customer")
     caravan_owned   = db.relationship("Caravan",  backref="owner")
     corporate_owned = db.relationship("Corporate", backref="owner", primaryjoin='Account.id==Corporate.owner_id')
+
+    account_roles = db.relationship('Role', secondary=roles_account, backref=db.backref('accounts', lazy='dynamic'))
 
     resets = db.relationship("ResetPassword", backref="account")
 
@@ -184,6 +185,22 @@ class Account(JsonSerializable, db.Model):
     def is_spanish_speaking(self):
         return re.match(r"(Guate|Urug|Col|Venezu|E?uador|Argen|Spa|Esp|Para|Chil|Mexi)", self.country or '', re.IGNORECASE) != None
 
+    @property
+    def roles(self):
+        return [role.name for role in self.account_roles]
+
+    def has_role(self, roles):
+        roles_to_verify = ('admin',)
+        if isinstance(roles, tuple):
+            roles_to_verify += roles
+        if isinstance(roles, basestring):
+            roles_to_verify += (roles,)
+
+        for r in roles_to_verify:
+            if r in self.roles:
+                return True
+        return False
+
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     hash         = db.Column(db.String(64))
@@ -206,3 +223,9 @@ class City(db.Model):
     longitude = db.Column(db.Numeric)
 
     __tablename__ = 'cities'
+
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String)
+

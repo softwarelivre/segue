@@ -5,6 +5,21 @@ import flask
 from segue.errors import NotAuthorized, SegueError
 from segue.core import jwt_required, logger
 
+from flask_jwt import verify_jwt, current_user
+from flask import request
+
+def roles_accepted(*roles):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt()
+            if not current_user.has_role(roles):
+                logger.info('denied access to endpoint {} to user {}'.format(request.url_rule.endpoint, current_user.id))
+                raise NotAuthorized()
+            return fn(*args, **kwargs)
+        return decorator
+    return wrapper
+
 def admin_only(fn):
     @wraps(fn)
     def wrapped(instance, *args, **kw):

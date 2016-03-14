@@ -144,6 +144,16 @@ class EditAccountSchema(AccountSchema):
         del self.fields['email']
         del self.fields['email_confirm']
 
+
+class AccountTokenSchema(BaseSchema):
+    type = Field.str(dump_only=True, default='Account.token')
+
+    def serialize(self, account):
+        return self.dump(account).data
+
+    class Meta:
+        fields = ('id', 'name', 'email', 'role', 'roles', 'dirty')
+
 #TODO: CREATE A SCHEMA
 reset = {
     "$schema": "http://json-schema.org/draft-04/schema#",
