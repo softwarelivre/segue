@@ -12,7 +12,7 @@ import schema
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
     def hide_field(self, child):
-        return child in [ 'password', 'certificates' ]
+        return child in [ 'password', 'certificates', 'account_roles' ]
 
     def serialize_child(self, child):
         return False
@@ -20,7 +20,7 @@ class AccountJsonSerializer(SQLAlchemyJsonSerializer):
 class SafeAccountJsonSerializer(AccountJsonSerializer):
     _serializer_name = 'safe'
     def hide_field(self, child):
-        return child in [ 'password','email', 'role', 'phone', 'city', 'document', 'certificates' ]
+        return child in [ 'password','email', 'role', 'phone', 'city', 'document', 'certificates', 'account_roles' ]
 
 roles_account = db.Table('roles_accounts',
         db.Column('account_id', db.Integer(), db.ForeignKey('account.id')),
