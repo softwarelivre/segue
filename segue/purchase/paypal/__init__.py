@@ -81,6 +81,7 @@ class PayPalSession(object):
     @staticmethod
     def default_config():
         return PayPalConfig(
+                    API_ENVIRONMENT=config.PAYPAL_API_ENVIRONMENT,
                     API_USERNAME=config.PAYPAL_API_USERNAME,
                     API_PASSWORD=config.PAYPAL_API_PASSWORD,
                     API_SIGNATURE=config.PAYPAL_API_SIGNATURE)
