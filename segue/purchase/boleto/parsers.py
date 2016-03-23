@@ -6,11 +6,11 @@ DATE_FORMAT = "%d%m%Y"
 class BoletoFileParser(object):
     def parse(self, content):
         lines = content.split("\n")
-        useful_lines = filter(self._is_line, lines)
+        useful_lines = filter(self._is_valid_line, lines)
         return map(self._parse_line, useful_lines)
 
-    def _is_line(self, line):
-        return len(line) > 0
+    def _is_valid_line(self, line):
+        return len(line) > 0 and line.count(';') > 0
 
     def _parse_line(self, line):
         parts = line.split(";")
