@@ -1,6 +1,8 @@
 import re
 from marshmallow import validates_schema, validates
 
+
+from segue.errors import FieldError
 from errors import InvalidCNPJ, InvalidCPF, InvalidZipCodeNumber
 from segue.schema import BaseSchema, Field, Validator
 from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
@@ -74,6 +76,10 @@ class BuyerSchema(BaseSchema):
 
     @validates_schema()
     def validate(self, data):
+
+        if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
+            raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
+
         #TODO: IMPROVE
         if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):
             if not ZipCodeValidator(data.get('address_zipcode', None)).is_valid():

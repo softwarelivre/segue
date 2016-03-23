@@ -3,6 +3,7 @@ from marshmallow import validates_schema, validates
 
 
 from errors import EmailAddressMisMatch, PasswordsMisMatch, InvalidCNPJ, InvalidCPF, InvalidZipCodeNumber
+from segue.errors import FieldError
 from segue.schema import BaseSchema, Field, Validator
 from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
@@ -121,6 +122,10 @@ class AccountSchema(BaseSchema):
 
         @validates_schema()
         def validate(self, data):
+
+            if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
+                raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
+
             if 'password' or 'password_confirm' in data:
                 if data.get('password', None) != data.get('password_confirm', None):
                     raise PasswordsMisMatch()
