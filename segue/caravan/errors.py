@@ -1,4 +1,5 @@
-from segue.errors import SegueError
+from segue.errors import SegueError, SegueGenericError
+from segue.babel import _l
 
 class InvalidCaravan(SegueError):
     code = 400
@@ -10,4 +11,18 @@ class AccountAlreadyHasCaravan(SegueError):
     def to_json(self):
         return { 'message': 'this account already has a caravan' }
 
+class AccountHasAlreadyInvited(SegueGenericError):
+    MESSAGE = _l('You can not invited the same person twice')
+
+
+class AccountIsARider(SegueGenericError):
+    MESSAGE = _l('This account is already in a caravan')
+
+
+class InvitedYourself(SegueGenericError):
+    MESSAGE = _l('You can not invite yourself')
+
+
+class InvitedAlreadyProcessed(SegueGenericError):
+    MESSAGE = _l('This invite has already been accepted or declined')
 

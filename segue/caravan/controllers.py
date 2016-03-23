@@ -70,19 +70,16 @@ class CaravanInviteController(object):
         result = self.service.create(caravan_id, data, by=self.current_user)
         return result, 200
 
+    @jwt_only
     @jsoned
     def accept(self, caravan_id, hash_code):
-        try:
-            verify_jwt()
-        except JWTError:
-            pass
-
-        result = self.service.answer(hash_code, accepted=True, by=self.current_user) or flask.abort(404)
+        result = self.service.accept_invite(hash_code, by=self.current_user) or flask.abort(404)
         return result, 200
 
+    @jwt_only
     @jsoned
     def decline(self, caravan_id, hash_code):
-        result = self.service.answer(hash_code, accepted=False) or flask.abort(404)
+        result = self.service.decline_invite(hash_code, by=self.current_user) or flask.abort(404)
         return result, 200
 
     @jsoned

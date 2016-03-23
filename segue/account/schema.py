@@ -107,6 +107,8 @@ class AccountSchema(BaseSchema):
             validate=[Validator.length(min=3, max=15)]
         )
 
+        caravan_invite_hash = Field.str(dump=True, attribute='caravan_invite_hash')
+
         @validates('cpf')
         def validate_cpf(self, data):
             if not CPFValidator(data).is_valid():

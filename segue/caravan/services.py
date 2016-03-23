@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from segue.core import db
 from segue.hasher import Hasher
 from segue.mailer import MailerService
@@ -7,7 +9,8 @@ import schema
 
 from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory, CaravanLeaderPurchaseFactory
-from errors import AccountAlreadyHasCaravan
+from errors import AccountAlreadyHasCaravan, AccountHasAlreadyInvited
+from errors import AccountIsARider, InvitedYourself, InvitedAlreadyProcessed
 
 from segue.account.services import AccountService
 
@@ -35,6 +38,7 @@ class CaravanService(object):
 
     def create(self, data, owner):
         if self.get_by_owner(owner.id, owner): raise AccountAlreadyHasCaravan()
+        if owner.accepted_a_caravan_invite: raise AccountIsARider()
 
         caravan = CaravanFactory.from_json(data, schema.new_caravan)
         caravan.owner = owner
@@ -44,9 +48,8 @@ class CaravanService(object):
 
     def modify(self, caravan_id, data, by=None):
         caravan = self.get_one(caravan_id, by)
+        caravan = CaravanFactory.update_model(caravan, data, schema.edit_caravan)
 
-        for name, value in CaravanFactory.clean_for_update(data).items():
-            setattr(caravan, name, value)
         db.session.add(caravan)
         db.session.commit()
         return caravan
@@ -78,6 +81,17 @@ class CaravanInviteService(object):
         caravan = self.caravans.get_one(caravan_id, by)
 
         invite = CaravanInviteFactory.from_json(data, schema.new_invite)
+
+        if invite.recipient == by.email:
+            raise InvitedYourself()
+
+        if caravan.has_invited(invite.recipient):
+            raise AccountHasAlreadyInvited()
+
+        account = self.accounts.get_by_email(invite.recipient)
+        if account and account.accepted_a_caravan_invite:
+            raise AccountIsARider()
+
         invite.caravan = caravan
         invite.hash    = self.hasher.generate()
 
@@ -92,18 +106,39 @@ class CaravanInviteService(object):
     def get_by_hash(self, invite_hash):
         return CaravanInvite.query.filter(CaravanInvite.hash == invite_hash).first()
 
-    def answer(self, hash_code, accepted=True, by=None):
+    def accept_invite(self, hash_code, by=None):
         invite = self.get_by_hash(hash_code)
         if not invite:
             return None
-        if self.accounts.is_email_registered(invite.recipient):
-            if not by or by.email != invite.recipient:
-                raise NotAuthorized
 
-        invite.status = 'accepted' if accepted else 'declined'
+        if not invite.is_pending:
+            raise InvitedAlreadyProcessed()
+
+        if Caravan.by_owner(by.id):
+            raise AccountAlreadyHasCaravan()
+
+        invite.account = by.id
+        invite.status = 'accepted'
+
         db.session.add(invite)
         db.session.commit()
         return invite
+
+    def decline_invite(self, hash_code, by=None):
+        invite = self.get_by_hash(hash_code)
+        if not invite:
+            return None
+
+        if not invite.is_pending:
+            raise InvitedAlreadyProcessed()
+
+        invite.account = by.id
+        invite.status = 'declined'
+
+        db.session.add(invite)
+        db.session.commit()
+        return invite
+
 
     def register(self, hash_code, account_data):
         invite = self.get_by_hash(hash_code)
