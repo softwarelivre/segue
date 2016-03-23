@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-09 11:28-0300\n"
+"POT-Creation-Date: 2016-03-23 14:50-0300\n"
 "PO-Revision-Date: 2016-02-15 19:32-0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt\n"
@@ -112,6 +112,22 @@ msgstr "Os e-mails não são iguais"
 #: segue/account/errors.py:60
 msgid "Password does not match"
 msgstr "As senhas não são iguais"
+
+#: segue/caravan/errors.py:15
+msgid "You can not invited the same person twice"
+msgstr ""
+
+#: segue/caravan/errors.py:19
+msgid "This account is already in a caravan"
+msgstr "Esta conta já pertence a uma caravana"
+
+#: segue/caravan/errors.py:23
+msgid "You can not invite yourself"
+msgstr "Você não pode se convidar"
+
+#: segue/caravan/errors.py:27
+msgid "This invite has already been accepted or declined"
+msgstr "Este convite já foi aceito ou rejeitado"
 
 #: segue/document/errors.py:7
 #, fuzzy

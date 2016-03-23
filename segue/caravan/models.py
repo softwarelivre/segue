@@ -26,6 +26,18 @@ class Caravan(JsonSerializable, db.Model):
     def paid_riders(self):
         return self.riders.filter(Purchase.status == 'paid')
 
+    def has_invited(self, recipient):
+        for invite in self.invites:
+            if invite.recipient == recipient:
+                return True
+        return False
+
+
+    @classmethod
+    def by_owner(cls, id):
+        return cls.query.filter(Caravan.owner_id==id).first()
+
+
 class CaravanInvite(JsonSerializable, db.Model):
     _serializers = [ CaravanInviteJsonSerializer, ShortCaravanInviteJsonSerializer ]
 
@@ -38,6 +50,18 @@ class CaravanInvite(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+
+    @property
+    def has_accepted(self):
+        return self.status == 'accepted'
+
+    @property
+    def has_declined(self):
+        return self.status == 'declined'
+
+    @property
+    def is_pending(self):
+        return self.status == 'pending'
 
 class CaravanRiderPurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'caravan-rider' }
