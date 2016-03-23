@@ -63,6 +63,7 @@ class Account(JsonSerializable, db.Model):
     resume           = db.Column(db.Text)
     certificate_name = db.Column(db.Text)
 
+    caravan_invite  = db.relationship('CaravanInvite')
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
@@ -71,6 +72,7 @@ class Account(JsonSerializable, db.Model):
     proposals       = db.relationship("Proposal", backref="owner")
     purchases       = db.relationship("Purchase", backref="customer")
     caravan_owned   = db.relationship("Caravan",  backref="owner")
+
     corporate_owned = db.relationship("Corporate", backref="owner", primaryjoin='Account.id==Corporate.owner_id')
 
     account_roles = db.relationship('Role', secondary=roles_account, backref=db.backref('accounts', lazy='dynamic'))
@@ -184,6 +186,24 @@ class Account(JsonSerializable, db.Model):
     @property
     def is_spanish_speaking(self):
         return re.match(r"(Guate|Urug|Col|Venezu|E?uador|Argen|Spa|Esp|Para|Chil|Mexi)", self.country or '', re.IGNORECASE) != None
+
+    @classmethod
+    def by_email(cls, email):
+        return cls.query.filter(Account.email==email).first()
+
+    @property
+    def accepted_a_caravan_invite(self):
+        for invite in self.caravan_invite:
+            if invite.has_accepted:
+                return True
+        return False
+
+    @property
+    def caravan_invite_hash(self):
+        if self.accepted_a_caravan_invite:
+            return self.caravan_invite.hash
+        else:
+            return ''
 
     @property
     def roles(self):
