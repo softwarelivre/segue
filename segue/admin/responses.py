@@ -259,8 +259,10 @@ class BuyerDetailResponse(BaseResponse):
         self.id              = buyer.id
         self.kind            = buyer.kind
         self.name            = buyer.name
-        self.document        = buyer.document
         self.contact         = buyer.contact
+        self.document        = buyer.document
+        self.extra_document  = buyer.extra_document
+        self.document_file_hash = buyer.document_file_hash
         self.address_street  = buyer.address_street
         self.address_number  = buyer.address_number
         self.address_extra   = buyer.address_extra
