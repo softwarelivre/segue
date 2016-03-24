@@ -35,7 +35,7 @@ class Proposal(JsonSerializable, db.Model):
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     invites      = db.relationship("ProposalInvite", backref="proposal", lazy='dynamic')
     track_id     = db.Column(db.Integer, db.ForeignKey('track.id'))
-    status       = db.Column(db.Text, server_default='proposal')
+    status       = db.Column(db.Text, server_default='pending')
 
     tags          = db.relationship("ProposalTag", backref="proposal", lazy="dynamic")
     notifications = db.relationship("CallNotification", backref="proposal", lazy="dynamic")
