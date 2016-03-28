@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import or_
+from sqlalchemy import or_,and_
 
 from ..core import logger
 from ..core import db
@@ -105,16 +105,16 @@ class AccountService(object):
 
         return self._create_or_update(account)
 
-
-    def lookup(self, needle, by=None, limit=0):
+    def lookup(self, criteria=None, by=None, limit=0):
         #TODO: IMPROVE THIS FUNCTION
-        base    = self.filters.all_joins(Account.query, needle)
-        filters = self.filters.needle(needle, by)
-        queryset = base.filter(or_(*filters))
+        base = self.filters.joins_for(Account.query, **criteria)
+        filters = self.filters.given_criteria(**criteria)
+        queryset = base.filter(and_(*filters))
+
         if limit:
-            return queryset.limit(limit).all()
-        else:
-            return queryset.all()
+            queryset = queryset.limit(limit)
+
+        return queryset.all()
 
     def check_ownership(self, account, alleged):
         if isinstance(account, int): account = self._get_account(id)
