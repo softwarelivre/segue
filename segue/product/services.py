@@ -32,6 +32,9 @@ class ProductService(object):
     def list(self):
         return Product.query.filter(self._in_time(), self._is_public()).order_by(DEFAULT_ORDERING).all()
 
+    def all(self):
+        return Product.query.all()
+
     def caravan_products(self, hash_code):
         return CaravanProduct.query.filter(self._in_time()).order_by(DEFAULT_ORDERING).all()
 

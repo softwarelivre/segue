@@ -21,6 +21,8 @@ from flask.ext.jwt import current_user
 from ..responses import *
 
 from .account import AdminAccountController
+from .purchase import AdminPurchaseController
+from .product import AdminProductController
 from .proposal import AdminProposalController
 from .judge import AdminJudgeController
 from .schedule import AdminScheduleController
