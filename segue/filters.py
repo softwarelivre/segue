@@ -31,6 +31,14 @@ class FilterStrategies(object):
             result.append(self.enforce_user(as_user))
         return result
 
+    def given_criteria(self, **criteria):
+        result = []
+        for key, value in criteria.items():
+            if hasattr(self, 'by_'+key) and value:
+                method = getattr(self, 'by_'+key)
+                result.append(method(value))
+        return result
+
     def joins_for(self, queryset, **criteria):
         result = queryset
         for key, value in criteria.items():

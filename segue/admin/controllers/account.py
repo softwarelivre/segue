@@ -11,6 +11,11 @@ from ..responses import AccountDetailResponse, ProposalDetailResponse
 
 from segue.responses import Response
 from schemas import AccountDetail
+from segue.schema import Field
+
+
+from flask import request
+from webargs.flaskparser import parser
 
 class AdminAccountController(object):
     def __init__(self, accounts=None, purchases=None):
@@ -38,8 +43,15 @@ class AdminAccountController(object):
     @jwt_only
     @admin_only
     def list(self):
-        criteria = request.args.get('q')
-        result = self.accounts.lookup(criteria, limit=20)
+        args = parser.parse({
+                'name': Field.str(),
+                'email': Field.str(),
+                'document': Field.str(),
+                'product_id': Field.int()
+            },
+            request
+        )
+        result = self.accounts.lookup(criteria=args, limit=20)
         return Response(result, AccountDetail).create(), 200
 
     @jsoned
