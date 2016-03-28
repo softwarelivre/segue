@@ -1,17 +1,10 @@
 from models import Account
+from segue.purchase.models import Purchase
 from segue.filters import FilterStrategies
 
-def _looks_like_an_id(value):
-    return isinstance(value, basestring) and value.isdigit() and int(value) < 10**5
-
 class AccountFilterStrategies(FilterStrategies):
-    def by_purchase_id(self, value):
-        if not _looks_like_an_id(value): return
-        from segue.purchase.models import Purchase
-        return Purchase.id == value
 
     def by_id(self, value):
-        if not _looks_like_an_id(value): return
         return Account.id == value
 
     def by_email(self, value):
@@ -21,11 +14,16 @@ class AccountFilterStrategies(FilterStrategies):
         return Account.name.ilike('%'+value+'%')
 
     def by_document(self, value):
-        if _looks_like_an_id(value): return
         return Account.document.like('%'+value+'%')
 
+    def by_product_id(self, value):
+        return Purchase.product_id == value
+
+    def by_purchase_id(self, value):
+        return Purchase.id == value
+
     def join_for_purchase_id(self, queryset, needle=None):
-        if _looks_like_an_id(needle):
-            return queryset.join('purchases')
-        else:
-            return queryset
+        return queryset.join('purchases')
+
+    def join_for_product_id(self, queryset, needle=None):
+        return queryset.join('purchases')
