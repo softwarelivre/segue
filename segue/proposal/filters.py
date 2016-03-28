@@ -30,6 +30,9 @@ class ProposalFilterStrategies(FilterStrategies):
     def by_status(self, value, as_user=None):
         return Proposal.status == value
 
+    def by_type(self, value, as_user=None):
+        return Proposal.type == value
+
     def by_slotted(self, value, as_user=None):
         from segue.schedule.models import Slot
         if not isinstance(value, bool):
@@ -42,3 +45,9 @@ class ProposalFilterStrategies(FilterStrategies):
     def join_for_slotted(self, queryset, needle=None):
         from segue.schedule.models import Slot
         return queryset.outerjoin(Slot)
+
+    def by_author_name(self, value, as_user=None):
+        return Account.name.ilike('%{}%'.format(value))
+
+    def joins_for(self, queryset, **criteria):
+        return queryset.join('owner')

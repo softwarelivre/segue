@@ -14,6 +14,20 @@ class AdminAccountBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:account_id>/proposals',      methods=['GET'],  view_func=self.controller.proposals_of_account)
         self.add_url_rule('/holder-of/<int:purchase_id>',     methods=['GET'],  view_func=self.controller.get_by_purchase)
 
+class AdminPurchaseBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminPurchaseBlueprint, self).__init__('admin.purchase', __name__, url_prefix='/admin/purchases')
+        self.controller = AdminPurchaseController()
+        self.add_url_rule('',                                 methods=['GET'],  view_func=self.controller.list)
+
+
+class AdminProductBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(AdminProductBlueprint, self).__init__('admin.product', __name__, url_prefix='/admin/products')
+        self.controller = AdminProductController()
+        self.add_url_rule('',                                 methods=['GET'],  view_func=self.controller.list)
+
+
 class AdminProposalBlueprint(flask.Blueprint):
     def __init__(self):
         super(AdminProposalBlueprint, self).__init__('admin.proposal', __name__, url_prefix='/admin/proposals')
@@ -88,6 +102,8 @@ class AdminBlueprint(flask.Blueprint):
 def load_blueprints():
     return [
         AdminAccountBlueprint(),
+        AdminProductBlueprint(),
+        AdminPurchaseBlueprint(),
         AdminProposalBlueprint(),
         AdminTournamentsBlueprint(),
         AdminPromoCodeBlueprint(),

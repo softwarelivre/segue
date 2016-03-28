@@ -32,3 +32,18 @@ class AccountDetail(AccountSchema):
     class Meta:
         exclude = ('password',)
 
+#TODO: REVIEW
+class PurchaseDetail(BaseSchema):
+    id = Field.int()
+    status = Field.str()
+    customer_id = Field.int(attribute='customer.id')
+    customer_name = Field.str(attribute='customer.name')
+    product_id = Field.int()
+    product_description = Field.str(attribute='product.description')
+    category = Field.str(attribute='product.category')
+
+    links = Field.links({
+        'account': {
+            'href': Field.url('admin.account.get_one', account_id='<id>')
+        },
+    })
