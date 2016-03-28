@@ -2,9 +2,11 @@ import flask
 
 from flask import request
 from flask.ext.jwt import current_user
+from webargs.flaskparser import parser
 
 from segue.decorators import jsoned, jwt_only, admin_only
 from segue.core import logger
+from segue.schema import Field
 
 from segue.proposal.services import ProposalService, InviteService
 
@@ -20,7 +22,15 @@ class AdminProposalController(object):
     @admin_only
     @jsoned
     def list(self):
-        parms = request.args.to_dict()
+        parms = parser.parse({
+                'title': Field.str(),
+                'type': Field.str(),
+                'status': Field.str(),
+                'author_name': Field.str(),
+                'track_id': Field.int(),
+            },
+            request
+        )
         result = self.service.lookup(as_user=self.current_user, **parms)
         return ProposalShortResponse.create(result), 200
 

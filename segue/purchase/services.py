@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from sqlalchemy import and_
 import os
 
 from segue.core import db, logger, config
@@ -151,6 +152,18 @@ class PurchaseService(object):
         db.session.add(purchase)
         if commit: db.session.commit()
         return purchase
+
+    def lookup(self, criteria=None, by=None, limit=0):
+        base = Purchase.query.join('customer').join('product')
+        filters = self.filters.given_criteria(**criteria)
+        queryset = base.filter(and_(*filters))
+
+        if limit:
+            queryset = queryset.limit(limit)
+
+        print queryset
+
+        return queryset.all()
 
 class PaymentService(object):
     DEFAULT_PROCESSORS = dict(
