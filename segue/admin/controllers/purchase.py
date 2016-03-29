@@ -26,6 +26,7 @@ class AdminPurchaseController(object):
         args = parser.parse({
                 'id': Field.int(),
                 'customer_name': Field.str(),
+                'customer_id': Field.int(),
                 'status': Field.str(),
                 'product_id': Field.int()
             },
