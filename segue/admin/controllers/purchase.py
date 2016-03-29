@@ -32,5 +32,5 @@ class AdminPurchaseController(object):
             request
         )
 
-        result = self.purchases.lookup(criteria=args, limit=20)
+        result = self.purchases.lookup(criteria=args)
         return Response(result, PurchaseDetail).create(), 200
