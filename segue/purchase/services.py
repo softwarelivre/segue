@@ -161,8 +161,6 @@ class PurchaseService(object):
         if limit:
             queryset = queryset.limit(limit)
 
-        print queryset
-
         return queryset.all()
 
 class PaymentService(object):
