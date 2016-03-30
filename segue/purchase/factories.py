@@ -43,7 +43,7 @@ class PurchaseFactory(Factory):
         result = effective_class(**extra_fields)
         result.buyer = buyer
         result.product = product
-        result.due_date = datetime.today() + timedelta(days=int(product.payment_days))
+        result.due_date = product.due_date
         #TODO: IMPROVE CALCULATE THE AMOUNT OF THE PURCHASE
         if not result.amount:
             result.amount = product.price

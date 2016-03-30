@@ -19,7 +19,7 @@ class Product(JsonSerializable, db.Model):
     public            = db.Column(db.Boolean, default=True)
     max_purchases     = db.Column(db.Integer, default=0)
     price             = db.Column(db.Numeric)
-    payment_days      = db.Column(db.Numeric)
+    due_date          = db.Column(db.Date)
     sold_until        = db.Column(db.DateTime)
     description       = db.Column(db.Text)
     information       = db.Column(db.Text)
