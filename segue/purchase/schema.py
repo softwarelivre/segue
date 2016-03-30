@@ -12,6 +12,7 @@ BUYER_TYPES = ['person','company','government', 'foreign']
 
 class BuyerSchema(BaseSchema):
 
+    id = Field.int(dump_only=True)
     kind = Field.str(
         required=True,
         validate=[Validator.one_of(choices=BUYER_TYPES)]
