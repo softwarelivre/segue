@@ -200,10 +200,10 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def caravan_invite_hash(self):
-        if self.accepted_a_caravan_invite:
-            return self.caravan_invite.hash
-        else:
-            return ''
+        for invite in self.caravan_invite:
+            if invite.has_accepted:
+                return invite.hash
+        return None
 
     @property
     def roles(self):
