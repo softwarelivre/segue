@@ -1,5 +1,7 @@
 from segue.schema import Field, BaseSchema
 from segue.account.schema import AccountSchema
+from segue.purchase.schema import BuyerSchema
+from segue.product.schema import ProductSchema
 from marshmallow import fields
 
 class PurchasePersonIdentifier(BaseSchema):
@@ -35,15 +37,27 @@ class AccountDetail(AccountSchema):
 #TODO: REVIEW
 class PurchaseDetail(BaseSchema):
     id = Field.int()
+    kind = Field.str()
+    category = Field.str()
+    public = Field.str()
+    price = Field.decimal()
+    sold_until = Field.date()
     status = Field.str()
+    description = Field.str()
+    created = Field.date()
+
+    buyer = fields.Nested(BuyerSchema)
+    product = fields.Nested(ProductSchema)
+
+    #TODO: FIX
     customer_id = Field.int(attribute='customer.id')
     customer_name = Field.str(attribute='customer.name')
-    product_id = Field.int()
-    product_description = Field.str(attribute='product.description')
-    category = Field.str(attribute='product.category')
 
     links = Field.links({
-        'account': {
+        'customer': {
             'href': Field.url('admin.account.get_one', account_id='<id>')
         },
+        'payments': {
+            'href': Field.url('admin.list_payments', purchase_id='<id>')
+        }
     })
