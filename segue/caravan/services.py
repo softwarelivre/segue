@@ -61,11 +61,11 @@ class CaravanService(object):
         if owner.has_valid_purchases: return None
 
         caravan = self.get_one(caravan_id, owner)
-        if caravan.paid_riders.count() >= 5:
-            purchase = CaravanLeaderPurchaseFactory.create(caravan)
-            db.session.add(purchase)
-            db.session.commit()
-            return purchase
+        #if caravan.paid_riders.count() >= 5:
+        #    purchase = CaravanLeaderPurchaseFactory.create(caravan)
+        #    db.session.add(purchase)
+        #    db.session.commit()
+        #    return purchase
 
 class CaravanInviteService(object):
     def __init__(self, caravans=None, hasher=None, accounts = None, mailer=None):

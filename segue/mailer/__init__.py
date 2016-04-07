@@ -59,22 +59,68 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
-    def notify_payment(self, purchase, payment):
+    def notify_payment(self, purchase):
         customer = purchase.customer
         product  = purchase.product
 
         message = self.message_factory.from_template('purchase/confirmation')
-        message.given(customer=customer, purchase=purchase, payment=payment, product=product)
+        message.given(customer=customer, purchase=purchase, product=product)
         message.to(customer.name, customer.email)
 
         return mailer.send(message.build())
 
-    def notify_donation(self, purchase, payment, claim_check_file_path):
+    def notify_corporate_payment(self, purchase, promocodes):
+        customer = purchase.customer
+        corporate = purchase.customer.corporate_owned
+        hash_codes = ''
+        for p in promocodes:
+            hash_codes += p.hash_code + ' '
+
+        message = self.message_factory.from_template('purchase/corporate_confirmation')
+        message.given(customer=customer, corporate=corporate, hash_codes=hash_codes)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+    def notify_corporate_promocode_payment(self, purchase, corporate_account):
+        customer = purchase.customer
+
+        message = self.message_factory.from_template('purchase/corporate_promocode_confirmation')
+        message.given(customer=customer, corporate=corporate_account, purchase=purchase)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+    def notify_gov_purchase_in_analysis(self, purchase):
+        customer = purchase.customer
+        corporate = purchase.customer.corporate_owned
+
+        message = self.message_factory.from_template('purchase/gov_analysis')
+        message.given(customer=customer, corporate=corporate, purchase=purchase)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+
+    def notify_gov_purchase_analysis(self, purchase, promocodes):
+        customer = purchase.customer
+        corporate = purchase.customer.corporate_owned
+        hash_codes = ''
+        for p in promocodes:
+            hash_codes += p.hash_code + ' '
+
+        message = self.message_factory.from_template('purchase/corporate_confirmation')
+        message.given(customer=customer, corporate=corporate, hash_codes=hash_codes)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+    def notify_donation(self, purchase, claim_check_file_path):
         customer = purchase.customer
         product  = purchase.product
 
         message = self.message_factory.from_template('donation/confirmation')
-        message.given(customer=customer, purchase=purchase, payment=payment, product=product)
+        message.given(customer=customer, purchase=purchase, product=product)
         message.to(customer.name, customer.email)
         message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
         return mailer.send(message.build())

@@ -4,9 +4,9 @@ from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
 from errors import ProductExpired, MinimumAmount, MaxPurchaseReached
-from segue.corporate.models import CorporatePurchase
+from segue.corporate.models import CorporatePurchase, GovPurchase
 from segue.purchase.promocode.models import PromoCode
-from segue.purchase.models import Purchase
+from segue.purchase.models import Purchase, StudentPurchase, DonationPurchase
 
 class ProductJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
@@ -28,6 +28,7 @@ class Product(JsonSerializable, db.Model):
     gives_kit         = db.Column(db.Boolean, default=True,  server_default='t')
     can_pay_cash      = db.Column(db.Boolean, default=False, server_default='f')
     original_deadline = db.Column(db.DateTime)
+    promocode_product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
 
     purchases  = db.relationship("Purchase", backref="product")
 
@@ -36,6 +37,13 @@ class Product(JsonSerializable, db.Model):
 
     def __repr__(self):
         return "<Product({})={}>".format(self.category, self.price)
+
+    @property
+    def gives_promocode(self):
+        if self.promocode_product_id:
+            return True
+        else:
+            return False
 
     def check_eligibility(self, buyer_data, account=None):
         if self.sold_until < datetime.now():
@@ -107,8 +115,18 @@ class PromoCodeProduct(Product):
 
         return promocode.product == self
 
+class CorporatePromoCode(PromoCodeProduct):
+    __mapper_args__ = {'polymorphic_identity': 'corporate-promocode'}
+
+class GovPromoCode(PromoCodeProduct):
+    __mapper_args__ = {'polymorphic_identity': 'gov-promocode'}
+
+
 class StudentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'student' }
+
+    def special_purchase_class(self):
+        return StudentPurchase
 
 class ForeignerProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'foreigner' }
@@ -130,18 +148,30 @@ class CorporateProduct(Product):
         if not account: return False
         return account.is_corporate
 
+    def extra_purchase_fields_for(self, buyer_data):
+        qty = buyer_data.get('purchase_qty', 0)
+        return {'qty': qty}
+
+
 class GovernmentProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'government' }
 
     def special_purchase_class(self):
-        return CorporatePurchase
+        return GovPurchase
 
     def check_eligibility(self, buyer_data, account=None):
         if not account: return False
         return account.is_government
 
+    def extra_purchase_fields_for(self, buyer_data):
+        qty = buyer_data.get('purchase_qty', 0)
+        return {'qty': qty}
+
 class DonationProduct(Product):
     __mapper_args__ = {'polymorphic_identity': 'donation'}
+
+    def special_purchase_class(self):
+        return DonationPurchase
 
     def extra_purchase_fields_for(self, buyer_data):
         """ Used in service.purchase for get the data from the request and send to the model"""

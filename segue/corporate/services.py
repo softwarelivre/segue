@@ -37,6 +37,28 @@ class CorporateService(object):
         elif result:
             raise NotAuthorized()
 
+    #TODO: REMOVE THIS
+    def create_corporate(self, owner, incharge_name):
+        from sqlalchemy import inspect
+        # if self.get_by_owner(owner.id, owner): raise AccountAlreadyHasCorporate()
+
+        corporate = Corporate()
+        mapper = inspect(owner)
+        for column in mapper.attrs:
+            if hasattr(corporate, column.key):
+                setattr(corporate, column.key, column.value)
+
+        #MISSING STUFF
+        corporate.address_district = owner.address_neighborhood
+        corporate.address_city = owner.city
+
+        corporate.owner_id = owner.id
+        corporate.incharge_name = incharge_name
+
+        db.session.add(corporate)
+        db.session.commit()
+        return corporate
+
     def create(self, data, owner):
         # if self.get_by_owner(owner.id, owner): raise AccountAlreadyHasCorporate()
 

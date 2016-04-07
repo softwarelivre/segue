@@ -78,8 +78,10 @@ class BuyerSchema(BaseSchema):
     @validates_schema()
     def validate(self, data):
 
-        if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
-            raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
+        if 'kind' in data:
+            if data['kind'] == 'person' or data['kind'] == 'foreign':
+                if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
+                    raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
 
         #TODO: IMPROVE
         if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):
