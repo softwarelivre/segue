@@ -11,7 +11,7 @@ from jwt import Signer
 from models import Account, ResetPassword
 from services import AccountService
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
-from responses import AccountResponse
+from responses import AccountResponse, EmployeesListResponse
 import schema
 
 
@@ -53,6 +53,23 @@ class AccountController(object):
         new_name = request.get_json().get('name',None)
         if not new_name: flask.abort(400)
         return self.service.set_certificate_name(account_id, new_name, by=self.current_user), 200
+
+    @jwt_only
+    @jsoned
+    def list_employees(self, account_id):
+        #TODO: FIX
+        from segue.purchase.promocode.models import PromoCodePayment, PromoCode
+        from segue.purchase.models import Purchase
+
+        result = db.session.query(PromoCodePayment)\
+            .join(Purchase)\
+            .join(Account)\
+            .filter(PromoCodePayment.promocode_id.in_(
+                db.session.query(PromoCode.id).filter(PromoCode.creator_id == account_id))).all()
+
+        if result:
+            return Response(result, EmployeesListResponse).create(), 200
+        return [], 200
 
     def list_proposals(self, account_id):
         query_string = "?owner_id={}".format(account_id)

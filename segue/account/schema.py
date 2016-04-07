@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 from marshmallow import validates_schema, validates
 
@@ -18,6 +20,11 @@ class AccountSchema(BaseSchema):
 
         id = Field.int(dump_only=True)
         role = Field.str(dump_only=True)
+        #TODO: REMOVE THIS HACK
+        type = Field.str()
+        # TODO: REMOVE THIS HACK
+        incharge = Field.str()
+
         email = Field.str(
             required=True,
             validate=[Validator.length(min=5, max=60), Validator.email()]
@@ -123,8 +130,15 @@ class AccountSchema(BaseSchema):
         @validates_schema()
         def validate(self, data):
 
-            if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
-                raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
+            #TODO: FIX THIS HACKSSS
+            if 'type' in data:
+                if data['type'] == 'corporate':
+                    print data
+                    incharge = data.get('incharge', '')
+                    if len(incharge.strip()) == 0:
+                        raise FieldError(message=u'Por favor, digite o nome do responsável', field='incharge')
+                elif not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
+                    raise FieldError(message=u'Por favor, digite seu nome e sobre nome', field='name')
 
             if 'password' or 'password_confirm' in data:
                 if data.get('password', None) != data.get('password_confirm', None):

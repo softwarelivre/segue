@@ -67,6 +67,12 @@ class StudentDocumentIsNotDefined(SegueError):
         return {'message': _l('You must define a student document')}
 
 
+class GovDocumentIsNotDefined(SegueError):
+    code = 400
+    def to_json(self):
+        return {'message': _l('You must define the governament document')}
+
+
 class StudentDocumentIsInvalid(SegueError):
     code = 400
 

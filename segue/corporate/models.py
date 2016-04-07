@@ -5,6 +5,7 @@ from ..json import JsonSerializable
 from segue.purchase.models import Purchase, Payment, Transition
 from segue.account.models import Account
 from segue.product.errors import WrongBuyerForProduct
+from errors import InvalidPurchaseQuantity
 
 from serializers import *
 
@@ -31,20 +32,27 @@ class Corporate(JsonSerializable, db.Model):
 
     created          = db.Column(db.DateTime, default=func.now())
     last_updated     = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    owner = db.relationship('Account', back_populates='corporate_owned', foreign_keys=[owner_id], uselist=False)
 
-    employees        = db.relationship('Account',           backref=db.backref('corporate', uselist=False))
-    purchases        = db.relationship('CorporatePurchase', backref=db.backref('corporate', uselist=False))
+    purchases        = db.relationship('CorporatePurchase' , backref=db.backref('corporate', uselist=False))
 
     __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'business' }
 
 EmployeeAccount = Account
 
-class GovCorporate(Corporate):
-    __mapper_args__ = { 'polymorphic_identity': 'government' }
+
 
 class CorporatePurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'corporate' }
     corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id'), name='cr_corporate_id')
+
+    def __init__(self, **extra_fields):
+        Purchase.__init__(self, **extra_fields)
+        qty = extra_fields.get('qty', 0)
+        if qty <= 0:
+            raise InvalidPurchaseQuantity()
+        else:
+            self.qty = qty
 
     @property
     def badge_corp(self):
@@ -68,6 +76,25 @@ class DepositPayment(Payment):
 
 class DepositTransition(Transition):
     __mapper_args__ = { 'polymorphic_identity': 'deposit' }
+
+
+class GovCorporate(Corporate):
+    __mapper_args__ = { 'polymorphic_identity': 'government' }
+
+
+class GovPurchase(CorporatePurchase):
+    __mapper_args__ = {'polymorphic_identity': 'government'}
+
+    def __init__(self, **extra_fields):
+        CorporatePurchase.__init__(self, **extra_fields)
+        #TODO: FIX REMOVE QTY CHECK
+        qty = extra_fields.get('qty', 0)
+        if qty <= 0:
+            raise InvalidPurchaseQuantity()
+        else:
+            self.qty = qty
+
+        self.status = 'purchase_in_analysis'
 
 class GovPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'government' }

@@ -129,13 +129,22 @@ class AccountService(object):
         if 'passport' in data:
             role = 'foreign'
 
+        #TODO: REMOVE INCHARGE
+        incharge = data.get('incharge', '')
+
         account = AccountFactory.from_json(data, schema.whitelist[rules])
         account.role = role
 
         if not account.document: raise DocumentIsNotDefined()
         if not account.password: account.password = self.hasher.generate()
 
-        return self._create_or_update(account)
+        #TODO: HACK
+        new_account = self._create_or_update(account)
+        if new_account.role == 'corporate':
+            from segue.corporate.services import CorporateService
+            CorporateService().create_corporate(new_account, incharge)
+
+        return new_account
 
     def _create_or_update(self, account):
         try:

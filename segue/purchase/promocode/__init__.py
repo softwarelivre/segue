@@ -23,7 +23,7 @@ class PromoCodeService(object):
     def query(self, **kw):
         base        = self.filter_strategies.joins_for(PromoCode.query, **kw)
         filter_list = self.filter_strategies.given(**kw)
-        return base.filter(*filter_list).order_by(PromoCode.description).all()
+        return base.filter(*filter_list).order_by(PromoCode.id).all()
 
     def create(self, product, description=None, creator=None, discount=100, quantity=1):
         if not description: raise MustProvideDescription()

@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy.sql import functions as func
-from ..core import db
+from ..core import db, logger
 from ..json import JsonSerializable
 
 from segue.product.models import Product

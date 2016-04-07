@@ -15,14 +15,11 @@ from segue.mailer import MailerService
 
 from paypal    import PayPalPaymentService
 from pagseguro import PagSeguroPaymentService
-from boleto    import BoletoPaymentService
 from cash      import CashPaymentService
 from models    import Purchase, Payment
-from errors    import NoSuchPayment, NoSuchPurchase, PurchaseAlreadySatisfied, PurchaseIsStale, DocumentIsNotDefined, StudentDocumentIsInvalid, StudentDocumentIsNotDefined
+from errors    import *
 
-from segue.document.services import DocumentService
-from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService
-from segue.purchase.factories import DonationClaimCheckFactory
+from segue.purchase.promocode import PromoCodeService, PromoCodePaymentService, PromoCode
 from segue.purchase.boleto import BoletoPaymentService
 from segue.purchase.boleto.parsers  import BoletoFileParser
 
@@ -40,12 +37,13 @@ class OnlinePaymentDeadline(object):
             raise DeadlineReached()
 
 class PurchaseService(object):
-    def __init__(self, db_impl=None, payments=None, filters=None, deadline=None, promocode=None):
+    def __init__(self, db_impl=None, mailer=None, payments=None, filters=None, deadline=None, promocode=None):
         self.db = db_impl or db
         self.payments = payments or PaymentService()
         self.filters = filters or PurchaseFilterStrategies()
         self.deadline = deadline or OnlinePaymentDeadline()
         self.promocode_service = promocode or PromoCodeService()
+        self.mailer = mailer or MailerService()
 
     def by_range(self, start, end):
         return Purchase.query.filter(Purchase.id.between(start, end)).order_by(Purchase.id)
@@ -76,12 +74,19 @@ class PurchaseService(object):
     def create(self, buyer_data, product, account, commit=True, **extra):
         buyer    = BuyerFactory().create(buyer_data, schema.buyer)
         if not buyer.document: raise DocumentIsNotDefined()
+
+        #TODO: REVIEW
         if product.category == 'student':
             if not buyer.extra_document and not buyer.document_file_hash:
                 raise StudentDocumentIsNotDefined()
             elif buyer.extra_document:
                 if not StudentDocumentValidator(buyer.extra_document, account.born_date).is_valid():
                     raise StudentDocumentIsInvalid(buyer.extra_document)
+
+        #DISABLED
+        #if product.category == 'government':
+        #    if not buyer.extra_document and not buyer.document_file_hash:
+        #        raise GovDocumentIsNotDefined()
 
         logger.info("Create buyer: %s", buyer)
 
@@ -90,8 +95,21 @@ class PurchaseService(object):
         self.db.session.add(buyer)
         self.db.session.add(purchase)
 
+        if purchase.category == 'government':
+            self.mailer.notify_gov_purchase_in_analysis(purchase)
+
         if 'hash_code' in buyer_data:
-            self.payments.create(purchase, 'promocode', { 'hash_code': buyer_data['hash_code'] })
+            hash = str(buyer_data['hash_code'])
+            _, payment = self.payments.create(purchase, 'promocode', {'hash_code': hash})
+
+            if payment.status == 'paid':
+                if product.category == 'corporate-promocode' or product.category == 'gov-promocode':
+                    promocode = PromoCode.query.filter(PromoCode.hash_code == hash).first()
+                    if not promocode.used:
+                        account.corporate_id = promocode.creator.corporate_owned.id
+                        self.db.session.add(account)
+                        #self.mailer.notify_corporate_promocode_payment(purchase, account)
+
 
         if commit:
             self.db.session.commit()
@@ -172,12 +190,13 @@ class PaymentService(object):
         promocode = PromoCodePaymentService
     )
 
-    def __init__(self, mailer=None, caravans=None, filters=None, **processors_overrides):
-        from segue.caravan.services import CaravanService # THIS IS UGLY
+    def __init__(self, mailer=None, caravans=None, filters=None, promocodes=None, **processors_overrides):
+        from segue.caravan.services import CaravanService
         self.processors_overrides = processors_overrides
         self.mailer               = mailer or MailerService()
         self.caravans             = caravans or CaravanService()
         self.filters              = filters or PaymentFilterStrategies()
+        self.promocodes           = promocodes or PromoCodeService()
 
     def query(self, by=None, **kw):
         filter_list = self.filters.given(**kw)
@@ -215,7 +234,9 @@ class PaymentService(object):
             db.session.add(purchase)
             db.session.commit()
 
-            self._notify_user(purchase, payment, transition)
+            if purchase.satisfied:
+                if transition.old_status != 'paid' and transition.new_status == 'paid':
+                    self.on_finish_payment(purchase)
 
             return purchase
         except KeyError, e:
@@ -241,12 +262,97 @@ class PaymentService(object):
             db.session.add(purchase)
             db.session.commit()
 
-            self._notify_user(purchase, payment, transition)
+            if purchase.satisfied:
+                if transition.old_status != 'paid' and transition.new_status == 'paid':
+                    self.on_finish_payment(purchase)
+
+
 
             return purchase, transition
         except Exception, e:
             logger.error('Exception was thrown while processing payment notification! %s', e)
             raise e
+
+    def on_finished_student_document_analysis(self, purchase):
+        if purchase.category != 'student':
+            # TODO: THROW A EXCEPTION
+            return {}
+
+        if purchase.status == 'payment_analysis':
+            if purchase.payment_analysed() == 'paid':
+                self.on_finish_payment(purchase)
+            else:
+                return True
+
+    def on_finished_gov_document_purchase_analysis(self, purchase):
+        if purchase.category != 'government':
+            #TODO: THROW A EXCEPTION
+            return {}
+        else:
+            purchase.status = 'pending'
+            db.session.add(purchase)
+            db.session.commit()
+            self.on_finish_governament(purchase)
+
+
+    def on_finish_payment(self, purchase):
+        if purchase.kind == 'corporate':
+            self.on_finish_corporate(purchase)
+        elif purchase.kind == 'government':
+            self.on_finish_governament(purchase)
+        elif purchase.kind == 'donation':
+            if purchase.product.gives_promocode:
+                self.on_finish_promocode_donation(purchase)
+            else:
+                self.on_finish_normal_donation(purchase)
+        elif purchase.kind == 'caravan-rider':
+            self.on_finish_caravan_rider(purchase)
+        else:
+            self.mailer.notify_payment(purchase)
+
+    def on_finish_corporate(self, purchase):
+        from segue.product.models import Product
+        promo_product = Product.query.filter(Product.id==purchase.product.promocode_product_id).first()
+
+        promocodes = self.promocodes.create(
+            promo_product,
+            creator=purchase.customer,
+            description=promo_product.description,
+            quantity=purchase.qty)
+
+        self.mailer.notify_corporate_payment(purchase, promocodes)
+
+    def on_finish_governament(self, purchase):
+        from segue.product.models import Product
+        promo_product = Product.query.filter(Product.id == purchase.product.promocode_product_id).first()
+
+        promocodes = self.promocodes.create(
+            promo_product,
+            creator=purchase.customer,
+            description=promo_product.description,
+            quantity=purchase.qty)
+
+        self.mailer.notify_gov_payment(purchase, promocodes)
+
+    def on_finish_promocode_donation(self, purchase):
+        from segue.product.models import Product
+        promo_product = Product.query.filter(Product.id==purchase.product.promocode_product_id).first()
+
+        promocodes = self.promocodes.create(
+            promo_product,
+            creator=purchase.customer,
+            description=promo_product.description
+        )
+        _, document = ClaimCheckDocumentService().create(purchase)
+        self.mailer.notify_promocode(purchase.customer, promocodes[0], document)
+
+    def on_finish_normal_donation(self, purchase):
+        document = ClaimCheckDocumentService().create(purchase)[0]
+        self.mailer.notify_donation(purchase, document)
+
+    def on_finish_caravan_rider(self, purchase):
+        logger.debug('attempting to exempt the leader of a caravan')
+        self.caravans.update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
 
     def processor_for(self, method):
         if method in self.processors_overrides:
@@ -255,47 +361,6 @@ class PaymentService(object):
             return self.DEFAULT_PROCESSORS[method]()
         raise NotImplementedError(method+' is not a valid payment method')
 
-    def _notify_user(self, purchase, payment, transition):
-        if purchase.satisfied and transition.old_status != 'paid' and transition.new_status == 'paid':
-            logger.debug('transition is good payment! notifying customer via e-mail!')
-
-            if purchase.product.id == 1:#FIX OMG
-                #TODO: REMOVE
-                from segue.product.models import Product
-
-                promo_product = Product.query.filter(Product.id==3).first()#OMG
-                customer = purchase.customer
-                pcs = PromoCodeService()
-                promocode = pcs.create(promo_product, creator=customer, description=u'Vale ingresso doação')[0]
-
-                document = DocumentService()
-                claim_check = DonationClaimCheckFactory().create(purchase)
-                doc = document.svg_to_pdf(
-                    claim_check.template_file,
-                    'claimcheck',
-                    claim_check.hash_code,
-                    variables=claim_check.template_vars)[0]
-
-                self.mailer.notify_promocode(customer, promocode, doc)
-
-            elif purchase.product.category == 'donation':
-                document = DocumentService()
-                claim_check = DonationClaimCheckFactory().create(purchase)
-
-                doc = document.svg_to_pdf(
-                    claim_check.template_file,
-                    'claimcheck',
-                    claim_check.hash_code,
-                    variables=claim_check.template_vars)[0]
-
-                self.mailer.notify_donation(purchase, payment, doc)
-            else:
-                self.mailer.notify_payment(purchase, payment)
-
-            # TODO: improve this code, caravan concerns should never live here!
-            if purchase.kind == 'caravan-rider':
-                logger.debug('attempting to exempt the leader of a caravan')
-                self.caravans.update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
 
 class ProcessBoletosService(object):
 
@@ -333,3 +398,22 @@ class ProcessBoletosService(object):
                 'late': late_payments,
                 'bad': bad_payments,
                 'unknown': unknown_payments}
+
+
+class ClaimCheckDocumentService(object):
+
+    def __init__(self, documents=None, claim_check_factory=None):
+        from segue.purchase.factories import DonationClaimCheckFactory
+        from segue.document.services import DocumentService
+        self.documents = documents or DocumentService()
+        self.claim_check_factory = claim_check_factory or DonationClaimCheckFactory()
+
+    def create(self, purchase):
+        claim_check = self.claim_check_factory.create(purchase)
+
+        return self.documents.svg_to_pdf(
+            claim_check.template_file,
+            'claimcheck',
+            claim_check.hash_code,
+            variables=claim_check.template_vars
+        )

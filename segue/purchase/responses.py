@@ -1,3 +1,5 @@
+from marshmallow.schema import fields
+
 from segue.responses import BaseResponse
 from segue.purchase.promocode.models import PromoCodePayment
 from segue.schema import BaseSchema, Field
@@ -28,6 +30,10 @@ class PromoCodeResponse(BaseResponse):
 
 #TODO: RENAME
 class PromoCodeListResponse(BaseSchema):
+
+    id = Field.int(attribute='used_by.id'),
+    name = Field.str(attribute='used_by.name')
+
 
     class Meta:
         fields = ('hash_code', 'description', 'discount', 'used')

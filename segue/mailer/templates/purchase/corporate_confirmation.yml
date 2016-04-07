@@ -1,0 +1,31 @@
+---
+
+template: purchase_corporate_confirmation
+language: pt
+subject: "#FISL17 - confirmação de pagamento"
+
+body: |
+    Prezad@ {corporate.incharge_name} da Empresa {customer.name},
+
+    Recebemos seu pagamento e abaixo segue(m) o(s) código(s) promocional(ais) para cadastro da(s) pessoa(s) que participarão do FISL17.
+
+    {hash_codes}
+
+    PARA UTILIZAÇÃO, É NECESSÁRIO SEGUIR OS SEGUINTES PASSOS:
+
+    1. Entregue um código promocional para cada indivíduo que comparecerá no FISL17;
+    2. Cada um que receber o código, deverá criar uma conta pessoal e preencher o cadastro no Sistema de Inscrições: http://segue.fisl17.softwarelivre.org
+    3. Inserir o código no campo: “Insira aqui o seu código promocional”;
+    4. Clicar em “Usar”;
+    4.1 O ingresso Corporativo aparecerá com desconto de 100%;
+    5. Clicar no Botão “Comprar”;
+    6. Clique em “Finalizar”.
+
+    A INSCRIÇÃO FOI EFETIVADA E SERÁ ENVIADO UM E-MAIL DE CONFIRMAÇÃO!
+
+
+    Caso tenha dúvidas, envie um e-mail para: financeiro@espacodeprojetos.com.br
+
+
+    Saudações livres!
+    Comissão Organizadora do #FISL17

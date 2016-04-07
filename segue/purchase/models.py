@@ -55,6 +55,7 @@ class Purchase(JsonSerializable, db.Model):
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
     customer_id    = db.Column(db.Integer, db.ForeignKey('account.id'))
     buyer_id       = db.Column(db.Integer, db.ForeignKey('buyer.id'))
+    qty            = db.Column(db.Integer, default=1)
     #TODO: Create a enum for status. Status from database an old database ( pending, paid, reimbursed, stale)
     status         = db.Column(db.Text, default='pending')
     amount         = db.Column(db.Numeric)
@@ -116,7 +117,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def outstanding_amount(self):
-        return self.amount - self.paid_amount
+        return (self.amount * self.qty) - self.paid_amount
 
     @property
     def has_started_payment(self):
@@ -125,6 +126,10 @@ class Purchase(JsonSerializable, db.Model):
     @property
     def satisfied(self):
         return self.status == 'paid'
+
+    def payment_analysed(self):
+        if self.status == 'payment_analysis':
+            self.status = 'paid'
 
     @property
     def description(self):
@@ -144,6 +149,27 @@ class Purchase(JsonSerializable, db.Model):
             if not (column.primary_key or column.unique):
                 arguments[name] = getattr(self, name)
         return self.__class__(**arguments)
+
+
+class StudentPurchase(Purchase):
+    __mapper_args__ = {'polymorphic_identity': 'student'}
+
+    def recalculate_status(self):
+        if self.outstanding_amount == 0: 
+            self.status = 'payment_analysis'
+
+    def payment_analysed(self):
+        if self.status == 'payment_analysis':
+            self.status = 'paid'
+        return self.status
+
+class DonationPurchase(Purchase):
+    #TODO: IMPROVE THIS CLASS
+    __mapper_args__ = {'polymorphic_identity': 'donation'}
+
+    def __init__(self, *args, **kwargs):
+        Purchase.__init__(self, *args, **kwargs)
+        self.amount = kwargs.pop('amount', 0)
 
 class ExemptPurchase(Purchase):
     __mapper_args__ = { 'polymorphic_identity': 'exempt' }

@@ -63,21 +63,25 @@ class Account(JsonSerializable, db.Model):
     resume           = db.Column(db.Text)
     certificate_name = db.Column(db.Text)
 
-    caravan_invite  = db.relationship('CaravanInvite')
+    caravan_invite  = db.relationship('CaravanInvite', uselist=True)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-    corporate_id = db.Column(db.Integer)
+    corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id'))
+    corporate = db.relationship('Corporate', backref='employees', foreign_keys=[corporate_id])
 
     proposals       = db.relationship("Proposal", backref="owner")
     purchases       = db.relationship("Purchase", backref="customer")
     caravan_owned   = db.relationship("Caravan",  backref="owner")
 
-    corporate_owned = db.relationship("Corporate", backref="owner", primaryjoin='Account.id==Corporate.owner_id')
+    corporate_owned = db.relationship('Corporate', back_populates='owner', primaryjoin='Account.id==Corporate.owner_id', uselist=False)
+
 
     account_roles = db.relationship('Role', secondary=roles_account, backref=db.backref('accounts', lazy='dynamic'))
 
     resets = db.relationship("ResetPassword", backref="account")
+
+
 
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
@@ -220,6 +224,14 @@ class Account(JsonSerializable, db.Model):
             if r in self.roles:
                 return True
         return False
+
+    #TODO: HACK REMOVE LOOK IN RESPONSES
+    @property
+    def incharge(self):
+        if self.corporate:
+            return self.corporate.incharge_name
+        return None
+
 
 class ResetPassword(JsonSerializable, db.Model):
     id           = db.Column(db.Integer, primary_key=True)
