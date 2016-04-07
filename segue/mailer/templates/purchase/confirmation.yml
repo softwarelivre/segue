@@ -13,8 +13,10 @@ body: |
     Seu pagamento foi recebido e processado com sucesso.
 
     Código do ingresso: {purchase.id}
+    Quantidade: {purchase.qty}
     Tipo de ingresso: {product.description}
     Valor do ingresso: R$ {product.price}
+    Valor total: R$ {purchase.amount}
 
     Saudações livres!
 

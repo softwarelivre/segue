@@ -26,9 +26,9 @@ import storage
 
 def _make_context():
     import segue.models
-    return dict(app=app, db=segue.core.db, models=segue.models)
+    return dict(app=app, db=segue.core.db, models=segue.models, config=segue.core.config)
 
-app = segue.Application(blueprints=False)
+app = segue.Application(blueprints=True)
 
 migrate = Migrate(app, segue.core.db)
 

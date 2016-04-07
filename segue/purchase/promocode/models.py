@@ -22,6 +22,11 @@ class PromoCode(JsonSerializable, db.Model):
     def used(self):
         return self.payment is not None
 
+    @property
+    def used_by(self):
+        if self.used:
+            return self.payment.purchase.customer
+
 class PromoCodePayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
 
