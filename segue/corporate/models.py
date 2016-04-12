@@ -94,7 +94,8 @@ class GovPurchase(CorporatePurchase):
         else:
             self.qty = qty
 
-        self.status = 'purchase_in_analysis'
+        self.status = 'gov_document_submission_pending'
+
 
 class GovPayment(Payment):
     __mapper_args__ = { 'polymorphic_identity': 'government' }

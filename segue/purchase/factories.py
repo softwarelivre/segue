@@ -44,6 +44,9 @@ class PurchaseFactory(Factory):
         result.buyer = buyer
         result.product = product
         result.due_date = product.due_date
+        #TODO: FIX LATER
+        if result.status == 'gov_document_submission_pending' and buyer.document_file_hash:
+            result.status = 'gov_document_in_analysis'
         #TODO: IMPROVE CALCULATE THE AMOUNT OF THE PURCHASE
         if not result.amount:
             result.amount = product.price

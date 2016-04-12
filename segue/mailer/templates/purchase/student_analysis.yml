@@ -1,0 +1,24 @@
+---
+
+template: student_analysis
+language: pt
+subject: "#FISL17 - confirmação de pagamento"
+
+body: |
+
+    {customer.name},
+
+    **Confirmação de pagamento!**
+
+    Seu pagamento foi recebido e processado com sucesso.
+    Estamos análisando a documentação enviada. Este processo pode levar alguns dias.
+
+    Código do ingresso: {purchase.id}
+    Quantidade: {purchase.qty}
+    Tipo de ingresso: {product.description}
+    Valor do ingresso: R$ {product.price}
+    Valor total: R$ {purchase.amount}
+
+    Saudações livres!
+
+    Comissão Organizadora do #FISL17

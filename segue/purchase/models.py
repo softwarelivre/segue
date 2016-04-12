@@ -156,10 +156,10 @@ class StudentPurchase(Purchase):
 
     def recalculate_status(self):
         if self.outstanding_amount == 0: 
-            self.status = 'payment_analysis'
+            self.status = 'student_document_in_analysis'
 
     def payment_analysed(self):
-        if self.status == 'payment_analysis':
+        if self.status == 'student_document_in_analysis':
             self.status = 'paid'
         return self.status
 

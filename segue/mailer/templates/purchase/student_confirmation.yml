@@ -1,0 +1,21 @@
+---
+
+template: student_confirmation
+language: pt
+subject: "#FISL17 - confirmação de inscrição"
+
+body: |
+
+    {customer.name},
+
+    **Ingresso confirmado!**
+
+    Código do ingresso: {purchase.id}
+    Quantidade: {purchase.qty}
+    Tipo de ingresso: {product.description}
+    Valor do ingresso: R$ {product.price}
+    Valor total: R$ {purchase.amount}
+
+    Saudações livres!
+
+    Comissão Organizadora do #FISL17

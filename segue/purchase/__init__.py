@@ -11,6 +11,7 @@ class PurchaseBlueprint(flask.Blueprint):
         self.add_url_rule('/<string:name>.schema',                  methods=['GET'],  view_func=self.controller.schema)
         self.add_url_rule('/<int:purchase_id>',                     methods=['GET'],  view_func=self.controller.get_one)
         self.add_url_rule('/<int:purchase_id>/pay/<string:method>', methods=['POST'], view_func=self.controller.pay)
+        self.add_url_rule('/<int:purchase_id>/upload-buyer-document',     methods=['POST'], view_func=self.controller.upload_buyer_document)
         self.add_url_rule('/<int:purchase_id>/clone',               methods=['POST'], view_func=self.controller.clone)
         self.add_url_rule('/promocode/<string:hash>',               methods=['GET'],  view_func=self.controller.check_promocode)
         self.add_url_rule('/process-boletos',                        methods=['POST'],  view_func=self.controller.process_boletos)
