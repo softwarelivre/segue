@@ -82,11 +82,12 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
-    def notify_corporate_promocode_payment(self, purchase, corporate_account):
+    def notify_corporate_promocode_payment(self, purchase, promocode):
         customer = purchase.customer
+        corporate = promocode.creator
 
         message = self.message_factory.from_template('purchase/corporate_promocode_confirmation')
-        message.given(customer=customer, corporate=corporate_account, purchase=purchase)
+        message.given(customer=customer, corporate=corporate, purchase=purchase, promocode=promocode)
         message.to(customer.name, customer.email)
 
         return mailer.send(message.build())
@@ -101,16 +102,57 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def notify_gov_purchase(self, purchase):
+        customer = purchase.customer
+        corporate = purchase.customer.corporate_owned
 
-    def notify_gov_purchase_analysis(self, purchase, promocodes):
+        message = self.message_factory.from_template('purchase/gov')
+        message.given(customer=customer, corporate=corporate, purchase=purchase)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+
+    def notify_gov_purchase_analysed(self, purchase, promocodes):
         customer = purchase.customer
         corporate = purchase.customer.corporate_owned
         hash_codes = ''
         for p in promocodes:
             hash_codes += p.hash_code + ' '
 
-        message = self.message_factory.from_template('purchase/corporate_confirmation')
+        message = self.message_factory.from_template('purchase/gov_confirmation')
         message.given(customer=customer, corporate=corporate, hash_codes=hash_codes)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+    def notify_gov_purchase_received(self, purchase):
+        customer = purchase.customer
+        corporate = purchase.customer.corporate_owned
+
+        message = self.message_factory.from_template('purchase/gov_analysis')
+        message.given(customer=customer, corporate=corporate, purchase=purchase)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+    def notify_student_purchase_received(self, purchase):
+        customer = purchase.customer
+        product = purchase.product
+
+        message = self.message_factory.from_template('purchase/student_analysis')
+        message.given(customer=customer, product=product, purchase=purchase)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+
+    def notify_student_document_analyzed(self, purchase):
+        customer = purchase.customer
+        product = purchase.product
+
+        message = self.message_factory.from_template('purchase/student_confirmation')
+        message.given(customer=customer, product=product, purchase=purchase)
         message.to(customer.name, customer.email)
 
         return mailer.send(message.build())

@@ -26,3 +26,5 @@ class InvitedYourself(SegueGenericError):
 class InvitedAlreadyProcessed(SegueGenericError):
     MESSAGE = _l('This invite has already been accepted or declined')
 
+class AccountHasATicket(SegueGenericError):
+    MESSAGE = _l('You already have a bought a ticket for the event')

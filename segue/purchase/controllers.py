@@ -8,6 +8,8 @@ from segue.json import JsonFor
 from segue.core import config
 from segue.decorators import jsoned, jwt_only, admin_only
 
+from segue.document.services import DocumentService
+from segue.hasher import Hasher
 from services import PurchaseService, PaymentService, PromoCodeService
 from factories import PurchaseFactory
 from responses import GuideResponse, PromoCodeResponse, PromoCodeListResponse
@@ -17,9 +19,13 @@ from promocode.factories import PromoCode
 from flask import request, url_for, redirect
 import schema
 
+
 class PurchaseController(object):
-    def __init__(self, service=None):
+    def __init__(self, service=None, payments=None, hash=None, documents=None):
         self.service = service or PurchaseService()
+        self.payments = payments or PaymentService()
+        self.hash = hash or Hasher(10)
+        self.documents = documents or DocumentService()
         self.current_user = current_user
 
     @jsoned
@@ -33,6 +39,25 @@ class PurchaseController(object):
             return dict(payments=result), 200
 
         return 200
+
+    @jsoned
+    @jwt_only
+    def upload_buyer_document(self, purchase_id):
+        #TODO: IMPROVE
+        from segue.document.services import DocumentService
+
+        data = request.get_json()
+        purchase = self.service.get_one(purchase_id, by=current_user)
+        doc = data.get('document_file', None)
+        if doc and purchase:
+            document_file_hash = self.hash.generate()
+            self.documents.base64_to_pdf('buyer-document', document_file_hash, doc)
+            self.payments.on_gov_document_received(purchase, document_file_hash)
+            return 200
+        else:
+            return 404
+
+
 
     @jsoned
     def current_mode(self):

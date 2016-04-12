@@ -96,7 +96,7 @@ class PurchaseService(object):
         self.db.session.add(purchase)
 
         if purchase.category == 'government':
-            self.mailer.notify_gov_purchase_in_analysis(purchase)
+            self.mailer.notify_gov_purchase(purchase)
 
         if 'hash_code' in buyer_data:
             hash = str(buyer_data['hash_code'])
@@ -105,11 +105,9 @@ class PurchaseService(object):
             if payment.status == 'paid':
                 if product.category == 'corporate-promocode' or product.category == 'gov-promocode':
                     promocode = PromoCode.query.filter(PromoCode.hash_code == hash).first()
-                    if not promocode.used:
-                        account.corporate_id = promocode.creator.corporate_owned.id
-                        self.db.session.add(account)
-                        #self.mailer.notify_corporate_promocode_payment(purchase, account)
-
+                    account.corporate_id = promocode.creator.corporate_owned.id
+                    self.db.session.add(account)
+                    self.mailer.notify_corporate_promocode_payment(purchase, promocode)
 
         if commit:
             self.db.session.commit()
@@ -237,6 +235,9 @@ class PaymentService(object):
             if purchase.satisfied:
                 if transition.old_status != 'paid' and transition.new_status == 'paid':
                     self.on_finish_payment(purchase)
+            elif purchase.category == 'student':
+                if purchase.status == 'student_document_in_analysis':
+                    self.mailer.notify_student_purchase_received(purchase)
 
             return purchase
         except KeyError, e:
@@ -265,8 +266,9 @@ class PaymentService(object):
             if purchase.satisfied:
                 if transition.old_status != 'paid' and transition.new_status == 'paid':
                     self.on_finish_payment(purchase)
-
-
+            elif purchase.category == 'student':
+                if purchase.status == 'student_document_in_analysis':
+                    self.mailer.notify_student_purchase_received(purchase)
 
             return purchase, transition
         except Exception, e:
@@ -278,14 +280,26 @@ class PaymentService(object):
             # TODO: THROW A EXCEPTION
             return {}
 
-        if purchase.status == 'payment_analysis':
-            if purchase.payment_analysed() == 'paid':
-                self.on_finish_payment(purchase)
-            else:
-                return True
+        if purchase.payment_analysed() == 'paid':
+            db.session.add(purchase)
+            db.session.commit()
+            self.mailer.notify_student_document_analyzed(purchase)
 
-    def on_finished_gov_document_purchase_analysis(self, purchase):
-        if purchase.category != 'government':
+
+    def on_gov_document_received(self, purchase, document_file_hash):
+        if purchase.category != 'government' and purchase.status == 'gov_document_submission_pending':
+            #TODO: THROW A EXCEPTION
+            return {}
+        else:
+            purchase.buyer.document_file_hash = document_file_hash
+            purchase.status = 'gov_document_in_analysis'
+            db.session.add(purchase)
+            db.session.commit()
+            self.mailer.notify_gov_purchase_received(purchase)
+
+
+    def on_gov_document_analyzed(self, purchase):
+        if purchase.category != 'government' and purchase.status == 'gov_document_in_analysis':
             #TODO: THROW A EXCEPTION
             return {}
         else:
@@ -296,16 +310,16 @@ class PaymentService(object):
 
 
     def on_finish_payment(self, purchase):
-        if purchase.kind == 'corporate':
+        if purchase.category == 'business':
             self.on_finish_corporate(purchase)
-        elif purchase.kind == 'government':
-            self.on_finish_governament(purchase)
-        elif purchase.kind == 'donation':
+        elif purchase.category == 'government':
+            pass
+        elif purchase.category == 'donation':
             if purchase.product.gives_promocode:
                 self.on_finish_promocode_donation(purchase)
             else:
                 self.on_finish_normal_donation(purchase)
-        elif purchase.kind == 'caravan-rider':
+        elif purchase.category == 'caravan-rider':
             self.on_finish_caravan_rider(purchase)
         else:
             self.mailer.notify_payment(purchase)
@@ -332,7 +346,7 @@ class PaymentService(object):
             description=promo_product.description,
             quantity=purchase.qty)
 
-        self.mailer.notify_gov_payment(purchase, promocodes)
+        self.mailer.notify_gov_purchase_analysed(purchase, promocodes)
 
     def on_finish_promocode_donation(self, purchase):
         from segue.product.models import Product
@@ -343,7 +357,7 @@ class PaymentService(object):
             creator=purchase.customer,
             description=promo_product.description
         )
-        _, document = ClaimCheckDocumentService().create(purchase)
+        document,_ = ClaimCheckDocumentService().create(purchase)
         self.mailer.notify_promocode(purchase.customer, promocodes[0], document)
 
     def on_finish_normal_donation(self, purchase):
