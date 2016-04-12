@@ -61,6 +61,9 @@ class AccountController(object):
         from segue.purchase.promocode.models import PromoCodePayment, PromoCode
         from segue.purchase.models import Purchase
 
+        if current_user.id != account_id:
+            return [], 404
+
         result = db.session.query(PromoCodePayment)\
             .join(Purchase)\
             .join(Account)\

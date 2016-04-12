@@ -225,6 +225,14 @@ class Account(JsonSerializable, db.Model):
                 return True
         return False
 
+    @property
+    def can_start_a_caravan(self):
+        for pur in self.purchases:
+            #TODO: CHECK PURCHASE STATUS
+            if pur.category != 'donation':
+                return False
+        return True
+
     #TODO: HACK REMOVE LOOK IN RESPONSES
     @property
     def incharge(self):

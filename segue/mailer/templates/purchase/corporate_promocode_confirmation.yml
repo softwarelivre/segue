@@ -7,7 +7,7 @@ subject: "#FISL17 - confirmação de inscrição"
 body: |
     {customer.name},
 
-    Você utilizou o código corporativo {promocode.hash_code} e sua inscrição foi efetuada com sucesso.
+    Você utilizou o código  {promocode.hash_code} e sua inscrição foi efetuada com sucesso.
 
     **Ingresso confirmado!**
 

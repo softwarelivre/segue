@@ -5,16 +5,12 @@ language: pt
 subject: "#FISL17 - Empenho em análise"
 
 body: |
-    Prezad@ {corporate.incharge_name} da {customer.name},
+    Prezad@ {corporate.incharge_name} da Organização {customer.name},
 
-    Recebemos sua solicitação de {purchase.qty} inscrição(ções) na modalidade EMPENHO para o FISL 17.
+    Recebemos a nota de empenho relacionada a sua solicitação de {purchase.qty} inscrição(ções) nesta modalidade para o FISL 17.
+    Em 5 dias úteis o cadastro e a respectiva nota de empenho serão analisados, e após aprovação,  você receberá o passo-a-passo para a efetivação das inscrições.
 
-    Esse email lhe garante a reserva das inscrições solicitadas, as quais serão efetivamente confirmadas  após a inclusão e validação da nota de empenho em formato PDF (tamanho 2MB) no sistema: http://segue.fisl17.softwarelivre.org/
-
-    5 dias úteis após o recebimento da respectiva nota de empenho, você receberá o passo -a -passo para a efetivação das inscrições.
-
-    Aguarde o nosso contato.
+    Aguarde nosso contato
 
     Atenciosamente,
-
-    Associação Software Livre.Org
+    ASL.Org

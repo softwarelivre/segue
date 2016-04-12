@@ -10,7 +10,7 @@ import schema
 from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory, CaravanLeaderPurchaseFactory
 from errors import AccountAlreadyHasCaravan, AccountHasAlreadyInvited
-from errors import AccountIsARider, InvitedYourself, InvitedAlreadyProcessed
+from errors import AccountIsARider, InvitedYourself, InvitedAlreadyProcessed, AccountHasATicket
 
 from segue.account.services import AccountService
 
@@ -39,6 +39,8 @@ class CaravanService(object):
     def create(self, data, owner):
         if self.get_by_owner(owner.id, owner): raise AccountAlreadyHasCaravan()
         if owner.accepted_a_caravan_invite: raise AccountIsARider()
+        if not owner.can_start_a_caravan:
+            raise AccountHasATicket()
 
         caravan = CaravanFactory.from_json(data, schema.new_caravan)
         caravan.owner = owner
