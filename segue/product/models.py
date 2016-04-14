@@ -3,7 +3,7 @@ from sqlalchemy import func
 from ..json import JsonSerializable, SQLAlchemyJsonSerializer
 from ..core import db
 
-from errors import ProductExpired, MinimumAmount, MaxPurchaseReached
+from errors import ProductExpired, MinimumAmount, MaxPurchaseReached, AlreadyUsed
 from segue.corporate.models import CorporatePurchase, GovPurchase
 from segue.purchase.promocode.models import PromoCode
 from segue.purchase.models import Purchase, StudentPurchase, DonationPurchase
@@ -110,10 +110,21 @@ class PromoCodeProduct(Product):
         hash_code = buyer_data.get('hash_code',None)
         if not hash_code: return False
 
-        promocode = PromoCode.query.filter(PromoCode.hash_code == hash_code).first()
-        if not promocode: return False
+        promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
+        if not promocodes: return False
 
-        return promocode.product == self
+        #TODO CREATE A DATABASE CONTRAINT
+        for promocode in promocodes:
+            if promocode.product != self:
+                return False
+
+        # ONE PRODUCT PER CLIENT FOR PROMOCODES WITH SAME HASH
+        if db.session.query(func.count(Purchase.id)) \
+            .filter(Purchase.product_id == promocode.product.id) \
+            .filter(Purchase.customer_id == account.id).scalar():
+            raise AlreadyUsed()
+
+        return True
 
 class CorporatePromoCode(PromoCodeProduct):
     __mapper_args__ = {'polymorphic_identity': 'corporate-promocode'}

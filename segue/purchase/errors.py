@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from segue.babel import _l
-from segue.errors import SegueError, SegueFieldError, FieldError
+from segue.errors import SegueError, SegueFieldError, FieldError, SegueGenericError
 
 class PaymentVerificationFailed(SegueError):
     code = 500

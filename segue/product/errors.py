@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from segue.babel import _l
-from segue.errors import SegueError
+from segue.errors import SegueError, SegueGenericError
 
 class NoSuchProduct(SegueError):
     code = 404
@@ -29,3 +29,6 @@ class MaxPurchaseReached(SegueError):
     code = 400
     def to_json(self):
         return {'message': _l('Max purchased reached')}
+
+class AlreadyUsed(SegueGenericError):
+    MESSAGE = 'You have already used this promocode';
