@@ -47,11 +47,14 @@ class PromoCodeService(object):
 
     def check(self, hash_code):
         logger.info("PromoCodeService.check, hash_code: %s", hash_code)
-        promocode = PromoCode.query.filter(PromoCode.hash_code == hash_code).first()
-        logger.info(promocode)
-        if not promocode: return None
-        if promocode.used: return None
-        return promocode
+        promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
+
+        for promocode in promocodes:
+            logger.info(promocode)
+            if not promocode.used:
+                return promocode
+        return None
+
 
 class PromoCodePaymentService(object):
     def __init__(self, cash_service=None, promocodes=None, factory=None):
