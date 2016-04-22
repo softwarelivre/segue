@@ -113,15 +113,26 @@ def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
         if not purchases: continue
 
         for p in purchases:
-            if p.status == 'paid':
+            
+            if p.status == 'paid' and p.product_id not in [1,2,3, 9, 10, 13,14]:
                 purchase = p
                 buyer = purchase.buyer
                 if not buyer:
                     continue
-                guessed_state = guess_state(buyer, states_cache)
+                #guessed_state = guess_state(buyer, states_cache)
                 ongoing_payments = [ payment for payment in p.payments if (payment.status in Payment.VALID_PAYMENT_STATUSES) ]
                 if ongoing_payments:
                     payment = ongoing_payments[0]
+
+                skip = False
+                for t in payment.transitions:
+                    if t.created.date() <= datetime.date(2016, 03, 29) <= datetime.date(2016, 04, 18):
+                        if hasattr(t, 'payment_date') and t.payment_date >= datetime.date(2016, 03, 29):                            print(t.payment_date)
+                            skip = True
+                        
+                if skip: 
+                    print('skip')
+                    continue    
 
                 data_list = [
                     purchase.id,
@@ -134,12 +145,13 @@ def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
                     buyer.address_extra,
                     buyer.address_city,
                     buyer.address_zipcode,
-                    guessed_state,
+                    buyer.address_state,
                     get_category(purchase.product.category),
                     payment.type,
-                    purchase.product.price,
+                    purchase.amount,
                     get_transition_date(payment),
-                    get_our_number(payment)
+                    get_our_number(payment),
+                    buyer.address_neighborhood
                 ]
 
                 ds.append(data_list)
@@ -163,13 +175,13 @@ def adempiere_filter(data, states_cache):
     # ["0CODIGO DA INSCRICAO","1EMAIL","2NOME",
     #  "3TELEFONE","4DOCUMENTO","5ENDERECO","6NUMERO",
     #  "7COMPLEMENTO","8CIDADE","9CEP","10ESTADO","11TIPO DE INSCRICAO",
-    #  "12FORMA DE PAGAMENTO","13VALOR","14DATA DO PAGAMENTO","15NOSSO NUMERO"]
+    #  "12FORMA DE PAGAMENTO","13VALOR","14DATA DO PAGAMENTO","15NOSSO NUMERO", "16NEIGHBORHOOD"]
     # separator: þ
 
     for d in data:
         purchase_id = d[0]
         cpf = format_document(d[4]) or "nulo"
-        cnpj = "nulo"
+        cnpj = format_document(d[4], type="CNPJ") or "nulo"
         name = d[2]
         email = d[1]
         phone_1 = d[3] or "nulo"
@@ -180,18 +192,59 @@ def adempiere_filter(data, states_cache):
         address = d[5]
         address_number = d[6] or "nulo"
         address_extra = d[7] or "nulo"
-        address_district = get_district(zipcode, states_cache)
+        address_district = d[16]
         #TODO: in the future, allow for multiple tickets in one single document.
         quantity = 1
         amount = d[13]
         ticket_type = d[11]
 
-        content += u"{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}\n".format(
-            purchase_id, "PF", cpf, cnpj, name,
-            email, phone_1, phone_2, zipcode, state, city, address, address_number,
-            address_district, address_extra, quantity, amount, "0", ticket_type)
+        discount = "0"
+        client_type = 'PF'
+        if cnpj != 'nulo':
+            client_type = 'PJ'
+
+
+        description = get_description(ticket_type, purchase_id)
+        content += u'{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ'.format(
+            purchase_id, client_type, cpf, cnpj, name, email, format_phone(phone_1), format_phone(phone_2),
+            format_cep(zipcode), state, city, address, address_number, address_district, address_extra,
+            quantity, amount, discount
+        )
+        content += unicode(description, 'utf-8')
+        content += '\n' 
+
 
     return content
+
+def get_description(category, number):
+    first_paragraph = '01 inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(category)
+    second_paragraph = 'Inscrição nº {}. * * *'.format(number)
+    third_paragraph = 'A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'
+    forth_paragraph = 'Tributos: ISS 5% + COFINS 7,6% = 12,6%.'
+    text = first_paragraph + second_paragraph + third_paragraph + forth_paragraph
+    return text
+
+def format_phone(value):
+    if len(value) < 10:
+        return 'nulo'
+
+    suffix_len = len(value) - 2
+    f = '{}{}-' + '{}' * suffix_len
+
+    return f.format(*list(value))
+
+def format_cep(value):
+    #possibilites:
+        #None
+        #formatted
+        #not formatted
+    if len(value) == 9:
+        return value
+    if len(value) == 8:
+        return "{}{}{}{}{}-{}{}{}".format(*list(value))
+    else:
+        return "nulo"
+
 
 def get_district(zipcode, states_cache):
     c = get_Correios()
@@ -211,14 +264,20 @@ def format_document(value, type="CPF"):
         #not formatted
     if type == "CPF" and value and len(value) == 11:
         return "{}{}{}.{}{}{}.{}{}{}-{}{}".format(*list(value))
+    elif type == 'CNPJ' and len(value) == 14:
+        return "{}{}.{}{}{}.{}{}{}/{}{}{}{}-{}{}".format(*list(value))
     else:
         return "nulo"
 
 def get_transition_date(payment):
     transition = [ transition for transition in payment.transitions if (transition.new_status in Payment.VALID_PAYMENT_STATUSES) ][0]
+    print(payment.id)
+    if payment.type == 'paypal':
+        return transition.created
     if payment.type == 'pagseguro':
         return get_date_pagseguro(transition)
     elif payment.type == 'boleto':
+        print transition.id 
         if hasattr(transition, 'payment_date'):
             return transition.payment_date
         else:
@@ -257,15 +316,15 @@ def strip_accents(item):
 
 def get_category(name):
     if name == 'normal':
-        return "Ingresso individual"
+        return "individual"
     elif name == 'student':
-        return "Ingresso de estudante"
+        return "estudante"
     elif name == 'caravan':
-        return "Ingresso de caravana"
+        return "caravana"
     elif name == 'corp':
-        return "Ingresso corporativo"
-    elif name == 'gov':
-        return "Empenho"
+        return "corporativa"
+    elif name == 'business':
+        return "empenho"
     else:
         return "Tipo de ingresso desconhecido"
 
