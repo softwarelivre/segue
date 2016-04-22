@@ -152,7 +152,7 @@ class PurchaseService(object):
 
     def check_promocode(self, hash, by=None):
         logger.info("received promocode hash: " + hash)
-        return self.promocode_service.check(hash)
+        return self.promocode_service.check(hash, by=by)
 
     def give_speaker_ticket(self, account, commit=True):
         from segue.proposal.models import SpeakerProduct

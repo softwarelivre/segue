@@ -18,7 +18,7 @@ class PromoCodePaymentFactory(PaymentFactory):
     def create(self, purchase, promocode):
         payment = super(PromoCodePaymentFactory, self).create(purchase, target_model=self.model)
         payment.promocode = promocode
-        payment.amount    = purchase.product.price * promocode.discount
+        payment.amount    = purchase.amount * purchase.qty * promocode.discount
         if promocode.discount == 1:
             payment.status = 'paid'
         else:

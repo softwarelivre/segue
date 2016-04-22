@@ -40,7 +40,7 @@ class PromoCodePayment(Payment):
     @property
     def paid_amount(self):
         valid = self.promocode != None
-        total_value = self.purchase.product.price
+        total_value = self.purchase.total_amount
         if valid:
             discounted  = self.promocode.discount * total_value
         return discounted if valid else 0
