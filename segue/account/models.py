@@ -101,11 +101,11 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def is_corporate(self):
-        return self.corporate != None and self.corporate.kind == 'business';
+        return self.corporate != None and self.corporate.kind == 'business'
 
     @property
     def is_government(self):
-        return self.corporate != None and self.corporate.kind == 'government';
+        return self.corporate != None and self.corporate.kind == 'government'
 
     @property
     def presented_talks(self):
