@@ -45,14 +45,18 @@ class PromoCodeService(object):
         db.session.commit()
         return result
 
-    def check(self, hash_code):
+    def check(self, hash_code, by=None):
         logger.info("PromoCodeService.check, hash_code: %s", hash_code)
         promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
 
         for promocode in promocodes:
-            logger.info(promocode)
             if not promocode.used:
-                return promocode
+                #TODO: HARD CODING
+                if promocode.product.category == 'corporate-discount-promocode':
+                    if by and by.corporate_owned:
+                        return promocode
+                else:
+                    return promocode
         return None
 
 
@@ -66,7 +70,7 @@ class PromoCodePaymentService(object):
         hash_code = data.get('hash_code',None)
         if not hash_code: raise InvalidHashCode(hash_code)
 
-        promocode = self.promocodes.check(hash_code)
+        promocode = self.promocodes.check(hash_code, by=purchase.customer)
         if not promocode: raise InvalidHashCode(hash_code)
 
         if force_product: purchase.product = promocode.product

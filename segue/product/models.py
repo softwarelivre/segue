@@ -126,6 +126,41 @@ class PromoCodeProduct(Product):
 
         return True
 
+
+class CorporatePromoCodeProduct(PromoCodeProduct):
+    __mapper_args__ = {'polymorphic_identity': 'corporate-discount-promocode'}
+
+    def special_purchase_class(self):
+        return CorporatePurchase
+
+    def check_eligibility(self, buyer_data, account=None):
+        hash_code = buyer_data.get('hash_code', None)
+        if not account or not account.is_corporate:
+            return False
+
+        promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
+        if not promocodes: return False
+
+        for promocode in promocodes:
+            if promocode.product != self:
+                return False
+
+        # ONE PRODUCT PER CLIENT FOR PROMOCODES WITH SAME HASH
+        if db.session.query(func.count(Purchase.id)) \
+                .filter(Purchase.product_id == promocode.product.id) \
+                .filter(Purchase.customer_id == account.id).scalar():
+            raise AlreadyUsed()
+
+        return True
+
+
+
+    def extra_purchase_fields_for(self, buyer_data):
+        import decimal
+        qty = buyer_data.get('purchase_qty', 0)
+        return {'qty': decimal.Decimal(qty)}
+
+
 class CorporatePromoCode(PromoCodeProduct):
     __mapper_args__ = {'polymorphic_identity': 'corporate-promocode'}
 

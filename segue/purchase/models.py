@@ -113,11 +113,18 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def paid_amount(self):
-        return sum([ p.paid_amount for p in self.payments ])
+        for p in self.payments:
+            print type(p)
+
+        return sum([ p.paid_amount for p in self.payments])
+
+    @property
+    def total_amount(self):
+        return self.amount * self.qty
 
     @property
     def outstanding_amount(self):
-        return (self.amount * self.qty) - self.paid_amount
+        return self.total_amount - self.paid_amount
 
     @property
     def has_started_payment(self):
