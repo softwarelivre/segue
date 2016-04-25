@@ -81,143 +81,123 @@ def caravan_report(out_file = "caravan_report"):
     print "done!"
 
 
-def adempiere_format(out_file = "adempiere_export"):
-    buyers_report(out_file, adempiere=True, testing=False)
-
-def buyers_report(out_file = "buyers_report", adempiere=False, testing=False):
-    ds = get_Dataset()
-    states_cache, cache_file = get_states_cache()
-
-    counter = 0
-    extension = ".txt" if adempiere else ".xls"
-
-    filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")) + extension
+def adempiere_format(initial_date, end_date, out_file="adempiere_export"):
+    extension = ".txt"
+    filename = out_file + "_" + str(datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")) + extension
     print "generating report " + filename
-    f = codecs.open('./' + filename,'w', 'utf-8')
-    if adempiere:
-        ds = []
-    else:
-        ds.headers = ["CODIGO DA INSCRICAO","EMAIL","NOME","TELEFONE","DOCUMENTO","ENDERECO","NUMERO","COMPLEMENTO","CIDADE","CEP","ESTADO","TIPO DE INSCRICAO","FORMA DE PAGAMENTO","VALOR","DATA DO PAGAMENTO","NOSSO NUMERO"]
+    f = codecs.open('./' + filename, 'w', 'utf-8')
+    ds = []
 
-    for account in Account.query.all():
-        if testing:
-            counter += 1
-            if counter > 200:
-                break
+    exclude_categories = ['donation']
+    purchases = Purchase.query \
+        .join('product') \
+        .filter(Purchase.status == 'paid')\
+        .filter(Product.category.notin_(exclude_categories))\
+        .order_by(Purchase.id)\
+        .all()
 
-        purchases = account.purchases
-        buyers      = [ p.buyer for p in purchases ]
-        payments    = list(it.chain.from_iterable([ p.payments for p in purchases ]))
-        #transitions = list(it.chain.from_iterable([ p.transitions for p in payments ]))
+    for purchase in purchases:
+        account = purchase.customer
+        buyer = purchase.buyer
 
-        if not purchases: continue
+        finished_payments = [payment for payment in purchase.payments if (payment.status in Payment.VALID_PAYMENT_STATUSES)]
 
-        for p in purchases:
-            
-            if p.status == 'paid' and p.product_id not in [1,2,3, 9, 10, 13,14]:
-                purchase = p
-                buyer = purchase.buyer
-                if not buyer:
-                    continue
-                #guessed_state = guess_state(buyer, states_cache)
-                ongoing_payments = [ payment for payment in p.payments if (payment.status in Payment.VALID_PAYMENT_STATUSES) ]
-                if ongoing_payments:
-                    payment = ongoing_payments[0]
+        paid_amount = purchase.total_amount
+        payments = []
+        for payment in finished_payments:
+            if hasattr(payment, 'promocode') and payment.promocode:
+                paid_amount -= payment.paid_amount
+            else:
+                payments.append(payment)
 
-                skip = False
-                for t in payment.transitions:
-                    if t.created.date() <= datetime.date(2016, 03, 29) <= datetime.date(2016, 04, 18):
-                        if hasattr(t, 'payment_date') and t.payment_date >= datetime.date(2016, 03, 29):                            print(t.payment_date)
-                            skip = True
-                        
-                if skip: 
-                    print('skip')
-                    continue    
+        #free fries = exclude from report
+        if not paid_amount:
+            #print("Free purchase id {} skipping".format(purchase.id))
+            continue
 
-                data_list = [
-                    purchase.id,
-                    account.email,
-                    account.name,
-                    account.phone,
-                    account.document,
-                    buyer.address_street,
-                    buyer.address_number,
-                    buyer.address_extra,
-                    buyer.address_city,
-                    buyer.address_zipcode,
-                    buyer.address_state,
-                    get_category(purchase.product.category),
-                    payment.type,
-                    purchase.amount,
-                    get_transition_date(payment),
-                    get_our_number(payment),
-                    buyer.address_neighborhood
-                ]
+        if len(payments) > 1:
+            print('More than one payment for purchase id {}. Skipping'.format(purchase.id))
+            continue
 
-                ds.append(data_list)
+        transaction_date = get_transition_date(payments[0])
+
+        initial = datetime.datetime.strptime(initial_date, '%Y-%m-%d')
+        end = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        transaction = datetime.datetime(transaction_date.year, transaction_date.month, transaction_date.day)
+        if not (initial <= transaction <= end):
+            continue
+
+        print('Including purchase id {} transaction date {}'.format(purchase.id, transaction_date))
+
+        data = {
+            'purchase_id': purchase.id,
+            'buyer_email': account.email,
+            'buyer_name': buyer.name,
+            'buyer_phone': buyer.contact,
+            'buyer_document': buyer.document,
+            'buyer_address_street': buyer.address_street,
+            'buyer_address_number': buyer.address_number,
+            'buyer_address_extra': buyer.address_extra,
+            'buyer_address_city': buyer.address_city,
+            'buyer_address_zipcode': buyer.address_zipcode,
+            'buyer_address_state': buyer.address_state,
+            'buyer_address_neighborhood': buyer.address_neighborhood,
+            'purchase_category': get_category(purchase.product.category),
+            'purchase_type': payment.type,
+            'purchase_qty': purchase.qty,
+            'paid_amount': paid_amount,
+            'transaction_date': transaction_date,
+            'bo_our_number': get_our_number(payment),
+        }
+
+        ds.append(data)
 
     print "fechando arquivo..."
-    if adempiere:
-        f.write(adempiere_filter(ds, states_cache))
-    else:
-        f.write(ds.xls)
+    f.write(adempiere_filter(ds))
     f.close()
 
-    print "escrevendo arquivo states_cache..."
-    f_cache_file = codecs.open(cache_file, "w")
-    json.dump(states_cache, f_cache_file)
-    f_cache_file.close()
-    print "done!"
 
-def adempiere_filter(data, states_cache):
+def adempiere_filter(data):
     content = u""
-    s = "þ"
-    # ["0CODIGO DA INSCRICAO","1EMAIL","2NOME",
-    #  "3TELEFONE","4DOCUMENTO","5ENDERECO","6NUMERO",
-    #  "7COMPLEMENTO","8CIDADE","9CEP","10ESTADO","11TIPO DE INSCRICAO",
-    #  "12FORMA DE PAGAMENTO","13VALOR","14DATA DO PAGAMENTO","15NOSSO NUMERO", "16NEIGHBORHOOD"]
-    # separator: þ
 
     for d in data:
-        purchase_id = d[0]
-        cpf = format_document(d[4]) or "nulo"
-        cnpj = format_document(d[4], type="CNPJ") or "nulo"
-        name = d[2]
-        email = d[1]
-        phone_1 = d[3] or "nulo"
-        phone_2 = "nulo"
-        zipcode = d[9] or "nulo"
-        state = d[10] or "nulo"
-        city = d[8] or "nulo"
-        address = d[5]
-        address_number = d[6] or "nulo"
-        address_extra = d[7] or "nulo"
-        address_district = d[16]
-        #TODO: in the future, allow for multiple tickets in one single document.
-        quantity = 1
-        amount = d[13]
-        ticket_type = d[11]
+        purchase_id = d['purchase_id']
+        cpf = format_document(d['buyer_document']) or 'nulo'
+        cnpj = format_document(d['buyer_document'], type='CNPJ') or 'nulo'
+        name = d['buyer_name']
+        email = d['buyer_email']
+        phone_1 = d['buyer_phone'] or 'nulo'
+        phone_2 = 'nulo'
+        zipcode = d['buyer_address_zipcode'] or 'nulo'
+        state = d['buyer_address_state'] or 'nulo'
+        city = d['buyer_address_city'] or 'nulo'
+        address = d['buyer_address_street']
+        address_number = d['buyer_address_number'] or 'nulo'
+        address_extra = d['buyer_address_extra'] or 'nulo'
+        address_district = d['buyer_address_neighborhood'] or 'nulo'
+
+        quantity = d['purchase_qty']
+        amount = d['paid_amount']
+        ticket_type = d['purchase_category']
 
         discount = "0"
         client_type = 'PF'
         if cnpj != 'nulo':
             client_type = 'PJ'
 
-
-        description = get_description(ticket_type, purchase_id)
+        description = get_description(ticket_type, quantity, purchase_id)
         content += u'{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ'.format(
             purchase_id, client_type, cpf, cnpj, name, email, format_phone(phone_1), format_phone(phone_2),
             format_cep(zipcode), state, city, address, address_number, address_district, address_extra,
             quantity, amount, discount
         )
         content += unicode(description, 'utf-8')
-        content += '\n' 
-
+        content += '\n'
 
     return content
 
-def get_description(category, number):
-    first_paragraph = '01 inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(category)
+def get_description(category, quantity, number):
+    first_paragraph = '{:0>2d} inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(quantity, category)
     second_paragraph = 'Inscrição nº {}. * * *'.format(number)
     third_paragraph = 'A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'
     forth_paragraph = 'Tributos: ISS 5% + COFINS 7,6% = 12,6%.'
@@ -270,14 +250,14 @@ def format_document(value, type="CPF"):
         return "nulo"
 
 def get_transition_date(payment):
-    transition = [ transition for transition in payment.transitions if (transition.new_status in Payment.VALID_PAYMENT_STATUSES) ][0]
-    print(payment.id)
+    transition = [transition for transition in payment.transitions
+                  if (transition.new_status in Payment.VALID_PAYMENT_STATUSES and
+                      transition.old_status not in Payment.VALID_PAYMENT_STATUSES)][0]
     if payment.type == 'paypal':
         return transition.created
     if payment.type == 'pagseguro':
         return get_date_pagseguro(transition)
     elif payment.type == 'boleto':
-        print transition.id 
         if hasattr(transition, 'payment_date'):
             return transition.payment_date
         else:
@@ -316,15 +296,19 @@ def strip_accents(item):
 
 def get_category(name):
     if name == 'normal':
-        return "individual"
+        return 'individual'
     elif name == 'student':
-        return "estudante"
+        return 'estudante'
     elif name == 'caravan':
-        return "caravana"
-    elif name == 'corp':
-        return "corporativa"
+        return 'caravanista'
+    elif name == 'caravan-rider':
+        return 'caravana'
     elif name == 'business':
-        return "empenho"
+        return 'corporativa'
+    elif name == 'government':
+        return 'empenho'
+    elif name == 'foreigner':
+        return 'estrangeiro'
     else:
         return "Tipo de ingresso desconhecido"
 
