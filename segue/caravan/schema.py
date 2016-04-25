@@ -8,7 +8,7 @@ class CaravanSchema(BaseSchema):
     )
     city = Field.str(
         required=True,
-        validate=[Validator.length(min=5, max=80)]
+        validate=[Validator.length(min=3, max=80)]
     )
     description = Field.str(
         required=True,
