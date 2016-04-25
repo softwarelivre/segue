@@ -124,7 +124,7 @@ def adempiere_format(initial_date, end_date, out_file="adempiere_export"):
         initial = datetime.datetime.strptime(initial_date, '%Y-%m-%d')
         end = datetime.datetime.strptime(end_date, '%Y-%m-%d')
         transaction = datetime.datetime(transaction_date.year, transaction_date.month, transaction_date.day)
-        if not (initial <= transaction <= end):
+        if not (initial <= transaction < end):
             continue
 
         print('Including purchase id {} transaction date {}'.format(purchase.id, transaction_date))
