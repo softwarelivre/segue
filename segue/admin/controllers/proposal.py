@@ -1,6 +1,6 @@
 import flask
 
-from flask import request
+from flask import request, abort
 from flask.ext.jwt import current_user
 from webargs.flaskparser import parser
 
@@ -113,3 +113,10 @@ class AdminProposalController(object):
         logger.info("user %s removed tag %s from proposal %d", self.current_user.email, tag_name, proposal_id)
         return ProposalDetailResponse(result), 200
 
+    @jwt_only
+    @admin_only
+    @jsoned
+    def remove_invite(self, proposal_id, invite_id):
+        self.invites.remove(invite_id) or abort(400)
+        logger.info("user {} removed invite {} from proposal {}".format(self.current_user.email, invite_id, proposal_id))
+        return '', 204
