@@ -284,6 +284,9 @@ class PaymentService(object):
             db.session.add(purchase)
             db.session.commit()
             self.mailer.notify_student_document_analyzed(purchase)
+            return True
+        else:
+            return False
 
 
     def on_gov_document_received(self, purchase, document_file_hash):
