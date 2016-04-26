@@ -299,6 +299,8 @@ def get_category(name):
         return 'individual'
     elif name == 'student':
         return 'estudante'
+    elif name == 'promocode':
+        return 'individual'
     elif name == 'caravan':
         return 'caravanista'
     elif name == 'caravan-rider':
