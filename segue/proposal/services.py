@@ -73,7 +73,8 @@ class ProposalService(object):
     def all_with_tags(self, *tags):
         return Proposal.query.join(ProposalTag).filter(ProposalTag.name.in_(tags)).order_by(Proposal.id).all()
 
-    def create(self, data, owner, enforce_deadline=True):
+    #TODO: SET ENFORCE_DEADLINE TO TRUE
+    def create(self, data, owner, enforce_deadline=False):
         if enforce_deadline:
             self.deadline.enforce()
         if isinstance(owner, int):
@@ -234,6 +235,15 @@ class InviteService(object):
             raise NotAuthorized
 
         return self.accounts.create(account_data)
+
+    def remove(self, invite_id):
+        #TODO: ENFORCE AUT
+        invite = ProposalInvite.query.filter(ProposalInvite.id == invite_id).first()
+        if invite:
+            db.session.delete(invite)
+            db.session.commit()
+            return True
+        return False
 
     def set_coauthors(self, proposal_id, coauthor_ids):
         proposal = self.proposals.get_one(proposal_id, strict=True)
