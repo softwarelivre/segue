@@ -19,7 +19,7 @@ class AdminPurchaseBlueprint(flask.Blueprint):
         super(AdminPurchaseBlueprint, self).__init__('admin.purchase', __name__, url_prefix='/admin/purchases')
         self.controller = AdminPurchaseController()
         self.add_url_rule('',                                 methods=['GET'],  view_func=self.controller.list)
-
+        self.add_url_rule('/<int:proposal_id>/confirm_student_document', methods=['GET'], view_func=self.controller.confirm_student_document)
 
 class AdminProductBlueprint(flask.Blueprint):
     def __init__(self):
@@ -37,6 +37,7 @@ class AdminProposalBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:proposal_id>',                        methods=['GET'],    view_func=self.controller.get_one)
         self.add_url_rule('/<int:proposal_id>',                        methods=['PUT'],    view_func=self.controller.modify)
         self.add_url_rule('/<int:proposal_id>/invites',                methods=['GET'],    view_func=self.controller.list_invites)
+        self.add_url_rule('/<int:proposal_id>/invite/<int:invite_id>', methods=['DELETE'], view_func=self.controller.remove_invite)
         self.add_url_rule('/<int:proposal_id>/coauthors',              methods=['POST'],   view_func=self.controller.set_coauthors)
         self.add_url_rule('/<int:proposal_id>/status',                 methods=['POST'],   view_func=self.controller.set_status)
         self.add_url_rule('/<int:proposal_id>/set-track',              methods=['POST'],   view_func=self.controller.change_track)
