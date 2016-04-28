@@ -222,11 +222,19 @@ class DonationProduct(Product):
     def extra_purchase_fields_for(self, buyer_data):
         """ Used in service.purchase for get the data from the request and send to the model"""
 
+        #TODO: REVIEW HARDCODING
+        extra_fields = {}
+
+        if self.id == 1 or self.id == 13:
+            extra_fields['shirt_size'] = buyer_data.get('shirt_size', None)
+            extra_fields['delivery'] = buyer_data.get('delivery', None)
+
         #A donation without a fixed price
         if not self.price:
             if 'amount' in buyer_data:
                 amount = float(buyer_data['amount'])
                 if amount < 10:
                     raise MinimumAmount()
-                return {'amount': buyer_data['amount']}
-        return {}
+                extra_fields['amount'] = buyer_data['amount']
+
+        return extra_fields

@@ -90,6 +90,14 @@ class PurchaseService(object):
 
         logger.info("Create buyer: %s", buyer)
 
+        #TODO: REVIEW
+        survey = {}
+        if 'shirt_size' in buyer_data and 'delivery' in buyer_data:
+            survey = {
+                'shirt_size': extra.pop('shirt_size'),
+                'delivery': extra.pop('delivery')
+            }
+
         purchase = PurchaseFactory.create(buyer, product, account, **extra)
 
         self.db.session.add(buyer)
@@ -111,6 +119,17 @@ class PurchaseService(object):
 
         if commit:
             self.db.session.commit()
+
+        #TODO: REVIEW
+        if survey:
+            from segue.survey.services import SurveyService
+            survey_name = 'fisl17_donation_shirt_purchase_{}'.format(purchase.id)
+
+            service = SurveyService()
+            service.save_answers(survey_name, survey, by_user=account)
+            print(survey_name, survey)
+
+
         return purchase
 
     def get_one(self, purchase_id, by=None, strict=False, check_ownership=True):
