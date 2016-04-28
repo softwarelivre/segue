@@ -1,6 +1,6 @@
 
 
-from flask import request
+from flask import request, abort
 from flask.ext.jwt import current_user
 from webargs.flaskparser import parser
 
@@ -43,9 +43,7 @@ class AdminPurchaseController(object):
     def confirm_student_document(self, purchase_id):
         #TODO: REVIEW
         pur = Purchase.query.filter(Purchase.id == purchase_id).first()
-        if pur:
-            if self.payments.on_finished_student_document_analysis(pur):
-                return 200
-            else:
-                return 400
+        if pur and self.payments.on_finished_student_document_analysis(pur):
+            return '', 204
+        abort(400)
 
