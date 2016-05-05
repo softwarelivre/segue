@@ -254,9 +254,6 @@ class PaymentService(object):
             if purchase.satisfied:
                 if transition.old_status != 'paid' and transition.new_status == 'paid':
                     self.on_finish_payment(purchase)
-            elif purchase.category == 'student':
-                if purchase.status == 'student_document_in_analysis' and purchase.status != 'student_document_in_analysis':
-                    self.mailer.notify_student_purchase_received(purchase)
 
             return purchase
         except KeyError, e:
@@ -286,7 +283,7 @@ class PaymentService(object):
                 if transition.old_status != 'paid' and transition.new_status == 'paid':
                     self.on_finish_payment(purchase)
             elif purchase.category == 'student':
-                if purchase.status == 'student_document_in_analysis' and purchase.status != 'student_document_in_analysis':
+                if purchase.status == 'student_document_in_analysis':
                     self.mailer.notify_student_purchase_received(purchase)
 
             return purchase, transition
