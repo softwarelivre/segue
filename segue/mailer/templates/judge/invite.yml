@@ -6,20 +6,27 @@ subject: "Ajude-nos a escolher as palestras do FISL 17!"
 
 body: |
 
-    Olá!
+    Saudações Livres !
 
-    Você está recebendo este e-mail por ser um participante
-    do FISL17 (ou de suas edições anteriores). Estamos
-    convidando você para fazer parte do nosso processo de
-    escolha de palestras dess edição.
+    Você foi convidado a participar no torneio (suíço) para escolher
+    as propostas de palestras no FISL17.
 
-    Para participar, é muito simples: basta clicar no
-    link abaixo e seguir as instruções. Você tem direito a {token.votes}
-    votos.
+    Com o seu "token" você terá a oportunidade de votar qual a sua
+    proposta preferida entre duas que serão apresentadas lado a lado.
+
+    Não é preciso ser especialista nos assuntos das duas propostas,
+    basta que leia as propostas e avalie qual das duas prefere.
+
+    Também pode optar por não escolher nenhum das duas.
+
+    Assim você está ajudando a construir a grade de conteúdos do
+    evento.
+
+    Para começar basta clicar no link abaixo:
 
     {backend_url}/api/judges/{token.hash}
 
-    Atenciosamente,
+    Agradecemos.
 
     --
     Associação Software Livre.Org
