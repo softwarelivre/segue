@@ -5,8 +5,9 @@ from segue.judge.services import JudgeService, TournamentService, RankingService
 from segue.judge.errors import JudgeAlreadyExists
 from segue.proposal.services import ProposalService
 from support import *;
+import time
 
-def invite_judges(filename, count=5, tid=0):
+def invite_judges(filename, count=5, tid=0, wait=30):
     init_command()
     content = open(filename, 'r').read()
 
@@ -21,6 +22,7 @@ def invite_judges(filename, count=5, tid=0):
             print "hash is {}{}{}, sending email...".format(F.GREEN, token.hash, F.RESET),
             mailer_service.invite_judge(token)
             print "OK"
+            time.sleep(wait)
         except JudgeAlreadyExists, e:
             print F.RED + "already exists!" + F.RESET
 
