@@ -184,6 +184,8 @@ def adempiere_filter(data):
         client_type = 'PF'
         if cnpj != 'nulo':
             client_type = 'PJ'
+        else:
+            name = name.title()
 
         description = get_description(ticket_type, quantity, purchase_id)
         content += u'{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ'.format(
