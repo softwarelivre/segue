@@ -2,7 +2,7 @@
 
 template: purchase_gov_confirmation
 language: pt
-subject: "#FISL17 - Confirmação de análise"
+subject: "#FISL17 - Confirmação de Empenho"
 
 body: |
     Prezad@ {corporate.incharge_name} da {customer.name},
