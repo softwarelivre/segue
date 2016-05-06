@@ -162,8 +162,11 @@ class StudentPurchase(Purchase):
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
     def recalculate_status(self):
-        if self.outstanding_amount == 0: 
-            self.status = 'student_document_in_analysis'
+        if self.outstanding_amount == 0:
+            if self.buyer.extra_document:
+                self.status = 'paid'
+            else:
+                self.status = 'student_document_in_analysis'
 
     def payment_analysed(self):
         if self.status == 'student_document_in_analysis':
