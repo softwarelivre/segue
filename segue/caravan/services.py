@@ -10,7 +10,7 @@ import schema
 from models import Caravan, CaravanInvite
 from factories import CaravanFactory, CaravanInviteFactory, CaravanLeaderPurchaseFactory
 from errors import AccountAlreadyHasCaravan, AccountHasAlreadyInvited
-from errors import AccountIsARider, InvitedYourself, InvitedAlreadyProcessed, AccountHasATicket
+from errors import AccountIsARider, InvitedYourself, InvitedAlreadyProcessed, AccountHasATicket, CorporateCanNotJoinACaravan
 
 from segue.account.services import AccountService
 
@@ -112,6 +112,10 @@ class CaravanInviteService(object):
         invite = self.get_by_hash(hash_code)
         if not invite:
             return None
+
+
+        if by.is_corporate or by.is_government:
+            raise CorporateCanNotJoinACaravan()
 
         if not invite.is_pending:
             raise InvitedAlreadyProcessed()

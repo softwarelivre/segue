@@ -28,3 +28,6 @@ class InvitedAlreadyProcessed(SegueGenericError):
 
 class AccountHasATicket(SegueGenericError):
     MESSAGE = _l('You already have a bought a ticket for the event')
+
+class CorporateCanNotJoinACaravan(SegueGenericError):
+    MESSAGE = _l('You can not join a caravan, because you have a corporate account')
