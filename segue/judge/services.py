@@ -108,7 +108,8 @@ class JudgeService(object):
         if judge.remaining <= 0: raise JudgeHasNoVotesLeft()
 
         pending_matches = judge.tournament.matches.filter(Match.result == None)
-        expired_max_time = datetime.now() - timedelta(minutes=15)
+        #TODO: REMOVE THE HARDCODING TIME
+        expired_max_time = datetime.now() - timedelta(days=5)
 
         was_assigned_to_me       = pending_matches.filter(Match.judge == judge).first()
         non_assigned_match       = pending_matches.filter(Match.judge == None).first()
