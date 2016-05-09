@@ -20,6 +20,7 @@ class AdminPurchaseBlueprint(flask.Blueprint):
         self.controller = AdminPurchaseController()
         self.add_url_rule('',                                 methods=['GET'],  view_func=self.controller.list)
         self.add_url_rule('/<int:purchase_id>/confirm_student_document', methods=['GET'], view_func=self.controller.confirm_student_document)
+        self.add_url_rule('/<int:purchase_id>/confirm_gov_document', methods=['GET'], view_func=self.controller.confirm_gov_document)
 
 class AdminProductBlueprint(flask.Blueprint):
     def __init__(self):

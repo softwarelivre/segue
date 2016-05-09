@@ -47,3 +47,14 @@ class AdminPurchaseController(object):
             return '', 204
         abort(400)
 
+    @jsoned
+    @jwt_only
+    @admin_only
+    def confirm_gov_document(self, purchase_id):
+        #TODO: REVIEW
+        pur = Purchase.query.filter(Purchase.id == purchase_id).first()
+        if pur and self.payments.on_gov_document_analyzed(pur):
+            return '', 204
+        abort(400)
+
+
