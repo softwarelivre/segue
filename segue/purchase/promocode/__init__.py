@@ -51,13 +51,41 @@ class PromoCodeService(object):
 
         for promocode in promocodes:
             if not promocode.used:
-                #TODO: HARD CODING
-                if promocode.product.category == 'corporate-discount-promocode':
-                    if by and by.corporate_owned:
+                # TODO: HARD CODING
+                if by.corporate_owned:
+                    if promocode.product.category == 'corporate-discount-promocode':
                         return promocode
                 else:
-                    return promocode
+                    if promocode.product.category != 'corporate-discount-promocode':
+                        return promocode
+
         return None
+
+    def validate_cryptofisl(self, hash_code):
+        import datetime
+        start = datetime.datetime(2016, 05, 06, 0, 0)
+        end = datetime.datetime(2016, 05, 07, 23, 59)
+        today = datetime.datetime.now()
+        if hash_code != 'CRYPTOFISL':
+            return True
+
+        if start < today <= end:
+            return True
+        else:
+            return False
+
+    def validate_tecnosinos(self, hash_code):
+        import datetime
+        start = datetime.datetime(2016, 05, 04, 0, 0)
+        end = datetime.datetime(2016, 05, 07, 23, 59)
+        today = datetime.datetime.now()
+        if hash_code != 'TECNOSINOS':
+            return True
+
+        if start < today <= end:
+            return True
+        else:
+            return False
 
 
 class PromoCodePaymentService(object):
