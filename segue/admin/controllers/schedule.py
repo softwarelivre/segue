@@ -38,7 +38,8 @@ class AdminScheduleController(object):
     @jsoned
     def overall_situation(self):
         result = SlotSituationResponse()
-        dates = [ date(2015,7,8), date(2015,7,9), date(2015,7,10), date(2015,7,11) ]
+        #TODO: FIX HARDCODING
+        dates = [date(2016, 7, 13), date(2016, 7, 14), date(2016, 7, 15), date(2016, 7, 16)]
         for day in dates:
             result.add_date_info(day, 'used_blocked',     self.slots.count(day=day, blocked=True,  available=False))
             result.add_date_info(day, 'used_non_blocked', self.slots.count(day=day, blocked=False, available=False))
