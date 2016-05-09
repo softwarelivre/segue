@@ -20,6 +20,10 @@ class Recording(db.Model):
     url     = db.Column(db.Text)
 
 class Slot(db.Model):
+    #TODO: CREATE CONFIG
+    MIN_SIZE=30
+    STEP_SIZE=30
+
     id          = db.Column(db.Integer, primary_key=True)
     room_id     = db.Column(db.Integer, db.ForeignKey('room.id'))
     talk_id     = db.Column(db.Integer, db.ForeignKey('proposal.id'))
@@ -52,7 +56,7 @@ class Slot(db.Model):
 
     @property
     def can_be_unstretched(self):
-        return self.duration > 60
+        return self.duration > Slot.MIN_SIZE
 
 class Notification(db.Model):
     id         = db.Column(db.Integer, primary_key=True)
