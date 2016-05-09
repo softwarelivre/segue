@@ -94,8 +94,8 @@ class PurchaseService(object):
         survey = {}
         if 'shirt_size' in buyer_data and 'delivery' in buyer_data:
             survey = {
-                'shirt_size': extra.pop('shirt_size'),
-                'delivery': extra.pop('delivery')
+                'shirt_size': extra.pop('shirt_size', None),
+                'delivery': extra.pop('delivery', None)
             }
 
         purchase = PurchaseFactory.create(buyer, product, account, **extra)
@@ -127,7 +127,6 @@ class PurchaseService(object):
 
             service = SurveyService()
             service.save_answers(survey_name, survey, by_user=account)
-            print(survey_name, survey)
 
 
         return purchase
@@ -320,12 +319,13 @@ class PaymentService(object):
     def on_gov_document_analyzed(self, purchase):
         if purchase.category != 'government' and purchase.status == 'gov_document_in_analysis':
             #TODO: THROW A EXCEPTION
-            return {}
+            return False
         else:
             purchase.status = 'pending'
             db.session.add(purchase)
             db.session.commit()
             self.on_finish_governament(purchase)
+            return True
 
 
     def on_finish_payment(self, purchase):
