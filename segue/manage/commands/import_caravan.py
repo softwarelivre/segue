@@ -4,6 +4,7 @@ import datetime
 import tablib
 import json
 import yaml
+import codecs
 
 from segue.core import db
 from segue.hasher import Hasher
@@ -27,14 +28,22 @@ mailer_service = MailerService()
 def import_caravan(in_file, caravan_yaml):
     caravan_data = yaml.load(open(caravan_yaml))
     product = product_service.get_product(caravan_data['product_id'])
+    product.price = int(caravan_data['price'])
     our_number = caravan_data['our_number']
     payment_date = caravan_data['payment_date']
     print "################## IMPORTAR CARAVANA #######################"
     print "Caravana:", caravan_data['caravan_name']
     print "Produto:", product.description, product.price
 
-    with open(in_file, "r") as f:
-        ds.csv = f.read()
+    with open(in_file, 'r') as f:
+        lines = f.readlines()
+        #TODO: FIX THIS HACK
+        ds.headers = lines.pop(0).replace('\n','').replace('\r','').split(';')
+
+        for line in lines:
+            # TODO: FIX THIS HACK
+            data = line.replace('\n', '').replace('\r','').decode('utf8').split(';')
+            ds.append(data)
 
     first = True
     has_caravan = False
@@ -42,7 +51,7 @@ def import_caravan(in_file, caravan_yaml):
         if first:
             caravan_id = get_or_add_caravan(item, caravan_data)
             caravan = Caravan.query.get(caravan_id)
-            print "lider da caravana:", item['NOME'], item['EMAIL']
+            print "lider da caravana:", item['NOME COMPLETO'], item['EMAIL']
             first = False
             has_caravan = True
             add_leader_exemption(caravan, product, item, our_number, payment_date)
@@ -80,17 +89,35 @@ def add_caravan(caravan_data, account):
 
 def get_or_add_account(item):
     h = Hasher(10)
+    password = h.generate();
 
     account_data = {
         'role': 'user',
-        'name': item['NOME'],
+        'name': item['NOME COMPLETO'],
+        'badge_name':item['NOME PARA O CRACHA'],
         'email': item['EMAIL'],
-        'document': str(item['CPF']).translate(None, './-'),
+        'email_confirm': item['EMAIL'],
+
+        'cpf': str(item['CPF']).translate(None, './-'),
+        'sex': item['SEXO'],
+        'born_date': item['DATA DE NASCIMENTO'],
+        'membership': False,
+        'disability': 'none',
+        'education': 'graduation_incomplete',
+        'occupation': 'student',
         'country': 'BRASIL',
-        'state': item['ESTADO'],
-        'city': item['CIDADE'],
+        'address_state': item['ESTADO'].strip(),
+        'city': item['CIDADE'].strip(),
+        'address_neighborhood': item['BAIRRO'],
+        'address_street': item['ENDERECO'],
+        'address_number': item['NUMERO'],
+        'address_extra': item['COMPLEMENTO'],
+        'address_zipcode': item['CEP'],
+
         'phone': item['TELEFONE'],
-        'password': h.generate()
+
+        'password': password,
+        'password_confirm': password,
     }
 
     if account_service.is_email_registered(account_data['email']):
@@ -105,14 +132,17 @@ def add_leader_exemption(caravan, product, owner_data, our_number, payment_date)
         # creates fake purchase for the caravan leader
         buyer_data = {
             'kind': 'person',
-            'name': owner_data['NOME'],
-            'document': owner_data['CPF'],
-            'contact': owner_data['NOME'],
+            'name': owner_data['NOME COMPLETO'],
+            'cpf': owner_data['CPF'],
+            'contact': owner_data['NOME COMPLETO'],
+            'address_country': 'BRASIL',
+            'address_state': owner_data['ESTADO'],
+            'address_city': owner_data['CIDADE'],
+            'address_neighborhood': owner_data['BAIRRO'],
             'address_street': owner_data['ENDERECO'],
             'address_number': owner_data['NUMERO'],
-            'address_city': owner_data['CIDADE'],
-            'address_country': 'BRASIL',
-            'address_zipcode': owner_data['CEP']
+            'address_extra': owner_data['COMPLEMENTO'],
+            'address_zipcode': owner_data['CEP'],
         }
 
         purchase = purchase_service.create(buyer_data, product, caravan.owner)
@@ -157,6 +187,7 @@ def add_caravan_rider(caravan, account):
     }
 
     invite = caravan_invite_service.create(caravan.id, invite_data, by=caravan.owner, send_email=False)
+    caravan_invite_service.accept_invite(invite.hash, by=account)
 
 def add_rider_purchase_and_payment(product, account, caravan, item, our_number, payment_date):
     if not account.has_valid_purchases:
@@ -164,6 +195,8 @@ def add_rider_purchase_and_payment(product, account, caravan, item, our_number, 
 
         purchase_data = {
             'product': product,
+            'amount': product.price,
+            'due_date': product.due_date,
             'customer': account,
             'buyer': get_or_add_buyer(item),
             'status': 'paid',
@@ -200,14 +233,16 @@ def add_rider_purchase_and_payment(product, account, caravan, item, our_number, 
 def get_or_add_buyer(item):
     buyer_data = {
         'kind': 'person',
-        'name': item['NOME'],
+        'name': item['NOME COMPLETO'],
         'document': item['CPF'],
-        'contact': item['NOME'],
+        'contact': item['NOME COMPLETO'],
+        'address_country': 'BRASIL',
+        'address_state': item['ESTADO'],
+        'address_city': item['CIDADE'],
         'address_street': item['ENDERECO'],
         'address_number': item['NUMERO'],
-        'address_city': item['CIDADE'],
-        'address_country': 'BRASIL',
-        'address_zipcode': item['CEP']
+        'address_extra': item['COMPLEMENTO'],
+        'address_zipcode': item['CEP'],
     }
 
     buyer = Buyer.query.filter(Buyer.document == buyer_data['document']).first()
