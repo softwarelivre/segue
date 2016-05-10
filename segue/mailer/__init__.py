@@ -199,6 +199,17 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+
+    def caravan_leader(self, caravan, purchase):
+        leader = caravan.owner
+
+        message = self.message_factory.from_template('caravan/leader')
+        message.given(leader=leader, caravan=caravan, purchase=purchase)
+        message.to(leader.name, leader.email)
+
+        return mailer.send(message.build())
+
+
     def reset_password(self, account, reset):
         message = self.message_factory.from_template('account/reset_password')
         message.given(account=account,reset=reset)
