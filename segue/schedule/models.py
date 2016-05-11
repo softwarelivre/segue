@@ -21,8 +21,8 @@ class Recording(db.Model):
 
 class Slot(db.Model):
     #TODO: CREATE CONFIG
-    MIN_SIZE=30
-    STEP_SIZE=30
+    MIN_SIZE=20
+    STEP_SIZE=20
 
     id          = db.Column(db.Integer, primary_key=True)
     room_id     = db.Column(db.Integer, db.ForeignKey('room.id'))
