@@ -142,6 +142,7 @@ def adempiere_format(initial_date, end_date, out_file="adempiere_export"):
             'buyer_address_zipcode': buyer.address_zipcode,
             'buyer_address_state': buyer.address_state,
             'buyer_address_neighborhood': buyer.address_neighborhood,
+            'buyer_address_country': buyer.address_country,
             'purchase_category': get_category(purchase.product.category),
             'purchase_type': payment.type,
             'purchase_qty': purchase.qty,
@@ -168,29 +169,41 @@ def adempiere_filter(data):
         email = d['buyer_email']
         phone_1 = d['buyer_phone'] or 'nulo'
         phone_2 = 'nulo'
-        zipcode = d['buyer_address_zipcode'] or 'nulo'
-        state = d['buyer_address_state'] or 'nulo'
-        city = d['buyer_address_city'] or 'nulo'
+        zipcode = d['buyer_address_zipcode']
+        state = d['buyer_address_state'].upper()
+        country = d['buyer_address_country']
+        city = d['buyer_address_city']
         address = d['buyer_address_street']
-        address_number = d['buyer_address_number'] or 'nulo'
+        address_number = d['buyer_address_number']
         address_extra = d['buyer_address_extra'] or 'nulo'
-        address_district = d['buyer_address_neighborhood'] or 'nulo'
+        address_district = d['buyer_address_neighborhood']
 
         quantity = d['purchase_qty']
         amount = d['paid_amount']
         ticket_type = d['purchase_category']
 
-        discount = "0"
-        client_type = 'PF'
+        discount = '0'
+        client_type = 'nulo'
+
         if cnpj != 'nulo':
             client_type = 'PJ'
-        else:
+            country = 'Brasil'
+
+        if cpf != 'nulo':
+            client_type = 'PF'
             name = name.title()
+            country = 'Brasil'
+
+        if cpf == 'nulo' and cnpj == 'nulo':
+            client_type = 'EX'
+            name = name.title()
+            buyer_document = d['buyer_document']
+
 
         description = get_description(ticket_type, quantity, purchase_id)
-        content += u'{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ'.format(
+        content += u'{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ{}þ'.format(
             purchase_id, client_type, cpf, cnpj, name, email, format_phone(phone_1), format_phone(phone_2),
-            format_cep(zipcode), state, city, address, address_number, address_district, address_extra,
+            format_cep(zipcode), country, state, city, address, address_number, address_district, address_extra,
             quantity, amount, discount
         )
         content += unicode(description, 'utf-8')
