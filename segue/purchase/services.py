@@ -2,6 +2,10 @@
 from datetime import datetime
 from sqlalchemy import and_
 import os
+import xmltodict
+import dateutil.parser
+import collections
+
 
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
@@ -450,3 +454,195 @@ class ClaimCheckDocumentService(object):
             claim_check.hash_code,
             variables=claim_check.template_vars
         )
+
+
+class AdempiereService(object):
+
+    def __init__(self):
+        pass
+
+    def generate_report(self, initial_date, end_date):
+        #TODO: FIX THIS IMPORT
+        from segue.models import Product
+
+        dataset = []
+
+        exclude_categories = ['donation']
+        purchases = Purchase.query \
+            .join('product') \
+            .filter(Purchase.status == 'paid') \
+            .filter(Product.category.notin_(exclude_categories)) \
+            .order_by(Purchase.id) \
+            .all()
+
+        for purchase in purchases:
+            account = purchase.customer
+            buyer = purchase.buyer
+
+            finished_payments = [payment for payment in purchase.payments if
+                                 (payment.status in Payment.VALID_PAYMENT_STATUSES)]
+
+            paid_amount = purchase.total_amount
+            payments = []
+            for payment in finished_payments:
+                if hasattr(payment, 'promocode') and payment.promocode:
+                    paid_amount -= payment.paid_amount
+                else:
+                    payments.append(payment)
+
+            # free fries = exclude from report
+            if not paid_amount:
+                continue
+
+            if len(payments) > 1:
+                continue
+
+            transaction_date = self._get_transition_date(payments[0])
+            transaction = datetime(transaction_date.year, transaction_date.month, transaction_date.day)
+
+            if not (initial_date <= transaction < end_date):
+                continue
+
+
+            #FORMAT THE STUFFF
+            purchase_discount = '0'
+            purchase_category = self._get_category(purchase.product.category)
+
+            buyer_type = 'nulo'
+            buyer_name = buyer.name
+            buyer_cpf = self._format_document(buyer.document) or 'nulo'
+            buyer_cnpj = self._format_document(buyer.document, type='CNPJ') or 'nulo'
+
+            buyer_phone = buyer.contact
+            buyer_address_zipcode = buyer.address_zipcode
+
+            if buyer_cnpj != 'nulo':
+                buyer_type = 'PJ'
+                buyer_phone = self._format_phone(buyer.contact)
+                buyer_address_zipcode = self._format_cep(buyer.address_zipcode)
+
+            if buyer_cpf != 'nulo':
+                buyer_type = 'PF'
+                buyer_name = buyer_name.title()
+                buyer_phone = self._format_phone(buyer.contact)
+                buyer_address_zipcode = self._format_cep(buyer.address_zipcode)
+
+            if buyer_cpf == 'nulo' and buyer_cnpj == 'nulo':
+                buyer_type = 'EX'
+                buyer_name = buyer_name.title()
+
+            data = collections.OrderedDict()
+            data['purchase_id'] = purchase.id
+
+            data['buyer_type'] = buyer_type
+
+            data['buyer_cpf'] = buyer_cpf
+            data['buyer_cnpj'] = buyer_cnpj
+
+            data['buyer_name'] = buyer_name
+            data['buyer_email'] = account.email
+            data['buyer_phone1'] = buyer_phone
+            data['buyer_phone2'] = 'nulo'
+            data['buyer_address_zipcode'] = buyer_address_zipcode
+            data['buyer_address_country'] = buyer.address_country
+            data['buyer_address_state'] = buyer.address_state.upper()
+            data['buyer_address_city'] = buyer.address_city
+            data['buyer_address_street'] = buyer.address_street
+            data['buyer_address_number'] = buyer.address_number
+            data['buyer_address_neighborhood'] = buyer.address_neighborhood
+            data['buyer_address_extra'] = buyer.address_extra or 'nulo',
+
+            data['purchase_qty'] = purchase.qty
+            data['purchase_amount'] = purchase.total_amount
+            data['purchase_discount'] = purchase_discount
+            data['purchase_description'] = self._get_description(purchase_category, purchase.qty, purchase.total_amount)
+
+            dataset.append(data)
+
+        return dataset
+
+    def _format_phone(self, value):
+        if len(value) < 10:
+            return 'nulo'
+
+        suffix_len = len(value) - 2
+        f = '{}{}-' + '{}' * suffix_len
+
+        return f.format(*list(value))
+
+    def _format_cep(self, value):
+        # possibilites:
+        # None
+        # formatted
+        # not formatted
+        if len(value) == 9:
+            return value
+        if len(value) == 8:
+            return "{}{}{}{}{}-{}{}{}".format(*list(value))
+        else:
+            return 'nulo'
+
+    def _format_document(self, value, type="CPF"):
+        # possibilites:
+        # None
+        # formatted
+        # not formatted
+        if type == "CPF" and value and len(value) == 11:
+            return "{}{}{}.{}{}{}.{}{}{}-{}{}".format(*list(value))
+        elif type == 'CNPJ' and len(value) == 14:
+            return "{}{}.{}{}{}.{}{}{}/{}{}{}{}-{}{}".format(*list(value))
+        else:
+            return "nulo"
+
+    def _get_description(self, category, quantity, number):
+        first_paragraph = '{:0>2d} inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(quantity, category)
+        second_paragraph = 'Inscrição nº {}. * * *'.format(number)
+        third_paragraph = 'A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'
+        forth_paragraph = 'Tributos: ISS 5% + COFINS 7,6% = 12,6%.'
+        text = first_paragraph + second_paragraph + third_paragraph + forth_paragraph
+        return text
+
+    def _get_transition_date(self, payment):
+        transition = [transition for transition in payment.transitions
+                      if (transition.new_status in Payment.VALID_PAYMENT_STATUSES and
+                          transition.old_status not in Payment.VALID_PAYMENT_STATUSES)][0]
+        if payment.type == 'paypal':
+            return transition.created
+        if payment.type == 'pagseguro':
+            return self._get_date_pagseguro(transition)
+        elif payment.type == 'boleto':
+            if hasattr(transition, 'payment_date'):
+                return transition.payment_date
+            else:
+                return transition.created
+        else:
+            return transition.created
+
+    def _get_category(self, name):
+        if name == 'normal':
+            return 'individual'
+        elif name == 'student':
+            return 'estudante'
+        elif name == 'promocode':
+            return 'individual'
+        elif name == 'caravan':
+            return 'caravanista'
+        elif name == 'caravan-rider':
+            return 'caravana'
+        elif name == 'business':
+            return 'corporativa'
+        elif name == 'government':
+            return 'empenho'
+        elif name == 'foreigner':
+            return 'estrangeiro'
+        else:
+            return "Tipo de ingresso desconhecido"
+
+    def _get_date_pagseguro(self, transition):
+        pagseguro_data = xmltodict.parse(transition.payload)
+        date = dateutil.parser.parse(pagseguro_data['transaction']['lastEventDate'])
+        naive = date.replace(tzinfo=None)
+        return naive
+
+    def _get_our_number(self, payment):
+        return payment.our_number if getattr(payment, 'our_number', None) is not None else ''
