@@ -44,9 +44,11 @@ class AdminAccountController(object):
     @admin_only
     def list(self):
         args = parser.parse({
+                'id': Field.int(),
                 'name': Field.str(),
                 'email': Field.str(),
                 'document': Field.str(),
+                'purchase_id': Field.int(),
                 'product_id': Field.int()
             },
             request
