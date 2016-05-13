@@ -59,7 +59,6 @@ class AdminPurchaseController(object):
         abort(400)
 
 
-    @jsoned
     @jwt_only
     @admin_only
     def adempiere_report(self):
