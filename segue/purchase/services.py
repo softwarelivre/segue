@@ -555,7 +555,7 @@ class AdempiereService(object):
             data['purchase_qty'] = purchase.qty
             data['purchase_amount'] = purchase.total_amount
             data['purchase_discount'] = purchase_discount
-            data['purchase_description'] = self._get_description(purchase_category, purchase.qty, purchase.total_amount)
+            data['purchase_description'] = self._get_description(purchase_category, purchase.qty, purchase.id)
 
             dataset.append(data)
 
