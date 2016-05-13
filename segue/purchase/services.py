@@ -555,7 +555,10 @@ class AdempiereService(object):
             data['purchase_qty'] = purchase.qty
             data['purchase_amount'] = purchase.total_amount
             data['purchase_discount'] = purchase_discount
-            data['purchase_description'] = self._get_description(purchase_category, purchase.qty, purchase.id)
+            data['purchase_description'] = self._get_description(purchase_category,
+                                                                 self._get_payment_type(payments[0]),
+                                                                 purchase.qty,
+                                                                 purchase.id)
 
             dataset.append(data)
 
@@ -594,10 +597,22 @@ class AdempiereService(object):
         else:
             return "nulo"
 
-    def _get_description(self, category, quantity, number):
+
+    def _get_payment_type(self, payment):
+        if payment.type == 'boleto':
+            return 'Boleto'
+        elif payment.type == 'pagseguro':
+            return 'PagSeguro'
+        elif payment.type == 'paypal':
+            return 'PayPal'
+        else:
+            return ''
+
+
+    def _get_description(self, category, payment_type, quantity, number):
         first_paragraph = '{:0>2d} inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(quantity, category)
         second_paragraph = 'Inscrição nº {}. * * *'.format(number)
-        third_paragraph = 'A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'
+        third_paragraph = ' {} * * *. A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'.format(payment_type)
         forth_paragraph = 'Tributos: ISS 5% + COFINS 7,6% = 12,6%.'
         text = first_paragraph + second_paragraph + third_paragraph + forth_paragraph
         return text
