@@ -107,6 +107,7 @@ class StandingsResponse(BaseResponse):
         super(StandingsResponse, self).__init__()
         self.id        = player.proposal.id
         self.title     = player.proposal.title
+        self.type      = player.proposal.type
         self.points    = player.points
         self.victories = player.victories
         self.ties      = player.ties
@@ -114,6 +115,7 @@ class StandingsResponse(BaseResponse):
         self.author    = player.proposal.owner.name
         self.position  = player.position
         if player.proposal.track:
+            self.track_id  = player.proposal.track.id
             self.zone      = player.proposal.track.name_pt.split(" - ")[0]
             self.area      = player.proposal.track.name_pt.split(" - ")[1]
 
