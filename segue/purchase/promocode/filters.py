@@ -17,4 +17,5 @@ class PromoCodeFilterStrategies(FilterStrategies):
         return PromoCode.description.ilike("%"+value+"%")
 
     def by_creator_id(self, value, as_user=None):
+        if not isinstance(value, int): return None
         return PromoCode.creator_id==value
