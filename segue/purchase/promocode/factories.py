@@ -51,3 +51,7 @@ class PromoCodeTransitionFactory(TransitionFactory):
         # transition.new_status        = status
         # transition.payload           = xml_payload.decode('iso-8859-1')
         # return transition
+
+
+class PromoCodeFactory(Factory):
+    model = PromoCode
