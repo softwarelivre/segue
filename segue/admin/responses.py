@@ -138,6 +138,7 @@ class RankingResponse(BaseResponse):
         super(RankingResponse, self).__init__()
         self.id        = ranked.proposal.id
         self.title     = ranked.proposal.title
+        self.type      = ranked.proposal.type
         self.author    = ranked.proposal.owner.name
         self.tags      = ranked.tag_names
         self.ranking   = ranked.rank
