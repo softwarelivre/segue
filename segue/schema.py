@@ -113,6 +113,9 @@ class Validator(object):
     MSGS = {
         'oneOf': _l('Not a valid choice.'),
         'email': _l('Not a valid email address.'),
+        'range_between': _l('The value must be between {min} and {max}.'),
+        'range_min': _l('Smaller than {min}.'),
+        'range_max': _l('Bigger than {max}.'),
         'length_min': _l('Shorter than minimum length {min}.'),
         'length_max': _l('Longer than maximum length {max}.'),
         'length_all': _l('Length must be between {min} and {max}.'),
@@ -122,6 +125,17 @@ class Validator(object):
     @staticmethod
     def email():
         return validate.Email(error=Validator.MSGS['email'])
+
+    @staticmethod
+    def range(min=None, max=None):
+        error = None
+        if min and max:
+            error = Validator.MSGS['range_between']
+        elif min:
+            error = Validator.MSGS['range_min']
+        elif max:
+            error = Validator.MSGS['range_max']
+        return validate.Range(min=min, max=max, error=error)
 
     @staticmethod
     def length(min=None, max=None, equal=None):
