@@ -113,6 +113,23 @@ create_promocode = {
     ]
 }
 
+class PromoCodeSchema(BaseSchema):
+
+    description = Field.str(
+            required=True,
+            validate=[Validator.length(min=3, max=30)])
+
+    quantity = Field.int(
+            required=True,
+            validate=[Validator.range(min=1)])
+
+    discount = Field.int(
+            required=True,
+            validate=[Validator.range(min=1, max=100)])
+    
+    product_id = Field.int(
+            required=True)
+
 whitelist = dict(
     buyer = buyer,
     promocode = promocode,
