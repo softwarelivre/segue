@@ -68,6 +68,7 @@ class AdminCallBlueprint(flask.Blueprint):
         super(AdminCallBlueprint, self).__init__('admin.call', __name__, url_prefix="/admin/call")
         self.controller = AdminJudgeController()
         self.add_url_rule('/<int:tournament_id>/<int:track_id>',   methods=['GET'], view_func=self.controller.get_ranking_by_track)
+        self.add_url_rule('/<int:tournament_id>', methods=['GET'], view_func=self.controller.get_ranking_by_tournament)
 
 class AdminRoomBlueprint(flask.Blueprint):
     def __init__(self):

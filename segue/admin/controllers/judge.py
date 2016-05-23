@@ -42,4 +42,10 @@ class AdminJudgeController(object):
         result = self.rankings.classificate(tournament_id, track_id=track_id)
         return RankingResponse.create(result), 200
 
+    @jwt_only
+    @admin_only
+    @jsoned
+    def get_ranking_by_tournament(self, tournament_id):
+        result = self.rankings.classificattion_by_tournament(tournament_id)
+        return RankingResponse.create(result), 200
 
