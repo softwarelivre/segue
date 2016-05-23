@@ -69,6 +69,16 @@ class RankingService(object):
         self.tournaments = tournaments or TournamentService()
         self.proposals   = proposals   or ProposalService()
 
+    def classificattion_by_tournament(self, tournament_id):
+        tournament = self.tournaments.get_one(tournament_id)
+        standings = self.tournaments.get_standings(tournament_id)
+
+        idx_standings = { player.id: player for player in standings }
+
+        unsorted = [ Ranked(proposal, idx_standings) for proposal in tournament.proposals ]
+        return sorted(unsorted)
+
+
     def classificate(self, tournament_id, **filters):
         standings = self.tournaments.get_standings(tournament_id)
         proposals = self.proposals.query(**filters)

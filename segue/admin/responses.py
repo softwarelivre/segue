@@ -144,7 +144,9 @@ class RankingResponse(BaseResponse):
         self.ranking   = ranked.rank
         self.status    = ranked.proposal.status
         if ranked.proposal.track:
+            self.track_id = ranked.proposal.track.id
             self.zone = ranked.proposal.track.name_pt.split(" - ")[0]
+            self.track = ranked.proposal.track.name_pt.split(" - ")[1]
 
 class AccountShortResponse(BaseResponse):
     def __init__(self, account, links=False):
