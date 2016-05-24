@@ -82,6 +82,21 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def notify_corporate_promocode(self, purchase, promocodes):
+        customer = purchase.customer
+        corporate = purchase.customer.corporate_owned
+        hash_codes = ''
+        for p in promocodes:
+            hash_codes += p.hash_code + ' '
+
+        message = self.message_factory.from_template('purchase/corporate_promocode_especial')
+        message.given(customer=customer, corporate=corporate, hash_codes=hash_codes)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+
+
     def notify_corporate_promocode_payment(self, purchase, promocode):
         customer = purchase.customer
         corporate = promocode.creator
