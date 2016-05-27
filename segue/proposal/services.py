@@ -108,8 +108,11 @@ class ProposalService(object):
     def lookup(self, as_user=None, **kw):
         needle = kw.pop('q',None)
         limit  = kw.pop('limit',None)
+        queryset = Proposal.query
+        if 'slotted' in kw:
+            queryset = self.filter_strategies.join_for_slotted(queryset)
         filter_list = self.filter_strategies.needle(needle, as_user, **kw)
-        return Proposal.query.filter(*filter_list).limit(limit).all()
+        return queryset.filter(*filter_list).limit(limit).all()
 
     def modify(self, proposal_id, data, by=None, allow_modify_owner=False, enforce_deadline=True):
         if enforce_deadline:
