@@ -229,7 +229,8 @@ class ProposalShortResponse(BaseResponse):
         self.slotted = proposal.slotted
         if embeds:
             self.owner  = AccountShortResponse.create(proposal.owner, links=False)
-            self.track  = TrackDetailResponse.create(proposal.track, links=False)
+            self.track = TrackDetailResponse.create(proposal.track, links=False)
+            self.slots = SlotShortResponse.create(proposal.slots.all())
 
 class PurchaseDetailResponse(BaseResponse):
     def __init__(self, purchase, links=True):

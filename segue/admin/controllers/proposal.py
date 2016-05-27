@@ -28,6 +28,7 @@ class AdminProposalController(object):
                 'status': Field.str(),
                 'author_name': Field.str(),
                 'track_id': Field.int(),
+                'slotted': Field.bool()
             },
             request
         )
