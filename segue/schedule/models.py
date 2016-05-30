@@ -66,7 +66,7 @@ class Notification(db.Model):
     content    = db.Column(db.Text)
     sent       = db.Column(db.DateTime)
     deadline   = db.Column(db.DateTime)
-    status     = db.Column(db.Enum('confirmed', 'pending', 'declined'))
+    status     = db.Column(db.Enum('confirmed', 'pending', 'declined', 'expired'))
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
