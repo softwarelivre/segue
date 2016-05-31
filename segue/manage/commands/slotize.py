@@ -47,8 +47,8 @@ def slot_value(slot):
         value += 1
     elif slot.begins.hour in (16,17):
         value += 2
-    elif slot.begins.hour in (9,10,18,19):
+    elif slot.begins.hour in (10,18,19):
         value -= 1
-    if slot.begins.day == 8:
+    if slot.begins.day == 13:
         value -= 1
     return value
