@@ -2,7 +2,7 @@
 
 template: non_selection
 language: pt
-subject: "obrigado por enviar sua proposta de palestra para o FISL17"
+subject: "Obrigado por enviar sua proposta de palestra para o FISL17"
 
 body: |
 
@@ -25,7 +25,7 @@ body: |
     {backend_url}/api/non-selection/{notice.hash}
 
     O pagamento antecipado (através de boleto) pode ser realizado
-    até o dia 30 de Junho de 2015. Após essa data, o pagamento
+    até o dia 07 de Julho de 2015. Após essa data, o pagamento
     somente será aceito em dinheiro, na secretaria do evento.
 
     Muito obrigada pela atenção.
