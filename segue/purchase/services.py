@@ -634,9 +634,9 @@ class AdempiereService(object):
             return transition.created
 
     def _get_category(self, name):
-        if name == 'normal':
+        if name == 'normal' or name == 'proponent':
             return 'individual'
-        elif name == 'student':
+        elif name == 'student' or name == 'proponent-student':
             return 'estudante'
         elif name == 'promocode':
             return 'individual'
