@@ -225,7 +225,7 @@ class DonationProduct(Product):
         #TODO: REVIEW HARDCODING
         extra_fields = {}
 
-        if self.id == 1 or self.id == 13 or self.id == 38:
+        if self.id == 1 or self.id == 13 or self.id == 58:
             extra_fields['shirt_size'] = buyer_data.get('shirt_size', None)
             extra_fields['delivery'] = buyer_data.get('delivery', None)
 
