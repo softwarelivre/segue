@@ -31,9 +31,9 @@ class SlotController(object):
     @jsoned
     def of_room(self, room_id, day=None):
         if day:
-            result = self.service.query(room=room_id, status='confirmed', day=day)
+            result = self.service.query(room=room_id, day=day)
         else:
-            result = self.service.query(room=room_id, status='confirmed')
+            result = self.service.query(room=room_id)
         return SlotResponse.create(result, embeds=True, links=False), 200
 
     @jsoned
