@@ -132,7 +132,7 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def satisfied(self):
-        return self.status == 'paid'
+        return self.status == 'paid' or self.status == 'confirmed'
 
     def payment_analysed(self):
         if self.status == 'payment_analysis':
