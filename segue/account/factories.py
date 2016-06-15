@@ -7,7 +7,7 @@ import schema
 class AccountFactory(Factory):
     model = Account
     #TODO: HACK REMOVE INCHARGE
-    ITEMS_TO_REMOVE = ['type', 'password_confirm', 'email_confirm', 'incharge', 'caravan_invite']
+    ITEMS_TO_REMOVE = ['type', 'password_confirm', 'email_confirm', 'incharge', 'caravan_invite', 'caravan_invite_hash']
 
     @classmethod
     def clean_for_insert(cls, data):
