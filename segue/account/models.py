@@ -183,7 +183,7 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def is_brazilian(self): #FIX ME
-        if self.country.upper() == 'BR':
+        if self.country and self.country.upper() == 'BR':
             return True
         return re.match(r"bra.*", self.country or '', re.IGNORECASE) != None
 
