@@ -87,11 +87,6 @@ class PurchaseService(object):
                 if not StudentDocumentValidator(buyer.extra_document, account.born_date).is_valid():
                     raise StudentDocumentIsInvalid(buyer.extra_document)
 
-        #DISABLED
-        #if product.category == 'government':
-        #    if not buyer.extra_document and not buyer.document_file_hash:
-        #        raise GovDocumentIsNotDefined()
-
         logger.info("Create buyer: %s", buyer)
 
         #TODO: REVIEW
@@ -114,12 +109,19 @@ class PurchaseService(object):
             hash = str(buyer_data['hash_code'])
             _, payment = self.payments.create(purchase, 'promocode', {'hash_code': hash})
 
+            #TODO: REVIEW
             if payment.status == 'paid':
+                promocode = PromoCode.query.filter(PromoCode.hash_code == hash).first()
+
                 if product.category == 'corporate-promocode' or product.category == 'gov-promocode':
-                    promocode = PromoCode.query.filter(PromoCode.hash_code == hash).first()
                     account.corporate_id = promocode.creator.corporate_owned.id
                     self.db.session.add(account)
                     self.mailer.notify_corporate_promocode_payment(purchase, promocode)
+
+                elif promocode.discount == 1.0:
+                    self.mailer.notify_payment(purchase)
+
+
 
         if commit:
             self.db.session.commit()
