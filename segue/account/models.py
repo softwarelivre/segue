@@ -41,7 +41,13 @@ class Account(JsonSerializable, db.Model):
     document         = db.Column(db.Text, unique=True)
 
     sex = db.Column(db.String(length=1))
+
     occupation = db.Column(db.Text)
+    occupation_position   = db.Column(db.Text)
+    occupation_decision_power = db.Column(db.Text)
+    employer_activity = db.Column(db.Text)
+    employer_size = db.Column(db.Text)
+
     education = db.Column(db.Text)
     born_date = db.Column(db.Date)
 
