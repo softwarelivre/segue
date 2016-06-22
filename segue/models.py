@@ -1,4 +1,4 @@
-from account.models  import Account, ResetPassword
+from account.models  import Account, ResetPassword, Role
 from proposal.models import ProposalTag, Proposal, ProposalInvite, Track, ProponentProduct, NonSelectionNotice, SpeakerProduct
 from product.models  import Product, StudentProduct, PromoCodeProduct, ForeignerProduct, ForeignerStudentProduct, CorporateProduct, GovernmentProduct
 from purchase.models import Buyer, Purchase, Payment, Transition
@@ -15,7 +15,7 @@ from certificate.models import Certificate, AttendantCertificate
 from survey.models import SurveyAnswer
 
 __all__ = [
-    'Account', 'ResetPassword',
+    'Account', 'ResetPassword', 'Role',
     'ProposalTag', 'Proposal', 'ProposalInvite', 'Track', 'ProponentProduct', 'NonSelectionNotice', 'SpeakerProduct',
     'Product', 'StudentProduct', 'PromoCodeProduct', 'ForeignerProduct', 'ForeignerStudentProduct', 'CorporateProduct', 'GovernmentProduct',
     'Buyer', 'Purchase', 'Payment', 'Transition',
