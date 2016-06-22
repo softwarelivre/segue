@@ -81,7 +81,13 @@ class Account(JsonSerializable, db.Model):
 
     resets = db.relationship("ResetPassword", backref="account")
 
-
+    @property
+    def promocodes(self):
+        from segue.purchase.promocode.models import PromoCode
+        if self.id:
+            return PromoCode.query.filter(PromoCode.creator_id == self.id).all()
+        else:
+            return []
 
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
