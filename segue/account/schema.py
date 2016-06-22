@@ -73,6 +73,12 @@ class AccountSchema(BaseSchema):
             required=True,
             validate=[Validator.length(min=1, max=20)]
         )
+
+        occupation_position       = Field.str()
+        occupation_decision_power = Field.str()
+        employer_activity         = Field.str()
+        employer_size             = Field.str()
+
         education = Field.str(
             required=True,
             validate=[Validator.length(min=1, max=40)]
