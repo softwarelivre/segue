@@ -77,11 +77,12 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
-    def notify_corporate_promocode_available(self, corporate):
+    def notify_corporate_promocode_available(self, corporate, promocodes):
         customer = corporate.owner
+        hash_codes = ' '.join([promo.hash_code for promo in promocodes])
 
         message = self.message_factory.from_template('corporate/promocode_available')
-        message.given(corporate=corporate)
+        message.given(corporate=corporate, hash_codes=hash_codes)
         message.to(customer.name, customer.email)
 
         return mailer.send(message.build())
