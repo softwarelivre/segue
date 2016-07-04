@@ -9,6 +9,10 @@ body: |
 
     Verificamos que existem códigos que ainda não foram utilizados no sistema de inscrições do Fórum Internacional Software Livre – FISL17.
 
+    Segue(m) o(s) códigos não utilizados:
+
+    {hash_codes}
+
     Siga os seguintes passos:
 
     1. Entregue o código promocional para o colaborador que comparecerá no FISL17;
