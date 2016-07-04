@@ -69,6 +69,24 @@ class MailerService(object):
 
         return mailer.send(message.build())
 
+    def notify_donation_promocode_available(self, customer, promocode):
+
+        message = self.message_factory.from_template('donation/promocode_available')
+        message.given(customer=customer, promocode=promocode)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+    def notify_corporate_promocode_available(self, corporate):
+        customer = corporate.owner
+
+        message = self.message_factory.from_template('corporate/promocode_available')
+        message.given(corporate=corporate)
+        message.to(customer.name, customer.email)
+
+        return mailer.send(message.build())
+
+
     def notify_corporate_payment(self, purchase, promocodes):
         customer = purchase.customer
         corporate = purchase.customer.corporate_owned
