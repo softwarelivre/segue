@@ -1,0 +1,23 @@
+---
+
+template: promocode_available
+language: pt
+subject: "#FISL17 - Código para inscrição não utilizado"
+
+body: |
+    Prezad@ {customer.name},
+
+    O código {promocode.hash_code} para isentar sua inscrição no FISL17 ainda não foi utilizado.
+
+    Siga os seguintes passos:
+
+    1. Logue no sistema de inscrições http://segue.fisl17.softwarelivre.org
+    2 . Clique em Inscrições FISL17;
+    3. Insira o código no campo: “Insira aqui o seu código promocional”;
+    4. Clique em “Usar”;
+    4.1 O ingresso aparecerá com desconto de 100%;
+    5. Clique no Botão “Comprar”;
+    6. Clique em “Finalizar”.
+
+    Saudações livres!
+    Comissão Organizadora do #FISL17
