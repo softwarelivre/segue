@@ -178,6 +178,19 @@ class PurchaseService(object):
         logger.info("received promocode hash: " + hash)
         return self.promocode_service.check(hash, by=by)
 
+    def give_ticket(self, account, product, commit=True):
+        purchase = PurchaseFactory.get_or_create(None, product, account)
+        purchase.status = 'paid'
+        db.session.add(purchase)
+        if commit: db.session.commit()
+        return purchase
+
+    def give_volunteer_ticket(self, account, commit=True):
+        from segue.product.models import VolunteerProduct
+        product = VolunteerProduct.query.first()
+        return self.give_ticket(account, product, commit=commit)
+
+
     def give_speaker_ticket(self, account, commit=True):
         from segue.proposal.models import SpeakerProduct
         product = SpeakerProduct.query.first()
@@ -289,7 +302,7 @@ class PaymentService(object):
                     self.on_finish_payment(purchase)
             elif purchase.category == 'student':
                 if purchase.status == 'student_document_in_analysis':
-                    self.mailer.notify_student_purchase_received(purchase)
+                   self.mailer.notify_student_purchase_received(purchase)
 
             return purchase, transition
         except Exception, e:
