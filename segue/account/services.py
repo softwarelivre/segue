@@ -103,6 +103,8 @@ class AccountService(object):
 
         if not account.document: raise DocumentIsNotDefined()
 
+        logger.info("Account=%s, edited by user=%s", str(account_id), str(by))
+
         return self._create_or_update(account)
 
     def lookup(self, criteria=None, by=None, limit=0):
