@@ -95,6 +95,15 @@ class Account(JsonSerializable, db.Model):
         else:
             return []
 
+    @property
+    def has_promocode(self):
+        from segue.purchase.promocode.models import PromoCode
+        if db.session.query(func.count(PromoCode.id))\
+                                .filter(PromoCode.creator_id==self.id)\
+                                .scalar() > 0:
+            return True
+        return False
+
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
         if self.id == alleged.id: return True
