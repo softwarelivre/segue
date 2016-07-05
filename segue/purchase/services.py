@@ -568,7 +568,7 @@ class AdempiereService(object):
             data['buyer_address_extra'] = buyer.address_extra or 'nulo',
 
             data['purchase_qty'] = purchase.qty
-            data['purchase_amount'] = purchase.total_amount
+            data['purchase_amount'] = '{0:.2f}'.format(paid_amount)
             data['purchase_discount'] = purchase_discount
             data['purchase_description'] = self._get_description(purchase_category,
                                                                  self._get_payment_type(payments[0]),
