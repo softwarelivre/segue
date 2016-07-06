@@ -9,7 +9,7 @@ class JSONEncoder(flask.json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, decimal.Decimal):
-            return "{0:0.16f}".format(obj)
+            return "{0:0.2f}".format(obj)
         if isinstance(obj, datetime.datetime):
             return obj.replace(microsecond=0).isoformat()
         if isinstance(obj, datetime.date):
