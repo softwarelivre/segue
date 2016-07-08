@@ -40,6 +40,8 @@ class Account(JsonSerializable, db.Model):
     role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
     document         = db.Column(db.Text, unique=True)
 
+    inform          = db.Column(db.Boolean, default=True)
+
     sex = db.Column(db.String(length=1))
 
     occupation = db.Column(db.Text)
