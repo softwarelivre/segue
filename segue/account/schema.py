@@ -89,6 +89,9 @@ class AccountSchema(BaseSchema):
         )
         born_date = Field.date(required=True)
         membership = Field.bool(required=True)
+
+        inform = Field.bool(required=True)
+
         country = Field.str(
             required=True,
             validate=[Validator.length(min=3, max=20)]
