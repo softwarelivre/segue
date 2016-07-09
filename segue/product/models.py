@@ -221,11 +221,12 @@ class DonationProduct(Product):
 
     def extra_purchase_fields_for(self, buyer_data):
         """ Used in service.purchase for get the data from the request and send to the model"""
+        give_tshirt = [1,13,58,71,73]
 
         #TODO: REVIEW HARDCODING
         extra_fields = {}
 
-        if self.id == 1 or self.id == 13 or self.id == 58:
+        if self.id in give_tshirt:
             extra_fields['shirt_size'] = buyer_data.get('shirt_size', None)
             extra_fields['delivery'] = buyer_data.get('delivery', None)
 
