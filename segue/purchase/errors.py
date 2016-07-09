@@ -81,3 +81,9 @@ class StudentDocumentIsInvalid(SegueError):
 
     def to_json(self):
         return {'message': _l('The student document {} is not valid'.format(self.document))}
+
+
+class BlockedDiscount(SegueError):
+    code = 400;
+    def to_json(self):
+        return { 'message': 'Este código promocional não consede 100% de desconto!' }
