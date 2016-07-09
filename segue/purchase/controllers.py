@@ -7,6 +7,7 @@ from flask import request
 from segue.json import JsonFor
 from segue.core import config
 from segue.decorators import jsoned, jwt_only, admin_only
+from segue.schema import Field
 
 from segue.document.services import DocumentService
 from segue.hasher import Hasher
@@ -17,6 +18,7 @@ from segue.purchase.services import ProcessBoletosService
 from segue.responses import Response
 from promocode.factories import PromoCode
 from flask import request, url_for, redirect
+from webargs.flaskparser import parser
 import schema
 
 
@@ -37,7 +39,6 @@ class PurchaseController(object):
             processor = ProcessBoletosService()
             result = processor.process(file.read())
             return dict(payments=result), 200
-
         return 200
 
     @jsoned
@@ -98,7 +99,12 @@ class PurchaseController(object):
     @jwt_only
     @jsoned
     def check_promocode(self, hash=None):
+        from segue.purchase.errors import BlockedDiscount
         result = self.service.check_promocode(hash, by=self.current_user) or flask.abort(404)
+        #HACK
+        if result and result.discount != 1.0 and self.service.current_mode() != 'online':
+            raise BlockedDiscount()
+
         return PromoCodeResponse(result), 200
 
     @jsoned
@@ -165,7 +171,12 @@ class PromocodeController(object):
     @jsoned
     @jwt_only
     def list(self):
-        #TODO: CHECK PARAMETERS
-        parms = {c: request.args.get(c) for c in ['creator_id'] if c in request.args}
+        parms = parser.parse({
+            'creator_id': Field.int(),
+            'purchase_id': Field.int()
+            },
+            request
+        )
+
         result = self.service.query(**parms)
         return Response(result, PromoCodeListResponse).create(), 200
