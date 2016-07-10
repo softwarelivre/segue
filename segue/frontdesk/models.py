@@ -7,12 +7,14 @@ from segue.corporate.models import CorporatePurchase
 
 PREFIXES = {
  'business':          'N',
+ 'corportate-promocode':  'N',
  'caravan':           'N',
  'caravan-leader':    'N',
  'sponsor':           'M',
  'foreigner':         'N',
  'foreigner-student': 'S',
  'government':        'E',
+ 'gov-procode':       'E',
  'normal':            'N',
  'organization':      'O',
  'press':             'I',
@@ -28,12 +30,14 @@ PREFIXES = {
 
 CATEGORY_RECEPTION_DESK = {
  'business':          'pre',
+ 'corportate-promocode':  'pre',
  'caravan':           'pre',
  'caravan-leader':    'pre',
  'sponsor':           'pre',
  'foreigner':         'pre',
  'foreigner-student': 'pre',
  'government':        'pre',
+ 'gov-procode':       'pre',
  'normal':            'pre',
  'organization':      'pre',
  'press':             'expopress',
@@ -84,7 +88,7 @@ class Badge(db.Model):
         for key in ['name','organization','city','category']:
             setattr(badge, key, data.get(key, None))
 
-        return badge;
+        return badge
 
     @property
     def xid(self):
@@ -112,10 +116,13 @@ class Visitor(db.Model):
     name     = db.Column(db.Text)
     email    = db.Column(db.Text)
     document = db.Column(db.Text)
+    phone    = db.Column(db.Text)
+    badge_name = db.Column(db.Text)
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.now)
 
+    #TODO CHECK
     @property
     def badge_data(self):
         return dict(
@@ -133,25 +140,52 @@ class Visitor(db.Model):
 class Person(object):
     def __init__(self, purchase, links=False):
         self.id           = purchase.id
+
+        self.customer_id   = purchase.customer.id
+        self.role         = purchase.customer.role
         self.name         = purchase.customer.name
         self.email        = purchase.customer.email
         self.document     = purchase.customer.document
+        self.phone        = purchase.customer.phone
         self.organization = purchase.customer.organization
         self.badge_name   = purchase.badge_name
         self.badge_corp   = purchase.badge_corp
-        self.city         = purchase.customer.city
-        self.country      = purchase.customer.country
-        self.category     = purchase.product.category
-        self.price        = purchase.product.price
-        self.status       = purchase.status
-        self.buyer        = purchase.buyer
-        self.purchase     = purchase
+
+        self.city                 = purchase.customer.city
+        self.country              = purchase.customer.country
+        self.address_state        = purchase.customer.address_state
+        self.address_neighborhood = purchase.customer.address_neighborhood
+        self.address_street       = purchase.customer.address_street
+        self.address_number       = purchase.customer.address_number
+        self.address_extra        = purchase.customer.address_extra
+        self.address_zipcode      = purchase.customer.address_zipcode
+
+        self.has_promocode   = purchase.customer.has_promocode
+
+        self.product_description = purchase.product.description
+        self.category            = purchase.product.category
+        self.price               = purchase.product.price
+        self.buyer               = purchase.buyer
+        self.purchase            = purchase
 
     @property
     def reception_desk(self):
         if not self.is_valid_ticket: return 'new'
         return CATEGORY_RECEPTION_DESK.get(self.category, 'pre')
 
+
+    @property
+    def has_payable_ticket(self):
+        return self.purchase.payable
+
+    @property
+    def donation_promocodes(self):
+        from segue.models import PromoCode
+
+        donation_products = db.session.query(Product.promocode_product_id).filter(Product.category == 'donation').subquery()
+        return PromoCode.query\
+                 .filter(PromoCode.creator_id == self.customer_id)\
+                 .filter(PromoCode.product_id.in_(donation_products)).all()
 
     @property
     def related_people(self):
@@ -181,8 +215,22 @@ class Person(object):
         return self.purchase.customer.is_brazilian
 
     @property
+    def is_corporate(self):
+        print(self.category)
+        if self.category == 'business' or self.category == 'government':  return True
+        else: return False
+
+    @property
     def is_valid_ticket(self):
+        if self.category == 'donation': return False
+        if self.category == 'government' and self.status == 'pending': return True
         return self.status == 'paid'
+
+
+    @property
+    def status(self):
+        if self.category == 'government' and self.purchase.status == 'pending': return 'paid'
+        else: return self.purchase.status
 
     @property
     def can_print_badge(self):
@@ -190,7 +238,7 @@ class Person(object):
 
     @property
     def can_change_badge_corp(self):
-        return self.purchase.can_change_badge_corp
+        return True
 
     @property
     def last_badge(self):
@@ -212,6 +260,21 @@ class Person(object):
     @property
     def can_change_product(self):
         return not (self.purchase.stale or self.purchase.satisfied or self.purchase.has_started_payment)
+
+    @property
+    def eligible_donation_products(self):
+        products = []
+
+        for product in Product.query.filter(Product.category=='donation').order_by(Product.price).all():
+            try:
+                if not product.can_pay_cash and product.sold_until > datetime.now():
+                    continue
+                elif product.check_eligibility({}, self.purchase.customer):
+                    products.append(product)
+            except SegueError, e:
+                pass
+
+        return products
 
     @property
     def eligible_products(self):

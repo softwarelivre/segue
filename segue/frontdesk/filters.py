@@ -16,6 +16,10 @@ class FrontDeskFilterStrategies(FilterStrategies):
         if isinstance(value, basestring) and "@" in value:
             return Account.email.ilike('%'+value+'%')
 
+    def by_customer_document(self, value, as_user=None):
+        if isinstance(value, basestring):
+            return Account.document == value
+
     def join_for_customer_name(self, queryset, needle=None):
         if isinstance(needle, basestring) and needle.isdigit():
             return queryset

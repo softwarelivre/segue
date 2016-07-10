@@ -1,4 +1,4 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 import sys
 from collections import defaultdict
 from datetime import datetime

@@ -200,3 +200,32 @@ class AccountService(object):
         db.session.commit()
 
         return reset
+
+    #HACK FOR FRONT DESK
+    def create_people(self, data):
+        from segue.frontdesk.schema import PeopleSchema
+
+        role = 'user'
+        if 'cnpj' in data:
+            role = 'corporate'
+            rules = 'create_corporate'
+        if 'passport' in data:
+            role = 'foreign'
+
+        #TODO: REMOVE INCHARGE
+        incharge = data.get('incharge', '')
+
+        account = AccountFactory.from_json(data, PeopleSchema())
+        account.role = role
+
+        if not account.document: raise DocumentIsNotDefined()
+        if not account.password: account.password = self.hasher.generate()
+
+        #TODO: HACK
+        new_account = self._create_or_update(account)
+        if new_account.role == 'corporate':
+            from segue.corporate.services import CorporateService
+            CorporateService().create_corporate(new_account, incharge)
+
+        return new_account
+
