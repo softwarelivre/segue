@@ -16,8 +16,14 @@ class FrontdeskPersonBlueprint(flask.Blueprint):
         self.controller = PersonController()
         self.add_url_rule('',                          methods=['GET'],   view_func=self.controller.list)
         self.add_url_rule('',                          methods=['POST'],  view_func=self.controller.create)
+        self.add_url_rule('/<int:customer_id>/add_product', methods=['POST'],  view_func=self.controller.add_product)
         self.add_url_rule('/<int:person_id>',          methods=['GET'],   view_func=self.controller.get_one)
         self.add_url_rule('/<int:person_id>',          methods=['PATCH'], view_func=self.controller.patch)
+
+        #RENAME
+        self.add_url_rule('/<int:person_id>/patch_info',             methods=['PATCH'], view_func=self.controller.patch_info)
+        self.add_url_rule('/<int:person_id>/patch_address',          methods=['PATCH'], view_func=self.controller.patch_address)
+        self.add_url_rule('/<int:person_id>/badge',                  methods=['PATCH'], view_func=self.controller.patch_badge)
 
         self.add_url_rule('/<int:person_id>/buyer',    methods=['GET'],   view_func=self.controller.buyer)
         self.add_url_rule('/<int:person_id>/related',  methods=['GET'],   view_func=self.controller.related)
@@ -28,6 +34,19 @@ class FrontdeskPersonBlueprint(flask.Blueprint):
         self.add_url_rule('/<int:person_id>/pay',      methods=['POST'],  view_func=self.controller.make_payment)
         self.add_url_rule('/<int:person_id>/badge',    methods=['GET'],   view_func=self.controller.get_badge)
         self.add_url_rule('/<int:person_id>/badge',    methods=['POST'],  view_func=self.controller.create_badge)
+
+
+
+        self.add_url_rule('/<int:person_id>/promocodes',   methods=['GET'], view_func=self.controller.promocodes_list)
+
+        self.add_url_rule('/<int:person_id>/donation/eligible', methods=['GET'], view_func=self.controller.eligible_donation)
+        self.add_url_rule('/<int:customer_id>/donation/new',     methods=['POST'],view_func=self.controller.new_donation)
+        self.add_url_rule('/<int:person_id>/donation/change',  methods=['POST'], view_func=self.controller.change_donation)
+
+        self.add_url_rule('/<int:customer_id>/employeer', methods=['GET'], view_func=self.controller.get_employeer)
+
+        self.add_url_rule('/<int:employer_id>/employees/add', methods=['POST'], view_func=self.controller.register_employee)
+        self.add_url_rule('/<int:person_id>/employees', methods=['GET'], view_func=self.controller.list_employees)
 
 class FrontdeskBadgeBlueprint(flask.Blueprint):
     def __init__(self):
@@ -47,6 +66,13 @@ class VisitorBlueprint(flask.Blueprint):
         self.controller = VisitorController()
         self.add_url_rule('', methods=['POST'], view_func=self.controller.create)
 
+class SpeakerBlueprint(flask.Blueprint):
+    def __init__(self):
+        super(SpeakerBlueprint, self).__init__('fd.speaker', __name__, url_prefix='/fd/speakers')
+        self.controller = SpeakerController()
+        self.add_url_rule('', methods=['POST'], view_func=self.controller.create)
+
+
 class ReportBlueprint(flask.Blueprint):
     def __init__(self):
         super(ReportBlueprint, self).__init__('fd.report', __name__, url_prefix='/fd/reports')
@@ -61,7 +87,7 @@ def load_blueprints():
         FrontdeskBadgeBlueprint(),
         FrontdeskPersonBlueprint(),
         ReportBlueprint(),
-
+        SpeakerBlueprint(),
         PrinterBlueprint(),
         VisitorBlueprint(),
     ]

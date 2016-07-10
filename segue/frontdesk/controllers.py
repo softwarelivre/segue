@@ -1,12 +1,12 @@
 from datetime import datetime
-from segue.core import config
+from segue.core import config, db
 
 from flask import request, abort, redirect
 from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html, cashier_only
 
-from services import BadgeService, PeopleService, VisitorService, ReportService
-from responses import PersonResponse, BadgeResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse
+from services import BadgeService, PeopleService, VisitorService, ReportService, SpeakerService
+from responses import PersonResponse, BadgeResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse, EmployeerResponse, EmployeeResponse
 
 class VisitorController(object):
     def __init__(self, visitors=None):
@@ -58,7 +58,7 @@ class PersonController(object):
     def list(self):
         needle = request.args.get('q')
         result = self.people.lookup(needle, by_user=self.current_user)
-        return PersonResponse.create(result, links=False), 200
+        return PersonResponse.create(result, links=True), 200
 
     @jwt_only
     @frontdesk_only
@@ -78,10 +78,50 @@ class PersonController(object):
     @jwt_only
     @frontdesk_only
     @jsoned
+    def patch_info(self, person_id):
+        data = request.get_json()
+        result = self.people.patch_info(person_id, by_user=self.current_user, **data)
+        return {}, 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def patch_address(self, person_id):
+        data = request.get_json()
+        result = self.people.patch_address(person_id, by_user=self.current_user, **data)
+        return {}, 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def patch_badge(self, person_id):
+        data = request.get_json()
+        result = self.people.patch_badge(person_id, by_user=self.current_user, **data)
+        return {}, 200
+
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def add_product(self, customer_id):
+        data = request.get_json()
+        result = self.people.add_product(customer_id, by_user=self.current_user)
+        return PersonResponse.create(result, embeds=False, links=False), 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def register_employee(self, employer_id):
+        data = request.get_json()
+        result = self.people.register_employee(employer_id, by_user=self.current_user, **data)
+        return {}, 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def create(self):
-        email = request.get_json().get('email',None)
-        if not email: abort(400)
-        result = self.people.create(email, by_user=self.current_user)
+        data = request.get_json()
+        result = self.people.create(data, by_user=self.current_user)
         return PersonResponse.create(result, embeds=False, links=False), 200
 
     @jwt_only
@@ -106,8 +146,9 @@ class PersonController(object):
     @jsoned
     def set_product(self, person_id):
         new_product_id = request.get_json().get('product_id',None)
+        qty = request.get_json().get('qty', 1)
         if not new_product_id: abort(400)
-        result = self.people.set_product(person_id, new_product_id, by_user=self.current_user)
+        result = self.people.set_product(person_id, new_product_id, qty, by_user=self.current_user)
         return {}, 200
 
     @jwt_only
@@ -116,6 +157,50 @@ class PersonController(object):
     def eligible(self, person_id):
         result = self.people.get_one(person_id, by_user=self.current_user) or abort(404)
         return ProductResponse.create(result.eligible_products), 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def eligible_donation(self, person_id):
+        result = self.people.get_one(person_id, by_user=self.current_user) or abort(404)
+        return ProductResponse.create(result.eligible_donation_products), 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def new_donation(self, customer_id):
+        result = self.people.new_donation(customer_id, by_user=self.current_user) or abort(404)
+        return PersonResponse.create(result), 200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def change_donation(self, person_id):
+        new_product_id = request.get_json().get('product_id') or abort(404)
+        amount = request.get_json().get('amount', 10)
+
+        result = self.people.set_donation(person_id, new_product_id, amount, by_user=self.current_user)
+        return {}, 200
+
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def get_employeer(self, customer_id):
+        result = self.people.get_employeer(customer_id, by_user=self.current_user)
+        return EmployeerResponse.create(result), 200
+
+    @jwt_only
+    @jsoned
+    def promocodes_list(self, person_id):
+        person_id = request.get_json().get('product_id') or abort(404)
+
+        person = self.people.get_one(person_id, by_user=self.current_user)
+
+        print(person.promocodes)
+
+        return {}, 200
+
 
     @jwt_only
     @frontdesk_only
@@ -145,6 +230,45 @@ class PersonController(object):
         result = self.badges.make_badge(printer, person, by_user=self.current_user)
 
         return {},200
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def list_employees(self, person_id):
+        # TODO: REMOVE
+        from segue.responses import Response
+        from segue.account.models import Account
+        from segue.purchase.promocode.models import PromoCodePayment, PromoCode
+        from segue.purchase.models import Purchase
+
+        customer_id = db.session.query(Purchase.customer_id).filter(Purchase.id==person_id).subquery()
+
+        result = db.session.query(PromoCodePayment) \
+            .join(Purchase) \
+            .join(Account) \
+            .filter(PromoCodePayment.promocode_id.in_(
+            db.session.query(PromoCode.id).filter(PromoCode.creator_id == customer_id))).all()
+
+        if result:
+            return EmployeeResponse.create(result), 200
+        return [], 200
+
+
+
+class SpeakerController(object):
+    def __init__(self, badges=None, speakers=None):
+        self.badges = badges or BadgeService()
+        self.speakers = speakers or SpeakerService()
+        self.current_user = current_user
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def create(self):
+        data = request.get_json()
+        speaker = self.speakers.create(by_user=self.current_user, **data)
+        return PersonResponse.create(speaker), 200
+
 
 class BadgeController(object):
     def __init__(self, badges=None):

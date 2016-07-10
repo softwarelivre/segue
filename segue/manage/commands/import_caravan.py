@@ -31,6 +31,7 @@ def import_caravan(in_file, caravan_yaml):
     product.price = int(caravan_data['price'])
     our_number = caravan_data['our_number']
     payment_date = caravan_data['payment_date']
+    caravan_id = caravan_data['caravan_id'] or None
     print "################## IMPORTAR CARAVANA #######################"
     print "Caravana:", caravan_data['caravan_name']
     print "Produto:", product.description, product.price
@@ -45,24 +46,26 @@ def import_caravan(in_file, caravan_yaml):
             data = line.replace('\n', '').replace('\r','').decode('utf8').split(';')
             ds.append(data)
 
-    first = True
-    has_caravan = False
+
+    caravan = None
+    if caravan_id:
+        caravan = Caravan.query.get(caravan_id)
+
     for item in ds.dict:
-        if first:
+        if not caravan:
             caravan_id = get_or_add_caravan(item, caravan_data)
             caravan = Caravan.query.get(caravan_id)
             print "lider da caravana:", item['NOME COMPLETO'], item['EMAIL']
-            first = False
-            has_caravan = True
-            add_leader_exemption(caravan, product, item, our_number, payment_date)
+
+            #add_leader_exemption(caravan, product, item, our_number, payment_date)
         else:
-            if has_caravan:
-                account = get_or_add_account(item)
-                print "convidado da caravana: ", account.email
-                add_caravan_rider(caravan, account)
-                add_rider_purchase_and_payment(product, account, caravan, item, our_number, payment_date)
+            account = get_or_add_account(item)
+            print "convidado da caravana: ", account.email
+            add_caravan_rider(caravan, account)
+            add_rider_purchase_and_payment(product, account, caravan, item, our_number, payment_date)
 
     print "####################### DONE! #############################"
+
 
 def get_or_add_caravan(item, caravan_data):
     is_owner_registered = account_service.is_email_registered(item['EMAIL'])

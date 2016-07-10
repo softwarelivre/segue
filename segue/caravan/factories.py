@@ -22,5 +22,7 @@ class CaravanLeaderPurchaseFactory(Factory):
         result.product  = CaravanLeaderProduct.query.first()
         result.caravan  = caravan
         result.status   = 'paid'
+        result.amount   = 0
+        result.qty      = 1
         result.customer = caravan.owner
         return result

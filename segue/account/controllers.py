@@ -12,7 +12,7 @@ from models import Account, ResetPassword
 from services import AccountService
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
 from responses import AccountResponse, EmployeesListResponse
-import schema
+
 
 
 class AccountController(object):
@@ -35,7 +35,8 @@ class AccountController(object):
 
     @jsoned
     def schema(self, name):
-        return schema.whitelist[name]
+        #TODO: REMOVE
+        return {}
 
     @jsoned
     def create(self):
