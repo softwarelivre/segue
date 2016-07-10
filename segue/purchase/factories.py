@@ -24,6 +24,29 @@ class BuyerFactory(Factory):
         buyer.document_file_hash = document_file_hash
         return buyer
 
+    def from_account(self, account):
+        buyer = Buyer()
+        #TODO: CHECK BUYER KIND
+        if account.role == 'user':
+            buyer.kind = 'person'
+        elif account.role == 'corporate':
+            buyer.kind = 'company'
+        elif account.role == 'foreign':
+            buyer.kind = 'foreign'
+
+        buyer.name                 = account.name
+        buyer.document             = account.document
+        buyer.contact              = account.phone
+        buyer.address_city         = account.city
+        buyer.address_country      = account.country
+        buyer.address_state        = account.address_state
+        buyer.address_street       = account.address_street
+        buyer.address_neighborhood = account.address_neighborhood
+        buyer.address_number       = account.address_number
+        buyer.address_extra        = account.address_extra
+        buyer.address_zipcode      = account.address_zipcode
+
+        return buyer
     @classmethod
     def clean_for_insert(cls, data):
         data.pop('document_file', None)

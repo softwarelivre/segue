@@ -23,6 +23,7 @@ class PromoCodeService(object):
     def query(self, **kw):
         base        = self.filter_strategies.joins_for(PromoCode.query, **kw)
         filter_list = self.filter_strategies.given(**kw)
+        print(base.filter(*filter_list).order_by(PromoCode.id))
         return base.filter(*filter_list).order_by(PromoCode.id).all()
 
     def create(self, product, description=None, creator=None, discount=100, quantity=1):
@@ -101,7 +102,9 @@ class PromoCodePaymentService(object):
         promocode = self.promocodes.check(hash_code, by=purchase.customer)
         if not promocode: raise InvalidHashCode(hash_code)
 
-        if force_product: purchase.product = promocode.product
+        if force_product:
+            purchase.product = promocode.product
+            purchase.amount = promocode.product.price
 
         payment = self.factory.create(purchase, promocode)
         purchase.recalculate_status()

@@ -19,3 +19,10 @@ class PromoCodeFilterStrategies(FilterStrategies):
     def by_creator_id(self, value, as_user=None):
         if not isinstance(value, int): return None
         return PromoCode.creator_id==value
+
+    #TODO: REMOVE FOR FRONTDESK
+    def by_purchase_id(self, value, as_user=None):
+        from segue.purchase.models import Purchase
+        if not isinstance(value, int): return None
+        customer_id = db.session.query(Purchase.customer_id).filter(Purchase.id == value).subquery()
+        return PromoCode.creator_id == customer_id

@@ -181,6 +181,8 @@ class PurchaseService(object):
     def give_ticket(self, account, product, commit=True):
         purchase = PurchaseFactory.get_or_create(None, product, account)
         purchase.status = 'paid'
+        purchase.amount = 0
+        purchase.qty = 1
         db.session.add(purchase)
         if commit: db.session.commit()
         return purchase
@@ -189,7 +191,6 @@ class PurchaseService(object):
         from segue.product.models import VolunteerProduct
         product = VolunteerProduct.query.first()
         return self.give_ticket(account, product, commit=commit)
-
 
     def give_speaker_ticket(self, account, commit=True):
         from segue.proposal.models import SpeakerProduct
@@ -357,7 +358,7 @@ class PaymentService(object):
                 self.on_finish_promocode_donation(purchase)
             else:
                 self.on_finish_normal_donation(purchase)
-        elif purchase.category == 'caravan-rider':
+        elif purchase.kind == 'caravan-rider':
             self.on_finish_caravan_rider(purchase)
         else:
             self.mailer.notify_payment(purchase)
@@ -403,8 +404,11 @@ class PaymentService(object):
         self.mailer.notify_donation(purchase, document)
 
     def on_finish_caravan_rider(self, purchase):
+        from segue.caravan.models import Caravan
         logger.debug('attempting to exempt the leader of a caravan')
-        self.caravans.update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
+        #TODO: FIX ME
+        caravan = Caravan.query.filter(Caravan.id==purchase.caravan_id).first()
+        self.caravans.update_leader_exemption(caravan.id, caravan.owner)
 
     def processor_for(self, method):
         if method in self.processors_overrides:

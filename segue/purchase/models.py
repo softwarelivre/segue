@@ -80,7 +80,16 @@ class Purchase(JsonSerializable, db.Model):
     @property
     def badge_name(self):
         if not self.customer: return ''
-        return self.customer.badge_name or self.customer.name
+        return self.customer.badge_name or self._make_badge_name(self.customer.name) or ''
+
+    def _make_badge_name(self, customer_name):
+        if len(customer_name) <= 20: return customer_name
+        splited_name = customer_name.split(' ')
+        if len(splited_name) > 1:
+            badge_name = splited_name[0] + ' ' + splited_name[-1]
+            if len(badge_name) <= 20:
+                return badge_name
+        return ''
 
     @property
     def badge_corp(self):
@@ -97,7 +106,12 @@ class Purchase(JsonSerializable, db.Model):
 
     @property
     def payable(self):
-        return not self.satisfied and datetime.now().date() <= self.due_date
+        #TODO: FIX THERE ARE PURCHASES WITHOUT DUE_DATE
+        expired = True
+        if self.due_date:
+            expired = self.due_date <= datetime.now().date()
+            print(self.due_date, datetime.now().date(), expired)
+        return not self.status in ['stale', 'reimbursed', 'cancelled','paid'] and not expired
 
     @property
     def stale(self):
@@ -146,6 +160,11 @@ class Purchase(JsonSerializable, db.Model):
     def can_start_payment(self):
         return self.due_date >= datetime.now().date()
 
+    def had_paid_with_cash(self):
+        for payment in self.payments:
+            if payment.type == 'cash':
+                return True
+
     def recalculate_status(self):
         self.status = 'paid' if self.outstanding_amount == 0 else 'pending'
 
@@ -163,7 +182,7 @@ class StudentPurchase(Purchase):
 
     def recalculate_status(self):
         if self.outstanding_amount == 0:
-            if self.buyer.extra_document:
+            if self.buyer.extra_document or self.had_paid_with_cash():
                 self.status = 'paid'
             else:
                 self.status = 'student_document_in_analysis'

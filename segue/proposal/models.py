@@ -134,6 +134,10 @@ class ProponentProduct(Product):
 class StudentProponentProduct(ProponentProduct):
     __mapper_args__ = { 'polymorphic_identity': 'proponent-student' }
 
+    def special_purchase_class(self):
+        from segue.purchase.models import StudentPurchase
+        return StudentPurchase
+
 class SpeakerProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'speaker' }
     def special_purchase_class(self):
