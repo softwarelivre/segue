@@ -12,13 +12,14 @@ class RoomResponse(BaseResponse):
 
 class SlotResponse(BaseResponse):
     def __init__(self, slot, embeds=False, links=True):
-        self.id         = slot.id
-        self.begins     = slot.begins
-        self.hour       = slot.begins.hour
-        self.duration   = slot.duration
-        self.room       = slot.room.id
-        self.room_name  = slot.room.name
-        self.status     = slot.status
+        self.id           = slot.id
+        self.begins       = slot.begins
+        self.hour         = slot.begins.hour
+        self.duration     = slot.duration
+        self.room         = slot.room.id
+        self.room_name    = slot.room.name
+        self.status       = slot.status
+        self.last_updated = slot.last_updated
         self.recordings = [ r.url for r in slot.recordings ]
 
         if embeds:
@@ -34,6 +35,7 @@ class TalkShortResponse(BaseResponse):
         self.title = talk.title
         self.owner = talk.owner.name
         self.track = talk.track.name_pt
+        self.last_updated = talk.last_updated
         self.coauthors = list(set([ x.name for x in talk.coauthors ]))
 
 class NotificationResponse(BaseResponse):
