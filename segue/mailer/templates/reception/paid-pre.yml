@@ -5,40 +5,37 @@ language: pt
 subject: "FISL17 - está chegando a hora!"
 
 body: |
+    Para acelerar seu atendimento, proceda da seguinte forma:
 
-    Olá, {person.name}!
+          Dirija-se à secretaria com o seguinte letreiro:
 
-    Sua inscrição no evento está confirmada, e o fisl
-    começa nesta quarta-feira, dia 8! Para acelerar
-    seu atendimento, proceda da seguinte forma:
+              Pré-inscritos, Expositores e Imprensa
 
-      - dirija-se à secretaria com o seguinte letreiro:
+          - informe o número de inscrição abaixo
+          - o crachá será entregue pelo atendente
 
-          Pré-inscritos, Expositores,
-          Imprensa, Blogs, Códigos promocionais
+                   ******************
+                     INSCRICAO PAGA
 
-      - informe o número de inscrição abaixo
-      - o crachá sera entregue pelo atendente
-      - *estudante: favor apresentar documento
-        que comprove sua matrícula para o
-        semestre corrente.*
+                      {person.id}
 
-               ******************
-                 INSCRICAO PAGA
+              {person.purchase.product.description}
+                   *******************
 
-                  {person.id}
+        Para sua maior conveniência, imprima o seu
+        cartão de inscrição, que pode ser visualizado
+        na URL abaixo:
 
-          {person.purchase.product.description}
-               *******************
+        {backend_url}/api/fd/reception/{person.purchase.hash_code}
 
-    Para sua maior conveniência, imprima o seu
-    cartão de inscrição, que pode ser visualizado
-    na URL abaixo:
+    Participe da Campanha de doação do FISL17!
 
-    {backend_url}/api/fd/reception/{person.purchase.hash_code}
+    Na secretaria do evento você poderá doar:
 
-    Cordialmente
+    * A partir de R$ 10,00 e receber um boton do FISL17;
+    *R$ 50,00 e receber uma camiseta do FISL17;
+    *R$ 450,00 e receber  um código promocional com 100%, um boton e uma camiseta do FISL17;
 
-    --
-    Organização
-    Associação Software Livre.Org
+    Saudações Livres,
+
+    Comissão Organizadora do #FISL17

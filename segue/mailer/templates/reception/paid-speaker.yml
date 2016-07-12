@@ -5,34 +5,39 @@ language: pt
 subject: "FISL17 - está chegando a hora!"
 
 body: |
+    O FISL17 começa nessa quarta-feira, dia 13 e sua inscrição está confirmada!
 
-    Olá {person.name}
+    Para acelerar seu atendimento, proceda da seguinte forma:
 
-    Sua inscrição no evento está confirmada, e o fisl
-    começa nesta quarta-feira, dia 8! Para acelerar
-    seu atendimento na recepção do evento, por favor
-    proceda da seguinte forma:
+          Dirija-se à secretaria com o seguinte letreiro:
 
-      - dirija-se ao balcão de PALESTRANTES
-      - informe o número de inscrição abaixo
-      - o crachá sera entregue pelo atendente
+                     Palestrantes
 
-               ******************
-              INSCRIÇÃO CONFIRMADA
+          - informe o número de inscrição abaixo
+          - o crachá será entregue pelo atendente
 
-                  {person.id}
+                   ******************
+                     INSCRICAO PAGA
 
-          {person.purchase.product.description}
-               *******************
+                      {person.id}
 
-    Para sua maior conveniência, imprima o seu
-    cartão de inscrição, que pode ser visualizado
-    na URL abaixo:
+              {person.purchase.product.description}
+                   *******************
 
-    {backend_url}/api/fd/reception/{person.purchase.hash_code}
+        Para sua maior conveniência, imprima o seu
+        cartão de inscrição, que pode ser visualizado
+        na URL abaixo:
 
-    Cordialmente
+        {backend_url}/api/fd/reception/{person.purchase.hash_code}
 
-    --
-    Organização
-    Associação Software Livre.Org
+    Participe da Campanha de doação do FISL17!
+
+    Na secretaria do evento você poderá doar:
+
+    * A partir de R$ 10,00 e receber um boton do FISL17;
+    *R$ 50,00 e receber uma camiseta do FISL17;
+    *R$ 450,00 e receber  um código promocional com 100%, um boton e uma camiseta do FISL17;
+
+    Saudações Livres,
+
+    Comissão Organizadora do #FISL17
