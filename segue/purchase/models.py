@@ -83,6 +83,7 @@ class Purchase(JsonSerializable, db.Model):
         return self.customer.badge_name or self._make_badge_name(self.customer.name) or ''
 
     def _make_badge_name(self, customer_name):
+        if not customer_name: return ''
         if len(customer_name) <= 20: return customer_name
         splited_name = customer_name.split(' ')
         if len(splited_name) > 1:
