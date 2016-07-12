@@ -2,6 +2,7 @@ import sys
 import collections
 
 from support import *
+import time
 
 from segue.frontdesk.services import BadgeService, PeopleService
 
@@ -39,6 +40,7 @@ def reception_mail(status, categories="", start=None, end=None):
             print "... {}category is correct{}, sending".format(F.GREEN, F.RESET)
             try:
                 people.send_reception_mail(person.id)
+                time.sleep(5)
             except Exception, e:
                 errors.append([ person.id, sys.exc_info() ])
 
