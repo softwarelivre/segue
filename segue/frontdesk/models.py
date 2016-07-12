@@ -25,7 +25,8 @@ PREFIXES = {
  'speaker':           'P',
  'student':           'S',
  'support':           'SU',
- 'visitor':           'VVV'
+ 'visitor':           'VVV',
+ 'volunteer':         'V'
 }
 
 CATEGORY_RECEPTION_DESK = {
@@ -48,6 +49,7 @@ CATEGORY_RECEPTION_DESK = {
  'speaker':           'speaker',
  'student':           'pre',
  'support':           'expopress',
+ 'volunteer':         'pre',
 }
 
 class Badge(db.Model):
