@@ -158,9 +158,9 @@ class AccountSchema(BaseSchema):
                     raise EmailAddressMisMatch()
 
             #TODO: IMPROVE
-            if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):
-                if not ZipCodeValidator(data.get('address_zipcode', None)).is_valid():
-                    raise InvalidZipCodeNumber()
+            #if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):
+            #    if not ZipCodeValidator(data.get('address_zipcode', None)).is_valid():
+            #        raise InvalidZipCodeNumber()
 
 class CreateAccountSchema(AccountSchema):
     pass

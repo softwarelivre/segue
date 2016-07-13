@@ -108,14 +108,22 @@ class SpeakerService(object):
         self.badges = badges or BadgeService()
         self.purchases = purchases or PurchaseService()
         self.accounts = accounts or AccountService()
+        self.products = ProductService()
+        self.peoples = PeopleService()
 
-    def create(self, by_user=None, **data):
+    def create(self, ticket=None, printer=None, by_user=None, **data):
+        #TODO: FIX
+        product = self.products.chepest_available_for(ticket)
         account = self.accounts.create_people(data)
-        purchase = self.purchases.give_speaker_ticket(account, commit=False)
+        purchase = self.purchases.give_ticket(account, product, commit=False)
+
 
         db.session.add(account)
         db.session.add(purchase)
         db.session.commit()
+
+        people = self.peoples.get_one(purchase.id, by_user=None, check_ownership=False, strict=True)
+        self.badges.make_badge(printer, people)
 
         return  Person(purchase)
 
