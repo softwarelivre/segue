@@ -100,6 +100,9 @@ class OrganizationProduct(LockedProduct):
 class SponsorProduct(LockedProduct):
     __mapper_args__ = { 'polymorphic_identity': 'sponsor' }
 
+    def check_eligibility(self, buyer_data, account=None):
+        return True
+
 class VolunteerProduct(LockedProduct):
     __mapper_args__ = { 'polymorphic_identity': 'volunteer' }
 
