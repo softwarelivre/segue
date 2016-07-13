@@ -51,6 +51,10 @@ class VisitorSchema(BaseSchema):
         validate=[Validator.length(max=20)]
     )
 
+    badge_corp = Field.str(
+        validate=[Validator.length(max=20)]
+    )
+
     email = Field.str(
         required=True,
         validate=[Validator.length(min=5, max=60), Validator.email()]
@@ -82,6 +86,14 @@ class PeopleSchema(BaseSchema):
         email = Field.str(
             required=True,
             validate=[Validator.length(min=5, max=60), Validator.email()]
+        )
+
+        badge_name = Field.str(
+            validate=[Validator.length(max=20)]
+        )
+
+        organization = Field.str(
+            validate=[Validator.length(max=20)]
         )
 
         name = Field.str(
