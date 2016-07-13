@@ -7,7 +7,7 @@ from segue.corporate.models import CorporatePurchase
 
 PREFIXES = {
  'business':          'N',
- 'corportate-promocode':  'N',
+ 'corporate-promocode':  'N',
  'caravan':           'N',
  'caravan-leader':    'N',
  'sponsor':           'M',
@@ -31,7 +31,7 @@ PREFIXES = {
 
 CATEGORY_RECEPTION_DESK = {
  'business':          'pre',
- 'corportate-promocode':  'pre',
+ 'corporate-promocode':  'pre',
  'caravan':           'pre',
  'caravan-leader':    'pre',
  'sponsor':           'pre',
