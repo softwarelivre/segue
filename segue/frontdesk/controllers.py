@@ -101,7 +101,7 @@ class PersonController(object):
 
 
     @jwt_only
-    @frontdesk_only
+    @cashier_only
     @jsoned
     def add_product(self, customer_id):
         data = request.get_json()
@@ -109,7 +109,7 @@ class PersonController(object):
         return PersonResponse.create(result, embeds=False, links=False), 200
 
     @jwt_only
-    @frontdesk_only
+    @cashier_only
     @jsoned
     def register_employee(self, employer_id):
         data = request.get_json()
@@ -266,7 +266,10 @@ class SpeakerController(object):
     @jsoned
     def create(self):
         data = request.get_json()
-        speaker = self.speakers.create(by_user=self.current_user, **data)
+        printer = data.pop('printer') or abort(400)
+        ticket = data.pop('ticket') or abort(400)
+
+        speaker = self.speakers.create(ticket=ticket, printer=printer, by_user=self.current_user, **data)
         return PersonResponse.create(speaker), 200
 
 
