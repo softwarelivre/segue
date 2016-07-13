@@ -141,6 +141,15 @@ class PersonController(object):
         result = self.people.pay(person_id, by_user=self.current_user, ip_address=request.remote_addr, **data)
         return {}, 200
 
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
+    def make_donation_payment(self, person_id):
+        data = request.get_json()
+        result = self.people.pay(person_id, by_user=self.current_user, ip_address=request.remote_addr, **data)
+        return {}, 200
+
     @jwt_only
     @frontdesk_only
     @jsoned
