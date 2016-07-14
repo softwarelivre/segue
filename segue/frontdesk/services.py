@@ -83,13 +83,14 @@ class BadgeService(object):
         db.session.commit()
         return True
 
-    def make_badge(self, printer, visitor_or_person, copies=1, by_user=None):
+    def make_badge(self, printer, visitor_or_person, organization=None, copies=1, by_user=None):
         if not visitor_or_person.can_print_badge: raise CannotPrintBadge()
         if printer not in self.printers: raise InvalidPrinter()
         badge = Badge.create(visitor_or_person)
         badge.printer = printer
         badge.issuer  = by_user
         badge.copies  = copies
+        if organization: badge.organization = organization
         badge.job_id  = self.printers[printer].print_badge(badge).id
         db.session.add(badge)
         db.session.commit()
