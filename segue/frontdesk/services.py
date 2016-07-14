@@ -116,11 +116,11 @@ class SpeakerService(object):
         product = self.products.chepest_available_for(ticket)
         account = self.accounts.create_people(data)
         purchase = self.purchases.give_ticket(account, product, commit=False)
-
-
         db.session.add(account)
         db.session.add(purchase)
         db.session.commit()
+
+        logger.info('SpeakerService.create  name={} email={} type={} by={}'.format(account.name,account.email,product.category,by_user))
 
         people = self.peoples.get_one(purchase.id, by_user=None, check_ownership=False, strict=True)
         self.badges.make_badge(printer, people)
