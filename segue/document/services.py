@@ -8,7 +8,7 @@ from subprocess import Popen, PIPE
 from xml.sax.saxutils import escape
 
 from segue.core import config, logger
-from segue.document.errors import DocumentNotFound, InvalidDocument, DocumentSaveFailed
+from segue.document.errors import *
 
 class DocumentService(object):
 
