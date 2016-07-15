@@ -302,7 +302,6 @@ class ReportController(object):
         self.current_user = current_user
 
     @jwt_only
-    @cashier_only
     @jsoned
     def get_report(self, date=None):
         date = datetime.strptime(date,DATE_FORMAT) if date else datetime.now()
