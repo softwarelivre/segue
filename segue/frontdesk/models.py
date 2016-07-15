@@ -269,7 +269,7 @@ class Person(object):
 
         for product in Product.query.filter(Product.category=='donation').order_by(Product.price).all():
             try:
-                if not product.can_pay_cash and product.sold_until > datetime.now():
+                if product.sold_until > datetime.now():
                     continue
                 elif product.check_eligibility({}, self.purchase.customer):
                     products.append(product)
