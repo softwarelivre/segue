@@ -28,14 +28,16 @@ class CertificateController(object):
     @jwt_only
     @jsoned
     def issue(self, account_id):
+        #ticket_id == person.id == purchase.id OMG!!!
         if self.current_user.id != account_id: flask.abort(403)
         descriptor = request.get_json().get('descriptor', None) or flask.abort(400)
-        kind = descriptor.split("-")[0]
+        ticket_id  = request.get_json().get('ticket_id', None) or flask.abort(400)
 
+        kind = descriptor.split("-")[0]
         payload = dict(language=self.current_user.guessed_language)
         if kind == 'speaker':
             payload['talk'] = self.proposals.get_one(descriptor.split("-")[1], strict=True)
 
-        result = self.service.issue_certificate(self.current_user, kind, **payload)
+        result = self.service.issue_certificate(self.current_user, ticket_id, kind, **payload)
 
         return CertificateResponse.create(result), 200

@@ -54,7 +54,7 @@ class Certificate(db.Model):
 
     @property
     def url(self):
-        return "{}/{}".format(config.CERTIFICATES_URL, self.hash_code)
+        return '{}/api/documents/certificate-{}.svg'.format(config.CERTIFICATES_URL, self.hash_code)
 
     @property
     def descriptor(self):
@@ -73,6 +73,13 @@ class VolunteerCertificate(Certificate):
     @property
     def template_file(self):
         return 'certificate/templates/volunteer.svg'
+
+class PressCertificate(Certificate):
+    __mapper_args__ = { 'polymorphic_identity': 'press' }
+
+    @property
+    def template_file(self):
+        return 'certificate/templates/press.svg'
 
 class SpeakerCertificate(Certificate):
     __mapper_args__ = { 'polymorphic_identity': 'speaker' }
