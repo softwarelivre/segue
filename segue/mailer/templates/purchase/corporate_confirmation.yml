@@ -7,7 +7,7 @@ subject: "#FISL17 - confirmação de pagamento"
 body: |
     Prezad@ {corporate.incharge_name} da Empresa {customer.name},
 
-    Recebemos seu pagamento e abaixo segue(m) o(s) corporativo(s) para cadastro da(s) pessoa(s) que participarão do FISL17.
+    Recebemos seu pagamento e abaixo segue(m) o(s) código(s) corporativo(s) para cadastro da(s) pessoa(s) que participarão do FISL17.
 
     {hash_codes}
 
