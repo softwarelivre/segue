@@ -3,7 +3,7 @@ from datetime import datetime
 from segue.factory import Factory
 from segue.hasher import Hasher
 
-from models import Certificate, AttendantCertificate, SpeakerCertificate, VolunteerCertificate
+from models import Certificate, AttendantCertificate, SpeakerCertificate, VolunteerCertificate, PressCertificate
 
 class CertificateFactory(Factory):
     model = Certificate
@@ -11,10 +11,10 @@ class CertificateFactory(Factory):
     def __init__(self, hasher=None):
         self.hasher = hasher or Hasher(10)
 
-    def create(self, account, language, target_model=Certificate):
+    def create(self, account, ticket, language, target_model=Certificate):
         entity = target_model()
         entity.account    = account
-        entity.ticket     = account.identifier_purchase
+        entity.ticket     = ticket
         entity.name       = account.certificate_name
         entity.language   = language
         entity.hash_code  = self.hasher.generate()
@@ -24,20 +24,26 @@ class CertificateFactory(Factory):
 class AttendantCertificateFactory(CertificateFactory):
     model = AttendantCertificate
 
-    def create(self, account, language='pt', **payload):
-        return super(AttendantCertificateFactory, self).create(account, language, target_model=AttendantCertificate)
+    def create(self, account, ticket, language='pt', **payload):
+        return super(AttendantCertificateFactory, self).create(account, ticket, language, target_model=AttendantCertificate)
 
 class VolunteerCertificateFactory(CertificateFactory):
     model = VolunteerCertificate
 
-    def create(self, account, language='pt', **payload):
-        return super(VolunteerCertificateFactory, self).create(account, language, target_model=VolunteerCertificate)
+    def create(self, account, ticket, language='pt', **payload):
+        return super(VolunteerCertificateFactory, self).create(account, ticket, language, target_model=VolunteerCertificate)
+
+class PressCertificateFactory(CertificateFactory):
+    model = PressCertificate
+
+    def create(self, account, ticket, language='pt', **payload):
+        return super(PressCertificateFactory, self).create(account, ticket, language, target_model=PressCertificate)
 
 class SpeakerCertificateFactory(CertificateFactory):
     model = SpeakerCertificate
 
-    def create(self, account, language='pt', talk=None):
+    def create(self, account, ticket, language='pt', talk=None):
         if not talk: raise ArgumentError()
-        entity = super(SpeakerCertificateFactory, self).create(account, language, target_model=SpeakerCertificate)
+        entity = super(SpeakerCertificateFactory, self).create(account, ticket, language, target_model=SpeakerCertificate)
         entity.talk = talk
         return entity
