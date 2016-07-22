@@ -11,7 +11,7 @@ from judge.models import Judge, Match, Tournament
 from schedule.models import Room, Slot, Notification, CallNotification, SlotNotification, Recording
 from frontdesk.models import Badge
 from corporate.models import Corporate, EmployeeAccount, CorporatePurchase, EmployeePurchase
-from certificate.models import Certificate, AttendantCertificate
+from certificate.models import Certificate, AttendantCertificate,PressCertificate
 from survey.models import SurveyAnswer
 
 __all__ = [
