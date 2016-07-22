@@ -526,6 +526,9 @@ class AdempiereService(object):
             #FORMAT THE STUFFF
             purchase_discount = '0'
             purchase_category = self._get_category(purchase.product.category)
+            from segue.purchase.factories import BuyerFactory
+            if not buyer:
+                buyer = BuyerFactory().from_account(account)
 
             buyer_type = 'nulo'
             buyer_name = buyer.name
@@ -577,7 +580,8 @@ class AdempiereService(object):
             data['purchase_description'] = self._get_description(purchase_category,
                                                                  self._get_payment_type(payments[0]),
                                                                  purchase.qty,
-                                                                 purchase.id)
+                                                                 purchase.id,
+                                                                 transaction_date)
 
             dataset.append(data)
 
@@ -628,12 +632,13 @@ class AdempiereService(object):
             return ''
 
 
-    def _get_description(self, category, payment_type, quantity, number):
+    def _get_description(self, category, payment_type, quantity, number, transaction_date):
         first_paragraph = '{:0>2d} inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(quantity, category)
         second_paragraph = 'Inscrição nº {}. * * *'.format(number)
         third_paragraph = ' {} * * *. A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'.format(payment_type)
         forth_paragraph = 'Tributos: ISS 5% + COFINS 7,6% = 12,6%.'
-        text = first_paragraph + second_paragraph + third_paragraph + forth_paragraph
+        fifth_paragraph = ' * * *. Recebido em: {}'.format(transaction_date.strftime('%d-%m-%Y'))
+        text = first_paragraph + second_paragraph + third_paragraph + forth_paragraph + fifth_paragraph
         return text
 
     def _get_transition_date(self, payment):
