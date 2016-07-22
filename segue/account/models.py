@@ -163,6 +163,10 @@ class Account(JsonSerializable, db.Model):
         return self.purchases[-1]
 
     @property
+    def satisfied_purchases(self):
+        return [p for p in self.purchases if p.satisfied]
+
+    @property
     def guessed_language(self):
         if self.is_brazilian: return 'pt'
         elif self.is_spanish_speaking: return 'es'
