@@ -54,7 +54,7 @@ class Certificate(db.Model):
 
     @property
     def url(self):
-        return '{}/api/documents/certificate-{}.svg'.format(config.CERTIFICATES_URL, self.hash_code)
+        return '{}/api/documents/certificate-{}.pdf'.format(config.CERTIFICATES_URL, self.hash_code)
 
     @property
     def descriptor(self):
