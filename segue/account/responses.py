@@ -8,6 +8,8 @@ class AccountResponse(AccountSchema):
     #TODO REMOVE THIS HACK
     incharge = Field.str()
 
+    certificate_name = Field.str()
+
     class Meta:
         exclude = ('password',)
 
