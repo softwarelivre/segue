@@ -11,6 +11,8 @@ class CertificateService(object):
     VALID_CATEGORIES = (
         'normal',
         'student',
+        'promocde',
+        'foreigner',
         'gov-promocode',
         'corporate-promocode',
         'caravan',
