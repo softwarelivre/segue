@@ -80,7 +80,7 @@ class DocumentService(object):
             for key, value in variables.items():
                 content = content.replace("%%{}%%".format(key), escape(value))
 
-        file_name = "{}-{}.svg".format(kind, hash_code)
+        file_name = "{}-{}.pdf".format(kind, hash_code)
         temp_path = os.path.join(self.tmp_dir, file_name)
         with codecs.open(temp_path, "wb", "utf8") as temp_file:
             temp_file.write(content)
