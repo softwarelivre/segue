@@ -99,9 +99,11 @@ class ProposalInvite(JsonSerializable, db.Model):
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
 
     account = db.relation('Account', uselist=False,
-        backref=db.backref('proposal_invites', uselist=True),
+        backref=db.backref('proposal_invites', uselist=True, cascade='save-update'),
         primaryjoin='Account.email == ProposalInvite.recipient',
-        foreign_keys='Account.email')
+        foreign_keys='Account.email',
+        cascade='save-update'
+    )
 
     def __repr__(self):
         return "<PropInvite({},{},{})>".format(self.proposal_id, self.recipient, self.status)
@@ -179,4 +181,3 @@ class NonSelectionNotice(db.Model):
         # logger.debug('-- earliest submission was %s', earliest_proposal.created)
 
         return was_not_accepted, earliest_proposal
-
