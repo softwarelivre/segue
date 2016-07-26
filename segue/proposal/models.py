@@ -99,10 +99,11 @@ class ProposalInvite(JsonSerializable, db.Model):
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
 
     account = db.relation('Account', uselist=False,
-        backref=db.backref('proposal_invites', uselist=True, cascade='save-update'),
+        backref=db.backref('proposal_invites', uselist=True, cascade=''),
         primaryjoin='Account.email == ProposalInvite.recipient',
         foreign_keys='Account.email',
-        cascade='save-update'
+        cascade='',
+        cascade_backrefs=False,
     )
 
     def __repr__(self):
