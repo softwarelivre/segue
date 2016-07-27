@@ -34,6 +34,7 @@ class TalkShortResponse(BaseResponse):
         self.id    = talk.id
         self.title = talk.title
         self.owner = talk.owner.name
+        self.owner_email = talk.owner.email
         self.track = talk.track.name_pt
         self.last_updated = talk.last_updated
         self.coauthors = list(set([ x.name for x in talk.coauthors ]))
@@ -54,4 +55,3 @@ class NotificationResponse(BaseResponse):
             self.proposal = notification.slot.talk
         elif self.kind == 'call':
             self.proposal = notification.proposal
-
