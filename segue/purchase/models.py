@@ -183,7 +183,7 @@ class StudentPurchase(Purchase):
 
     def recalculate_status(self):
         if self.outstanding_amount == 0:
-            if self.buyer.extra_document or self.had_paid_with_cash():
+            if self._has_student_voucher() or self.had_paid_with_cash():
                 self.status = 'paid'
             else:
                 self.status = 'student_document_in_analysis'
@@ -192,6 +192,9 @@ class StudentPurchase(Purchase):
         if self.status == 'student_document_in_analysis':
             self.status = 'paid'
         return self.status
+
+    def _has_student_voucher(self):
+        return self.buyer.extra_document or self.buyer.document_file_hash
 
 class DonationPurchase(Purchase):
     #TODO: IMPROVE THIS CLASS
