@@ -24,4 +24,5 @@ class InviteFactory(Factory):
         invite.name = account.name
         invite.status = status
         invite.proposal = proposal
-        return invite;
+        invite.account = account
+        return invite
