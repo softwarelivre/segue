@@ -220,10 +220,12 @@ class InviteService(object):
         invite = self.get_by_hash(hash_code)
         if not invite:
             return None
-        if self.accounts.is_email_registered(invite.recipient):
-            if not by or by.email != invite.recipient:
-                raise NotAuthorized
+        #TODO: REMOVE THIS CONSTRAINT, ONLY CHECK THE HASH
+        #if self.accounts.is_email_registered(invite.recipient):
+        #    if not by or by.email != invite.recipient:
+        #        raise NotAuthorized
 
+        invite.account  = by
         invite.status = 'accepted' if accepted else 'declined'
         db.session.add(invite)
         db.session.commit()
@@ -266,6 +268,3 @@ class InviteService(object):
         db.session.commit()
 
         return proposal
-
-
-
