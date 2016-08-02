@@ -4,7 +4,7 @@ class ProposalInviteResponse(BaseResponse):
     def __init__(self, invite, links=False):
         super(ProposalInviteResponse, self).__init__()
         self.id         = invite.id
-        self.account_id = invite.account.id if invite.account else None
+        self.account_id = invite.account_id
         self.name       = invite.name
         self.email      = invite.recipient
         self.status     = invite.status

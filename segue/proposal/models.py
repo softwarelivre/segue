@@ -97,14 +97,9 @@ class ProposalInvite(JsonSerializable, db.Model):
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
+    account_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
 
-    account = db.relation('Account', uselist=False,
-        backref=db.backref('proposal_invites', uselist=True, cascade=''),
-        primaryjoin='Account.email == ProposalInvite.recipient',
-        foreign_keys='Account.email',
-        cascade='',
-        cascade_backrefs=False,
-    )
+    account      = db.relationship('Account')
 
     def __repr__(self):
         return "<PropInvite({},{},{})>".format(self.proposal_id, self.recipient, self.status)
