@@ -37,7 +37,7 @@ class AdminAccountController(object):
     def modify(self, account_id):
         data = request.get_json()
         result = self.accounts.modify(account_id, data, by=self.current_user, allow_email_change=True) or flask.abort(404)
-        return result, 200
+        return Response(result, AccountDetail).create(), 200
 
     @jsoned
     @jwt_only
