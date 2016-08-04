@@ -82,7 +82,7 @@ class AccountService(object):
         if not self.check_ownership(account, by): raise NotAuthorized
         #TODO: IMPROVE RULE SELECTION
         rule = 'edit_account'
-        if account.role.has_role('corporate'):
+        if account.has_role('corporate'):
             rule = 'edit_corporate'
 
         if allow_email_change:
