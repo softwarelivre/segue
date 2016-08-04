@@ -27,11 +27,11 @@ class BuyerFactory(Factory):
     def from_account(self, account):
         buyer = Buyer()
         #TODO: CHECK BUYER KIND
-        if account.role == 'user':
+        if account.has_role('user'):
             buyer.kind = 'person'
-        elif account.role == 'corporate':
+        elif account.has_role('corporate'):
             buyer.kind = 'company'
-        elif account.role == 'foreign':
+        elif account.has_role('foreign'):
             buyer.kind = 'foreign'
 
         buyer.name                 = account.name

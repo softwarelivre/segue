@@ -1,10 +1,14 @@
 from segue.schema import Field
-from schema import AccountSchema
+from schema import AccountSchema, RoleSchema
+
 
 class AccountResponse(AccountSchema):
 
-    has_valid_purchases = Field.bool()
+    #TODO: REMOVE ROLE
+    role = Field.str()
+    roles = Field.nested(RoleSchema, many=True)
 
+    has_valid_purchases = Field.bool()
     #TODO REMOVE THIS HACK
     incharge = Field.str()
 

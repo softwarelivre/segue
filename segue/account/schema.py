@@ -9,17 +9,19 @@ from segue.errors import FieldError
 from segue.schema import BaseSchema, Field, Validator
 from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
 
-
-ACCOUNT_ROLES = [ "user","operator","admin","employee","cashier", "corporate", "foreign"]
 CPF_PATTERN = "^\d{3}.?\d{3}.?\d{3}-?\d{2}$"
 NAME_PATTERN = r"(.*)\s(.*)"
 DISABILITY_TYPES = ["none","hearing","mental","physical","visual"]
 
 
+class RoleSchema(BaseSchema):
+    class Meta:
+        fields = ('name',)
+
 class AccountSchema(BaseSchema):
 
         id = Field.int(dump_only=True)
-        role = Field.str(dump_only=True)
+
         #TODO: REMOVE THIS HACK
         type = Field.str()
         # TODO: REMOVE THIS HACK
@@ -178,11 +180,13 @@ class EditAccountSchema(AccountSchema):
 class AccountTokenSchema(BaseSchema):
     type = Field.str(dump_only=True, default='Account.token')
 
+    roles = Field.nested(RoleSchema, many=True)
+
     def serialize(self, account):
         return self.dump(account).data
 
     class Meta:
-        fields = ('id', 'name', 'email', 'role', 'roles', 'dirty')
+        fields = ('id', 'name', 'email', 'dirty', 'roles')
 
 #TODO: CREATE A SCHEMA
 reset = {
