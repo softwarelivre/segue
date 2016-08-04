@@ -99,7 +99,7 @@ class ProposalInvite(JsonSerializable, db.Model):
     status       = db.Column(db.Enum('pending','accepted','declined', 'cancelled', name='invite_statuses'),default='pending')
     account_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
 
-    account      = db.relationship('Account')
+    account      = db.relationship('Account', backref='proposal_invites')
 
     def __repr__(self):
         return "<PropInvite({},{},{})>".format(self.proposal_id, self.recipient, self.status)
