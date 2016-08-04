@@ -4,8 +4,6 @@ from schema import AccountSchema, RoleSchema
 
 class AccountResponse(AccountSchema):
 
-    #TODO: REMOVE ROLE
-    role = Field.str()
     roles = Field.nested(RoleSchema, many=True)
 
     has_valid_purchases = Field.bool()
