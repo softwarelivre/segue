@@ -1,5 +1,5 @@
 from segue.schema import Field, BaseSchema
-from segue.account.schema import AccountSchema
+from segue.account.schema import AccountSchema, RoleSchema
 from segue.purchase.schema import BuyerSchema
 from segue.product.schema import ProductSchema
 from marshmallow import fields
@@ -13,6 +13,7 @@ class PurchasePersonIdentifier(BaseSchema):
 
 class AccountDetail(AccountSchema):
 
+    roles = fields.Nested(RoleSchema, many=True)
     has_valid_purchases = Field.bool()
     identifier = fields.Nested(PurchasePersonIdentifier, attribute='identifier_purchase')
 
