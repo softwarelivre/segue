@@ -15,7 +15,7 @@ class FilterStrategies(object):
             if criterium is None: continue
             filters.append(criterium)
 
-        if as_user and as_user.role != 'admin':
+        if as_user and as_user.has_role('admin'):
             universe.append(self.enforce_user(as_user))
 
         universe.append(or_(*filters))
@@ -27,7 +27,7 @@ class FilterStrategies(object):
         for key, value in criteria.items():
             method = getattr(self, "by_"+key)
             result.append(method(value, as_user=as_user))
-        if as_user and as_user.role != 'admin':
+        if as_user and as_user.has_role('admin'):
             result.append(self.enforce_user(as_user))
         return result
 

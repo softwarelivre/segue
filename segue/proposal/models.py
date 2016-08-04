@@ -47,7 +47,7 @@ class Proposal(JsonSerializable, db.Model):
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
         if self.owner.id == alleged.id: return True
-        if alleged.role == 'admin': return True
+        if alleged.has_role('admin'): return True
         return False
 
     def __repr__(self):
