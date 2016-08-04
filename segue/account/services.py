@@ -77,22 +77,12 @@ class AccountService(object):
     def _get_account(self, id):
         return Account.query.get(id)
 
-    def migrate_role(self, account_id, new_role):
-        account = self.get_one(account_id, strict=True, check_ownership=False)
-        account.role = new_role
-        db.session.add(account)
-        db.session.commit()
-        db.session.expunge(account)
-        db.session.close()
-
-        return self.get_one(account_id, strict=True, check_ownership=False)
-
     def modify(self, account_id, data, by=None, allow_email_change=False):
         account = self._get_account(account_id)
         if not self.check_ownership(account, by): raise NotAuthorized
         #TODO: IMPROVE RULE SELECTION
         rule = 'edit_account'
-        if account.role == 'corporate':
+        if account.role.has_role('corporate'):
             rule = 'edit_corporate'
 
         if allow_email_change:
@@ -135,7 +125,7 @@ class AccountService(object):
         incharge = data.get('incharge', '')
 
         account = AccountFactory.from_json(data, schema.whitelist[rules])
-        account.role = role
+        account.grant_role(role, commit=False)
 
         if not account.document: raise DocumentIsNotDefined()
         if not account.password: account.password = self.hasher.generate()
@@ -165,7 +155,7 @@ class AccountService(object):
             account = Account.query.filter(Account.email == email).one()
             if account.password != password:
                 raise InvalidLogin()
-            if acceptable_roles and account.role not in acceptable_roles:
+            if acceptable_roles and account.has_role(acceptable_roles):
                 raise InvalidLogin()
             return self.signer.sign(account)
         except NoResultFound:
@@ -216,16 +206,15 @@ class AccountService(object):
         incharge = data.get('incharge', '')
 
         account = AccountFactory.from_json(data, PeopleSchema())
-        account.role = role
+        account.role.grant_role(role, commit=False)
 
         if not account.document: raise DocumentIsNotDefined()
         if not account.password: account.password = self.hasher.generate()
 
         #TODO: HACK
         new_account = self._create_or_update(account)
-        if new_account.role == 'corporate':
+        if new_account.has_role('corporate'):
             from segue.corporate.services import CorporateService
             CorporateService().create_corporate(new_account, incharge)
 
         return new_account
-
