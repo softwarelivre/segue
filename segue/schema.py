@@ -98,6 +98,10 @@ class Field(object):
         return fields.Raw(*args, **kwargs)
 
     @staticmethod
+    def nested(*args, **kwargs):
+        return fields.Nested(*args, **kwargs)
+
+    @staticmethod
     def create(cls, *args, **kwargs):
 
         msgs = Field.DEFAULT_MSGS.copy()
