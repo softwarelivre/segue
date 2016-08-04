@@ -141,7 +141,6 @@ class ValidProductFactory(SegueFactory):
     sold_until  = FuzzyNaiveDateTime(datetime.now(), datetime(2025,12,1,0,0,0))
     public      = True
     price       = FuzzyDecimal(70, 400, 2)
-    payment_days = FuzzyInteger(1, 50)
     description = "ingresso fisl16 - lote 1 - muggles"
 
 class ValidCaravanProductFactory(ValidProductFactory):
@@ -309,4 +308,3 @@ class ValidCertificateFactory(SegueFactory):
 class ValidAttendantCertificateFactory(ValidCertificateFactory):
     class Meta:
         model = AttendantCertificate
-
