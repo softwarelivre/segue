@@ -26,6 +26,7 @@ from .product import AdminProductController
 from .proposal import AdminProposalController
 from .judge import AdminJudgeController
 from .schedule import AdminScheduleController
+from .caravan import AdminCaravanController, AdminCaravanInviteController
 from promocode import AdminPromoCodeController
 
 class AdminController(object):
@@ -65,4 +66,3 @@ class AdminController(object):
     def list_call_notification_by_status(self, status):
         result = self.notifications.list_by_status('call', status)
         return CallNotificationResponse.create(result), 200
-

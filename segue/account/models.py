@@ -193,6 +193,10 @@ class Account(JsonSerializable, db.Model):
         return payments
 
     @property
+    def valid_purchases(self):
+        return [p for p in self.purchases if p.satisfied]
+
+    @property
     def has_valid_purchases(self):
         return any([ p.satisfied for p in self.purchases ])
 
@@ -262,12 +266,9 @@ class Account(JsonSerializable, db.Model):
                     db.session.commit()
 
     @property
-    def can_start_a_caravan(self):
-        for pur in self.purchases:
-            #TODO: CHECK PURCHASE STATUS
-            if pur.category != 'donation':
-                return False
-        return True
+    def has_valid_ticket(self):
+        return any([p for p in self.purchases if p.satisfied and not p.category.is_ticket])
+
 
     #TODO: HACK REMOVE LOOK IN RESPONSES
     @property

@@ -78,6 +78,10 @@ class Purchase(JsonSerializable, db.Model):
         return self.product.category
 
     @property
+    def is_ticket(self):
+        return self.product.category != 'donation'
+
+    @property
     def badge_name(self):
         if not self.customer: return ''
         return self.customer.badge_name or self._make_badge_name(self.customer.name) or ''
