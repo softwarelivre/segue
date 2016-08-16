@@ -25,7 +25,8 @@ class CaravanController(object):
     @jsoned
     def modify(self, caravan_id):
         data = request.get_json()
-        result = self.service.modify(caravan_id, data, by=self.current_user) or flask.abort(404)
+        owner = self.current_user
+        result = self.service.modify(caravan_id, data, owner, by=owner) or flask.abort(404)
         return result, 200
 
     @jwt_only

@@ -19,8 +19,13 @@ class Response(object):
             result = self.schema(many=True).dump(self.data).data
             return {'count': len(result), 'items': result}
         elif isinstance(self.data, Pagination):
-            #TODO: IMPLEMENT PAGINATION
-            return {}
+            result = self.schema(many=True).dump(self.data.items).data
+            return {
+                'items': result, 
+                'total': self.data.total, 
+                'page':  self.data.page, 
+                'per_page': self.data.per_page
+            }
         else:
             raise ValueError("Invalid data type")
 

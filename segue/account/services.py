@@ -75,6 +75,7 @@ class AccountService(object):
         return account
 
     def _get_account(self, id):
+        if not isinstance(id, int): return None
         return Account.query.get(id)
 
     def modify(self, account_id, data, by=None, allow_email_change=False):

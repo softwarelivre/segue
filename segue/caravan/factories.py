@@ -18,6 +18,7 @@ class CaravanLeaderPurchaseFactory(Factory):
 
     @classmethod
     def create(cls, caravan):
+        #TODO: CHECK IF PRODUCT EXISTS
         result = cls.model()
         result.product  = CaravanLeaderProduct.query.first()
         result.caravan  = caravan

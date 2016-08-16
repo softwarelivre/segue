@@ -1,4 +1,5 @@
 env
+venv
 .*.sw?
 .vagrant
 *.pyc
@@ -17,5 +18,6 @@ states.cache
 .DS_*
 TODO
 *.csv
-.idea
 segue/certificate/templates/*.svg
+.remote-sync.json
+.idea
