@@ -150,11 +150,11 @@ class PaymentServiceTestCases(SegueApiTestCase):
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
         mockito.when(self.mailer).notify_payment(purchase, payment)
 
-        result = self.service.notify(purchase.id, payment.id, payload)
+        purchase, transition = self.service.notify(purchase.id, payment.id, payload)
 
-        self.assertEquals(result[0].status, 'paid')
+        self.assertTrue(purchase.satisfied)
         self.assertEquals(payment.status, 'paid')
-        mockito.verify(self.mailer).notify_payment(purchase, payment)
+        mockito.verify(self.mailer).notify_payment(purchase)
         mockito.verifyZeroInteractions(self.caravans)
 
     def test_notification_that_pays_the_balance_of_a_caravan_rider_purchase(self):
