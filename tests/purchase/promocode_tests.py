@@ -5,6 +5,7 @@ from segue.purchase.promocode import PromoCodeService
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
+from click.testing import Result
 
 class PromoCodeServiceTestCase(SegueApiTestCase):
     def setUp(self):
@@ -52,6 +53,24 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
         result = self.service.lookup(criteria=dict(hash_code="amigo"))
         self.assertEqual(pagination.total, 1)
         self.assertEqual(pagination.items[0], pc1)
+
+    def test_must_not_return_a_promocode_out_of_the_valid_date(self):
+        start_at = date.today() - timedelta(days=7)
+        end_at = date.today() - timedelta(days=5)
+        
+        pc = self.create(ValidPromoCodeFactory, start_at=start_at, end_at=end_at)
+        
+        result = self.service.check(pc.hash_code)
+        self.assertIsNone(result)
+    
+    def test_must_return_a_promocode_valid_per_one_day(self):
+        start_at = date.today()
+        end_at = date.today()
+        
+        pc = self.create(ValidPromoCodeFactory, start_at=start_at, end_at=end_at)
+        
+        result = self.service.check(pc.hash_code)
+        self.assertIsNotNone(result)
 
 
     def test_check(self):
