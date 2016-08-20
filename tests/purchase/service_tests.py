@@ -197,11 +197,6 @@ class PaymentServiceTestCases(SegueApiTestCase):
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
 
-        print product.price
-        print purchase.amount
-        print payment.amount
-
-
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
 
         result = self.service.notify(purchase.id, payment.id, payload)
