@@ -80,7 +80,8 @@ class PurchaseServiceTestCases(SegueApiTestCase):
     def test_cannot_create_a_payment_for_purchase_of_an_expired_product(self):
         yesterday = datetime.now() - timedelta(days=1)
         product = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
-        purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
+        
+        purchase = self.create_from_factory(ValidPurchaseFactory, product=product, due_date=product.sold_until)
 
         with self.assertRaises(ProductExpired):
             self.service.create_payment(purchase.id, 'dummy', {}, by=purchase.customer)
