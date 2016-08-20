@@ -49,7 +49,6 @@ class ValidAccountFactory(SegueFactory):
 
     email    = _Sequence('email_{0}@example.com')
     name     = _Sequence('Joaozinho {0}')
-    role     = "user"
     password = "password"
     document     = _Sequence('123.456.789-2{0}')
     country      = "Brazil"
