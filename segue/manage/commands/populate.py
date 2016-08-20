@@ -75,7 +75,7 @@ def populate_reference_data(clean=False):
 
     if not Track.query.all():   db.session.add_all(tracks)
     if not Product.query.all(): db.session.add_all(products)
-    if not Roles.query.all(): db.session.add_all(roles)
+    if not Role.query.all(): db.session.add_all(roles)
 
     db.session.commit()
     return tracks, products
@@ -196,6 +196,7 @@ def _build_roles():
         role = Role()
         role.name = name
         role.description = description
+        return role
 
     roles = []
 
