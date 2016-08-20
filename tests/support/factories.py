@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import factory
 from factory import Sequence, LazyAttribute, SubFactory
@@ -9,6 +9,7 @@ from segue.core import db
 from segue.models import *
 
 import logging
+from cookielib import DAYS
 logger = logging.getLogger('factory')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
@@ -232,6 +233,8 @@ class ValidPromoCodeFactory(SegueFactory):
     product     = SubFactory(ValidProductFactory)
     hash_code   = _Sequence("C0FFE#{:04d}")
     description = _Sequence("code #{:04d}")
+    start_at    = FuzzyDate(date.today() - timedelta(days=7), date.today())
+    end_at      = FuzzyDate(date.today(), date.today() + timedelta(days=7))
 
 class ValidPromoCodePaymentFactory(ValidPaymentFactory):
     class Meta:
