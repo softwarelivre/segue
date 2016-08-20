@@ -166,6 +166,7 @@ class ValidBuyerFactory(SegueFactory):
     class Meta:
         model = Buyer
 
+    address_state   = 'RS'
     address_street  = "Rua dos Bobos"
     address_number  = _Sequence("#{0}")
     address_extra   = _Sequence("apto #{0}")
@@ -177,13 +178,13 @@ class ValidBuyerFactory(SegueFactory):
 class ValidBuyerCompanyFactory(ValidBuyerFactory):
     kind     = "company"
     name     = _Sequence("Empresa {0}")
-    document = _Sequence("12.345.789/0001-{0:02}")
+    document = "66716451000138"
     contact  = _Sequence("+55 23 4000-{0:04}")
 
 class ValidBuyerPersonFactory(ValidBuyerFactory):
     kind     = 'person'
     name     = _Sequence("Pagador {0}")
-    document = _Sequence("123.345.789-{0:02}")
+    document = "59961743750"
     contact  = _Sequence("+55 23 4567-{0:04}")
 
 class ValidPurchaseFactory(SegueFactory):
