@@ -2,6 +2,7 @@ from flask import request, abort
 from flask.ext.jwt import current_user
 from webargs.flaskparser import parser, use_args
 
+from segue.helpers import search_args
 from segue.responses import Response
 from segue.schema import Field
 from segue.decorators import jsoned, admin_only, jwt_only
@@ -23,17 +24,14 @@ class AdminCaravanController(object):
     @jsoned
     @jwt_only
     @admin_only
-    def list_caravans(self):
-        args = parser.parse({
-            'page': Field.int(missing=1),
-            'per_page':  Field.int(missing=25)
-        }, request)
+    @use_args(search_args)
+    def list_caravans(self, args):
         criteria = parser.parse({
             'caravan_name': Field.str(),
             'owner_name': Field.str()
         }, request)
-
-        result = self.caravans.lookup(criteria=criteria, page=args['page'], per_page=args['per_page'])
+        
+        result = self.caravans.lookup(criteria, page=args['page'], per_page=args['per_page'])
 
         return Response(result, CaravanListResponse).create(), 200
 

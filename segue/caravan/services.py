@@ -55,7 +55,7 @@ class CaravanService(object):
         db.session.commit()
         return caravan
 
-    def lookup(self, criteria=None, page=None, per_page=None):
+    def lookup(self, criteria, page=None, per_page=None):
         query = Caravan.query
         query = self.filters.joins_for(Caravan.query, **criteria)
         filter_list = self.filters.given_criteria(**criteria)
