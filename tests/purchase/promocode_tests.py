@@ -5,6 +5,7 @@ from segue.purchase.promocode import PromoCodeService
 
 from ..support import SegueApiTestCase, hashie
 from ..support.factories import *
+from click.testing import Result
 
 class PromoCodeServiceTestCase(SegueApiTestCase):
     def setUp(self):
@@ -13,10 +14,11 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
         self.service = PromoCodeService(hasher=self.mock_hasher)
 
     def test_calculates_paid_amount(self):
+        product_price = 100
         promo = self.create(ValidPromoCodeFactory, hash_code="DEFG5678", discount=0.2)
 
-        product = self.create(ValidProductFactory, price=100)
-        purchase = self.create(ValidPurchaseFactory, product=product)
+        product = self.create(ValidProductFactory, price=product_price)
+        purchase = self.create(ValidPurchaseFactory, product=product, amount=product_price)
         payment = self.create(ValidPromoCodePaymentFactory, purchase=purchase, promocode=promo)
 
         self.assertEqual(payment.paid_amount, 20)
@@ -44,13 +46,31 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
         pc1 = self.create(ValidPromoCodeFactory, hash_code="ABCD1234", description="amigo do rei")
         pc2 = self.create(ValidPromoCodeFactory, hash_code="DEFG5678", payment=payment)
 
-        result = self.service.lookup(q="ABCD")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0], pc1)
+        pagination = self.service.lookup(criteria=dict(hash_code="ABCD"))
+        self.assertEqual(pagination.total, 1)
+        self.assertEqual(pagination.items[0], pc1)
 
-        result = self.service.lookup(q="amigo")
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0], pc1)
+        result = self.service.lookup(criteria=dict(hash_code="amigo"))
+        self.assertEqual(pagination.total, 1)
+        self.assertEqual(pagination.items[0], pc1)
+
+    def test_must_not_return_a_promocode_out_of_the_valid_date(self):
+        start_at = date.today() - timedelta(days=7)
+        end_at = date.today() - timedelta(days=5)
+        
+        pc = self.create(ValidPromoCodeFactory, start_at=start_at, end_at=end_at)
+        
+        result = self.service.check(pc.hash_code)
+        self.assertIsNone(result)
+    
+    def test_must_return_a_promocode_valid_per_one_day(self):
+        start_at = date.today()
+        end_at = date.today()
+        
+        pc = self.create(ValidPromoCodeFactory, start_at=start_at, end_at=end_at)
+        
+        result = self.service.check(pc.hash_code)
+        self.assertIsNotNone(result)
 
 
     def test_check(self):
@@ -74,7 +94,7 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
 
         mockito.when(self.mock_hasher).generate().thenReturn('A').thenReturn('B').thenReturn('C')
 
-        result = self.service.create(product, "empresa x", creator, 70, 3)
+        result = self.service.create(product, "empresa x", creator=creator, discount=70, quantity=3)
 
         self.assertEqual(len(result), 3)
 

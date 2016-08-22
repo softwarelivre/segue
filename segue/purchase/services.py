@@ -408,6 +408,7 @@ class PaymentService(object):
         logger.debug('attempting to exempt the leader of a caravan')
         #TODO: FIX ME
         caravan = Caravan.query.filter(Caravan.id==purchase.caravan_id).first()
+        self.mailer.notify_payment(purchase)
         self.caravans.update_leader_exemption(caravan.id, caravan.owner)
 
     def processor_for(self, method):

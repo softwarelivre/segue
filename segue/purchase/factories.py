@@ -47,13 +47,15 @@ class BuyerFactory(Factory):
         buyer.address_zipcode      = account.address_zipcode
 
         return buyer
+
     @classmethod
     def clean_for_insert(cls, data):
         data.pop('document_file', None)
         cpf = data.pop('cpf', None)
         cnpj = data.pop('cnpj', None)
         passport = data.pop('passport', None)
-        data['document'] = cpf or cnpj or passport
+        if not 'document' in data:
+            data['document'] = cpf or cnpj or passport
         return data
 
 class PurchaseFactory(Factory):

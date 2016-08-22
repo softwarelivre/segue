@@ -80,7 +80,8 @@ class PurchaseServiceTestCases(SegueApiTestCase):
     def test_cannot_create_a_payment_for_purchase_of_an_expired_product(self):
         yesterday = datetime.now() - timedelta(days=1)
         product = self.create_from_factory(ValidProductFactory, sold_until=yesterday)
-        purchase = self.create_from_factory(ValidPurchaseFactory, product=product)
+        
+        purchase = self.create_from_factory(ValidPurchaseFactory, product=product, due_date=product.sold_until)
 
         with self.assertRaises(ProductExpired):
             self.service.create_payment(purchase.id, 'dummy', {}, by=purchase.customer)
@@ -149,28 +150,28 @@ class PaymentServiceTestCases(SegueApiTestCase):
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
         mockito.when(self.mailer).notify_payment(purchase, payment)
 
-        result = self.service.notify(purchase.id, payment.id, payload)
+        purchase, transition = self.service.notify(purchase.id, payment.id, payload)
 
-        self.assertEquals(result[0].status, 'paid')
+        self.assertTrue(purchase.satisfied)
         self.assertEquals(payment.status, 'paid')
-        mockito.verify(self.mailer).notify_payment(purchase, payment)
+        mockito.verify(self.mailer).notify_payment(purchase)
         mockito.verifyZeroInteractions(self.caravans)
 
     def test_notification_that_pays_the_balance_of_a_caravan_rider_purchase(self):
         payload    = mockito.Mock()
         product    = self.create_from_factory(ValidProductFactory, price=200)
-        purchase   = self.create_from_factory(ValidCaravanPurchaseFactory, product=product)
-        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=200)
+        purchase   = self.create_from_factory(ValidCaravanPurchaseFactory, product=product, amount=product.price)
+        payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=product.price)
         transition = self.create_from_factory(ValidTransitionToPaidFactory, payment=payment)
 
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
         mockito.when(self.mailer).notify_payment(purchase, payment)
 
-        result = self.service.notify(purchase.id, payment.id, payload)
+        purchase, transition = self.service.notify(purchase.id, payment.id, payload)
 
-        self.assertEquals(result[0].status, 'paid')
+        self.assertTrue(purchase.satisfied)
         self.assertEquals(payment.status, 'paid')
-        mockito.verify(self.mailer).notify_payment(purchase, payment)
+        mockito.verify(self.mailer).notify_payment(purchase)
         mockito.verify(self.caravans).update_leader_exemption(purchase.caravan.id, purchase.caravan.owner)
 
     def test_notification_that_does_not_pay_the_balance_of_purchase(self):
@@ -195,11 +196,6 @@ class PaymentServiceTestCases(SegueApiTestCase):
         purchase   = self.create_from_factory(ValidPurchaseFactory, product=product, amount=200)
         payment    = self.create_from_factory(ValidPaymentFactory, type='dummy', purchase=purchase, amount=100)
         transition = self.create_from_factory(ValidTransitionToPendingFactory, payment=payment)
-
-        print product.price
-        print purchase.amount
-        print payment.amount
-
 
         mockito.when(self.dummy).notify(purchase, payment, payload, 'notification').thenReturn(transition)
 
