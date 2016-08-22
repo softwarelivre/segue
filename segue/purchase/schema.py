@@ -28,7 +28,7 @@ class BuyerSchema(BaseSchema):
     cpf = Field.str()
     cnpj = Field.str()
     passport = Field.str()
-    document = Field.str(dump_only=True)
+    document = Field.str()
     extra_document = Field.str()
     document_file_hash = Field.str(dump_only=True)
     document_file = Field.raw()
@@ -65,23 +65,27 @@ class BuyerSchema(BaseSchema):
         validate=[Validator.length(min=3, max=15)]
     )
 
-    @validates('cpf')
-    def validate_cpf(self, data):
-        if not CPFValidator(data).is_valid():
-            raise InvalidCPF()
-
-    @validates('cnpj')
-    def validate_cnpj(self, data):
-        if not CNPJValidator(data).is_valid():
-            raise InvalidCNPJ()
-
     @validates_schema()
     def validate(self, data):
 
         if 'kind' in data:
-            if data['kind'] == 'person' or data['kind'] == 'foreign':
+            buyer_kind = data['kind']
+            
+            if 'document' in data:
+                if buyer_kind == 'person':
+                    if not CPFValidator(data['document']).is_valid():
+                        raise InvalidCPF()
+            
+            if 'document' in data:
+                if buyer_kind == 'corporate':
+                    if not CNPJValidator(data['document']).is_valid():
+                        raise InvalidCNPJ()
+    
+            if buyer_kind == 'person' or buyer_kind == 'foreign':
                 if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
                     raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
+            
+
 
         #TODO: IMPROVE
         if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):

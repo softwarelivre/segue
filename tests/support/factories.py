@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import factory
 from factory import Sequence, LazyAttribute, SubFactory
@@ -9,6 +9,7 @@ from segue.core import db
 from segue.models import *
 
 import logging
+from cookielib import DAYS
 logger = logging.getLogger('factory')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
@@ -49,7 +50,6 @@ class ValidAccountFactory(SegueFactory):
 
     email    = _Sequence('email_{0}@example.com')
     name     = _Sequence('Joaozinho {0}')
-    role     = "user"
     password = "password"
     document     = _Sequence('123.456.789-2{0}')
     country      = "Brazil"
@@ -167,6 +167,7 @@ class ValidBuyerFactory(SegueFactory):
     class Meta:
         model = Buyer
 
+    address_state   = 'RS'
     address_street  = "Rua dos Bobos"
     address_number  = _Sequence("#{0}")
     address_extra   = _Sequence("apto #{0}")
@@ -178,13 +179,13 @@ class ValidBuyerFactory(SegueFactory):
 class ValidBuyerCompanyFactory(ValidBuyerFactory):
     kind     = "company"
     name     = _Sequence("Empresa {0}")
-    document = _Sequence("12.345.789/0001-{0:02}")
+    document = "66716451000138"
     contact  = _Sequence("+55 23 4000-{0:04}")
 
 class ValidBuyerPersonFactory(ValidBuyerFactory):
     kind     = 'person'
     name     = _Sequence("Pagador {0}")
-    document = _Sequence("123.345.789-{0:02}")
+    document = "59961743750"
     contact  = _Sequence("+55 23 4567-{0:04}")
 
 class ValidPurchaseFactory(SegueFactory):
@@ -232,6 +233,8 @@ class ValidPromoCodeFactory(SegueFactory):
     product     = SubFactory(ValidProductFactory)
     hash_code   = _Sequence("C0FFE#{:04d}")
     description = _Sequence("code #{:04d}")
+    start_at    = FuzzyDate(date.today() - timedelta(days=7), date.today())
+    end_at      = FuzzyDate(date.today(), date.today() + timedelta(days=7))
 
 class ValidPromoCodePaymentFactory(ValidPaymentFactory):
     class Meta:
