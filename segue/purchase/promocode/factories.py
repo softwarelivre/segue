@@ -9,6 +9,11 @@ from segue.purchase.errors import InvalidPaymentNotification
 
 from models import PromoCode, PromoCodePayment, PromoCodeTransition
 
+class PromoCodeFactory(Factory):
+    
+    model = PromoCode
+
+
 class PromoCodePaymentFactory(PaymentFactory):
     model = PromoCodePayment
 
