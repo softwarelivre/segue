@@ -6,7 +6,7 @@ from segue.errors import FieldError
 from errors import InvalidCNPJ, InvalidCPF, InvalidZipCodeNumber
 from segue.schema import BaseSchema, Field, Validator
 from segue.validation import CPFValidator, CNPJValidator, ZipCodeValidator
-
+from marshmallow.decorators import post_load
 
 BUYER_TYPES = ['person','company','government', 'foreign']
 
@@ -28,7 +28,7 @@ class BuyerSchema(BaseSchema):
     cpf = Field.str()
     cnpj = Field.str()
     passport = Field.str()
-    document = Field.str()
+    document = Field.str(dump_only=True)
     extra_document = Field.str()
     document_file_hash = Field.str(dump_only=True)
     document_file = Field.raw()
@@ -64,28 +64,25 @@ class BuyerSchema(BaseSchema):
         required=True,
         validate=[Validator.length(min=3, max=15)]
     )
+    
+    @validates('cpf')
+    def validate_cpf(self, data):
+        if not CPFValidator(data).is_valid():
+            raise InvalidCPF()
+
+    @validates('cnpj')
+    def validate_cnpj(self, data):
+        if not CNPJValidator(data).is_valid():
+            raise InvalidCNPJ()
+
 
     @validates_schema()
     def validate(self, data):
 
         if 'kind' in data:
-            buyer_kind = data['kind']
-            
-            if 'document' in data:
-                if buyer_kind == 'person':
-                    if not CPFValidator(data['document']).is_valid():
-                        raise InvalidCPF()
-            
-            if 'document' in data:
-                if buyer_kind == 'corporate':
-                    if not CNPJValidator(data['document']).is_valid():
-                        raise InvalidCNPJ()
-    
-            if buyer_kind == 'person' or buyer_kind == 'foreign':
+            if data['kind'] == 'person' or data['kind'] == 'foreign':
                 if not re.match(r'.*\ .*', data.get('name', ''), re.IGNORECASE):
                     raise FieldError(message='Por favor, digite seu nome e sobre nome', field='name')
-            
-
 
         #TODO: IMPROVE
         if re.match(r'br.*', data.get('country', ''), re.IGNORECASE):
@@ -119,20 +116,32 @@ create_promocode = {
 
 class PromoCodeSchema(BaseSchema):
 
+    hash_code = Field.str(required=True,
+                          validade=[Validator.length(min=5, max=20)])
+
+    start_at = Field.date(required=True)
+    end_at = Field.date(required=True)
+
     description = Field.str(
-            required=True,
-            validate=[Validator.length(min=3, max=30)])
+        required=True,
+        validate=[Validator.length(min=3, max=20)]
+    )
 
-    quantity = Field.int(
+    #TODO: CREATE ENGLISH MESSAGE
+    discount = Field.float(
             required=True,
-            validate=[Validator.range(min=1)])
-
-    discount = Field.int(
-            required=True,
-            validate=[Validator.range(min=1, max=100)])
+            validate=[Validator.range(min=0.01, max=1.0, error='O valor deve do desconto ser entre 1 e 100')])
     
     product_id = Field.int(
             required=True)
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate(self, data):
+        start_at = data['start_at']
+        end_at = data['end_at']
+
+        if start_at > end_at:
+            raise FieldError(message='A data final deve ser maior que a inicial', field='end_at')
 
 whitelist = dict(
     buyer = buyer,

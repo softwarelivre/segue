@@ -109,27 +109,6 @@ class VolunteerProduct(LockedProduct):
 class PromoCodeProduct(Product):
     __mapper_args__ = { 'polymorphic_identity': 'promocode' }
 
-    def check_eligibility(self, buyer_data, account=None):
-        hash_code = buyer_data.get('hash_code',None)
-        if not hash_code: return False
-
-        promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
-        if not promocodes: return False
-
-        #TODO CREATE A DATABASE CONTRAINT
-        for promocode in promocodes:
-            if promocode.product != self:
-                return False
-
-        # ONE PRODUCT PER CLIENT FOR PROMOCODES WITH SAME HASH
-        if db.session.query(func.count(Purchase.id)) \
-            .filter(Purchase.product_id == promocode.product.id) \
-            .filter(Purchase.customer_id == account.id).scalar():
-            raise AlreadyUsed()
-
-        return True
-
-
 class CorporatePromoCodeProduct(PromoCodeProduct):
     __mapper_args__ = {'polymorphic_identity': 'corporate-discount-promocode'}
 
@@ -137,23 +116,8 @@ class CorporatePromoCodeProduct(PromoCodeProduct):
         return CorporatePurchase
 
     def check_eligibility(self, buyer_data, account=None):
-        hash_code = buyer_data.get('hash_code', None)
         if not account or not account.is_corporate:
             return False
-
-        promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
-        if not promocodes: return False
-
-        for promocode in promocodes:
-            if promocode.product != self:
-                return False
-
-        # ONE PRODUCT PER CLIENT FOR PROMOCODES WITH SAME HASH
-        if db.session.query(func.count(Purchase.id)) \
-                .filter(Purchase.product_id == promocode.product.id) \
-                .filter(Purchase.customer_id == account.id).scalar():
-            raise AlreadyUsed()
-
         return True
 
 

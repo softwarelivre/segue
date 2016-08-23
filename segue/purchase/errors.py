@@ -38,11 +38,14 @@ class InvalidHashCode(SegueError):
     def to_json(self):
         return { 'message': 'invalid hash code: {}'.format(self.args) }
 
-class MustProvideDescription(SegueFieldError):
-    FIELD = 'description'
-    LABEL = 'object_required'
+class MustProvideDescription(SegueGenericError):
     MESSAGE = 'please provide promocode description'
+    
+class MustDefineCreator(SegueGenericError):
+    MESSAGE = 'You must provide the creator id'
 
+class PromoCodeAlreadyUsed(SegueGenericError):
+    MESSAGE = 'This promocode is already used'
 
 class InvalidZipCodeNumber(FieldError):
     FIELD = 'address_zipcode'

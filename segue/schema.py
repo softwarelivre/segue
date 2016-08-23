@@ -74,6 +74,10 @@ class Field(object):
         return Field.create(fields.Integer, *args, **kwargs)
 
     @staticmethod
+    def float(*args, **kwargs):
+        return Field.create(fields.Float, *args, **kwargs)
+
+    @staticmethod
     def date(*args, **kwargs):
         return Field.create(fields.DateTime, *args, **kwargs)
 
@@ -131,14 +135,14 @@ class Validator(object):
         return validate.Email(error=Validator.MSGS['email'])
 
     @staticmethod
-    def range(min=None, max=None):
-        error = None
-        if min and max:
-            error = Validator.MSGS['range_between']
-        elif min:
-            error = Validator.MSGS['range_min']
-        elif max:
-            error = Validator.MSGS['range_max']
+    def range(min=None, max=None, error=None):
+        if not error:
+            if min and max:
+                error = Validator.MSGS['range_between']
+            elif min:
+                error = Validator.MSGS['range_min']
+            elif max:
+                error = Validator.MSGS['range_max']
         return validate.Range(min=min, max=max, error=error)
 
     @staticmethod
