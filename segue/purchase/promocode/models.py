@@ -8,15 +8,21 @@ class PromoCode(JsonSerializable, db.Model):
     __tablename__ = 'promocode'
 
     id             = db.Column(db.Integer, primary_key=True)
+#    kind           = db.Column(db.Text,    server_default='normal')
     creator_id     = db.Column(db.Integer, db.ForeignKey('account.id'))
     product_id     = db.Column(db.Integer, db.ForeignKey('product.id'))
     hash_code      = db.Column(db.String(32))
     description    = db.Column(db.Text)
     discount       = db.Column(db.Numeric)
 
+    start_at   = db.Column(db.Date)
+    end_at     = db.Column(db.Date)
+
     creator = db.relationship('Account')
     product = db.relationship('Product', backref='promocodes')
     payment = db.relationship('PromoCodePayment', uselist=False, backref=db.backref('promocode', uselist=False))
+
+#    __mapper_args__ = { 'polymorphic_on': kind, 'polymorphic_identity': 'normal' }
 
     @property
     def used(self):

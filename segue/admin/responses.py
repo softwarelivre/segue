@@ -1,4 +1,10 @@
+from marshmallow import fields
+
 from segue.responses import BaseResponse
+
+from segue.schema import BaseSchema, Field
+from segue.account.schema import AccountSchema
+from segue.product.schema import ProductSchema
 
 class ProposalInviteResponse(BaseResponse):
     def __init__(self, invite, links=False):
@@ -21,6 +27,19 @@ class TournamentDetailResponse(TournamentShortResponse):
     def __init__(self, tournament, links=False):
         super(TournamentDetailResponse, self).__init__(tournament)
         self.rounds = [ tournament.status_of_round(i) for i in range(1, tournament.current_round+1) ]
+
+class PromoCodeListResponse(BaseSchema):
+    id = Field.int()
+    discount = fields.Method('format_discount')
+    hash_code = Field.str(0)
+    description = Field.str()
+    creator = Field.nested(AccountSchema, only=['id','name'])
+    product = Field.nested(ProductSchema, only=['id','description'])
+    used_by = Field.nested(AccountSchema, only=['id', 'name'])
+
+    def format_discount(self, promocode):
+        return promocode.discount * 100
+
 
 class PromoCodeResponse(BaseResponse):
     def __init__(self, promocode, links=False):

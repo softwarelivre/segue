@@ -1,4 +1,6 @@
 from decimal import Decimal
+from datetime import datetime, timedelta
+
 import mockito
 
 from segue.purchase.promocode import PromoCodeService
@@ -91,10 +93,20 @@ class PromoCodeServiceTestCase(SegueApiTestCase):
     def test_creation(self):
         product = self.create(ValidProductFactory)
         creator = self.create(ValidAccountFactory)
-
+        #TODO: IMPROVE
+        start_at = datetime.today() + timedelta(days=7)
+        end_at = datetime.today() - timedelta(days=7)
+        promocode = {
+            'product_id': product.id,  
+            'description': 'empresa x', 
+            'start_at': datetime.strftime(start_at, "%d/%m/%Y"),
+            'end_at': datetime.strftime(start_at, "%d/%m/%Y"), 
+            'discount': 0.7     
+        }
+    
         mockito.when(self.mock_hasher).generate().thenReturn('A').thenReturn('B').thenReturn('C')
 
-        result = self.service.create(product, "empresa x", creator=creator, discount=70, quantity=3)
+        result = self.service.create(promocode, creator=creator, quantity=3)
 
         self.assertEqual(len(result), 3)
 

@@ -1,92 +1,89 @@
+# -*- coding: utf-8 -*-
+
+import datetime
+import copy
+
 from requests.exceptions import RequestException
+
 from segue.purchase.errors import InvalidPaymentNotification, NoSuchPayment, MustProvideDescription
 from segue.core import db, logger
 from segue.hasher import Hasher
 
+from segue.purchase.schema import PromoCodeSchema
 from filters import PromoCodeFilterStrategies
-from factories import PromoCodePaymentFactory, PromoCodeTransitionFactory
-from models import PromoCode
+from factories import PromoCodeFactory, PromoCodePaymentFactory, PromoCodeTransitionFactory
+from models import PromoCode, PromoCodePayment
 from segue.purchase.cash import CashPaymentService
-from ..errors import InvalidHashCode
+from ..errors import InvalidHashCode, MustDefineCreator, PromoCodeAlreadyUsed
+from copy import deepcopy
 
 class PromoCodeService(object):
     def __init__(self, hasher=None, products=None, filters=None):
         self.hasher            = hasher  or Hasher(length=10, prefix="PC")
         self.filter_strategies = filters or PromoCodeFilterStrategies()
 
-    def lookup(self, as_user=None, **kw):
-        needle = kw.pop('q',None)
-        limit  = kw.pop('limit',None)
-        filter_list = self.filter_strategies.needle(needle, as_user, **kw)
-        return PromoCode.query.filter(*filter_list).limit(limit).all()
+    def lookup(self, criteria=None, page=1, per_page=25):
+        filter_list = self.filter_strategies.given_criteria(**criteria)
+        return PromoCode.query.filter(*filter_list).paginate(page=page, per_page=per_page)
 
     def query(self, **kw):
         base        = self.filter_strategies.joins_for(PromoCode.query, **kw)
         filter_list = self.filter_strategies.given(**kw)
         return base.filter(*filter_list).order_by(PromoCode.id).all()
 
-    def create(self, product, description=None, creator=None, discount=100, quantity=1):
-        if not description: raise MustProvideDescription()
-
+    def create(self, data, quantity=None, creator=None):
+        if not 'description' in data: raise MustProvideDescription()
+        if not creator: raise MustDefineCreator()
+        
         result = []
-        for counter in xrange(quantity):
-            str_description = u"{} - {}/{}".format(description, counter+1, quantity)
-
-            p = PromoCode()
-            p.creator     = creator
-            p.product     = product
-            p.description = str_description
-            p.hash_code   = self.hasher.generate()
-            p.discount    = float(discount) / 100
-
+        unmodified_description = data['description']
+        for counter in range(quantity):
+            promocode_data = deepcopy(data)
+            promocode_data['description'] = u'{description} - {counter}/{total}'.format(
+                description=unmodified_description, counter=counter+1, total=quantity
+            )
+            
+            if not 'hash_code' in data:
+                promocode_data['hash_code'] = self.hasher.generate()
+             
+            p = PromoCodeFactory.from_json(promocode_data, PromoCodeSchema())
+            p.creator = creator
+            
             db.session.add(p)
             result.append(p)
-
+            
         db.session.commit()
         return result
 
     def check(self, hash_code, by=None):
         logger.info("PromoCodeService.check, hash_code: %s", hash_code)
-        promocodes = PromoCode.query.filter(PromoCode.hash_code == hash_code).all()
 
-        for promocode in promocodes:
-            if not promocode.used:
-                # TODO: HARD CODING
-                if by.corporate_owned:
-                    if promocode.product.category == 'corporate-discount-promocode':
-                        return promocode
-                else:
-                    if promocode.product.category != 'corporate-discount-promocode':
-                        return promocode
+        for promocode in self.available_promocodes(hash_code):
+            if promocode.product.check_eligibility(by):
+                return promocode
 
         return None
-
-    def validate_cryptofisl(self, hash_code):
-        import datetime
-        start = datetime.datetime(2016, 05, 06, 0, 0)
-        end = datetime.datetime(2016, 05, 07, 23, 59)
-        today = datetime.datetime.now()
-        if hash_code != 'CRYPTOFISL':
-            return True
-
-        if start < today <= end:
-            return True
+    
+    def remove(self, promocode):
+        
+        if not promocode.used:
+            db.session.delete(promocode)
+            db.session.commit()
         else:
-            return False
+            raise PromoCodeAlreadyUsed()
 
-    def validate_tecnosinos(self, hash_code):
-        import datetime
-        start = datetime.datetime(2016, 05, 04, 0, 0)
-        end = datetime.datetime(2016, 05, 07, 23, 59)
-        today = datetime.datetime.now()
-        if hash_code != 'TECNOSINOS':
-            return True
-
-        if start < today <= end:
-            return True
-        else:
-            return False
-
+    def available_promocodes(self, hash_code, by=None):
+        today = datetime.datetime.now().date()
+        subquery = db.session.query(PromoCodePayment.promocode_id)
+        return (PromoCode.query
+                    .filter(PromoCode.hash_code==hash_code)
+                    .filter(PromoCode.start_at<=today)
+                    .filter(PromoCode.end_at>=today)
+                    .filter(~PromoCode.id.in_(subquery))
+                    .all())
+        
+    def get_one(self, promocode_id):
+        return PromoCode.query.filter(PromoCode.id==promocode_id).first()
 
 class PromoCodePaymentService(object):
     def __init__(self, cash_service=None, promocodes=None, factory=None):
