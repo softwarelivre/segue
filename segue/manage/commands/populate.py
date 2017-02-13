@@ -50,7 +50,7 @@ def populate(clean=False):
 
 def populate_slots(start=0,end=0):
     init_command()
-    dates = [ datetime(2016,7,13), datetime(2016,7,14), datetime(2016,7,15), datetime(2016,7,16) ]
+    dates = [ datetime(2017,7,5), datetime(2017,7,6), datetime(2016,7,7), datetime(2016,7,8) ]
     hours = [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
 
     rooms = Room.query.filter(Room.id.between(int(start), int(end))).all()
@@ -85,26 +85,26 @@ def _build_products():
         return ValidProductFactory(
             kind='ticket',
             category=entry[0],
-            description="Ingresso FISL17 - {} - lote {}".format(entry[1], entry[2]),
+            description="Ingresso FISL18 - {} - lote {}".format(entry[1], entry[2]),
             sold_until=entry[3],
             price=Decimal(entry[4])
         )
 
     data = [
-        ("student", "estudante",  1, "2016-03-30 23:59:59", 60 ),
-        ("normal",  "individual", 1, "2016-03-30 23:59:59", 120),
+        ("student", "estudante",  1, "2017-03-30 23:59:59", 60 ),
+        ("normal",  "individual", 1, "2017-03-30 23:59:59", 120),
 
-        ("student", "estudante",  2, "2016-04-13 23:59:59", 85 ),
-        ("normal",  "individual", 2, "2016-04-13 23:59:59", 170),
+        ("student", "estudante",  2, "2017-04-13 23:59:59", 85 ),
+        ("normal",  "individual", 2, "2017-04-13 23:59:59", 170),
 
-        ("student", "estudante",  3, "2016-05-11 23:59:59", 110),
-        ("normal",  "individual", 3, "2016-05-11 23:59:59", 220),
+        ("student", "estudante",  3, "2017-05-11 23:59:59", 110),
+        ("normal",  "individual", 3, "2017-05-11 23:59:59", 220),
 
-        ("student", "estudante",  4, "2016-06-08 23:59:59", 135),
-        ("normal",  "individual", 4, "2016-06-08 23:59:59", 270),
+        ("student", "estudante",  4, "2017-06-08 23:59:59", 135),
+        ("normal",  "individual", 4, "2017-06-08 23:59:59", 270),
 
-        ("student", "estudante",  5, "2016-06-30 23:59:59", 160),
-        ("normal",  "individual", 5, "2016-06-30 23:59:59", 320),
+        ("student", "estudante",  5, "2017-06-30 23:59:59", 160),
+        ("normal",  "individual", 5, "2017-06-30 23:59:59", 320),
     ]
     return [ _build_one(x) for x in data ]
 
