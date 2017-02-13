@@ -2,13 +2,13 @@
 
 template: pending-new
 language: pt
-subject: "FISL17 - está chegando a hora!"
+subject: "FISL18 - está chegando a hora!"
 
 body: |
 
     Olá {person.name}!
 
-    Recebemos sua inscrição para o FISL17, mas
+    Recebemos sua inscrição para o FISL18, mas
     ela ainda não consta como paga em nossos
     registros. O evento começa nesta quarta-feira
     dia 8, e é possível realizar o pagamento da

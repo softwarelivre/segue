@@ -2,14 +2,14 @@
 
 template: non_selection
 language: pt
-subject: "Obrigado por enviar sua proposta de palestra para o FISL17"
+subject: "Obrigado por enviar sua proposta de palestra para o FISL18"
 
 body: |
 
     Olá {account.name}!
 
     Informamos que, infelizmente, nenhuma de suas propostas
-    de palestra para o FISL17 foi selecionada.
+    de palestra para o FISL18 foi selecionada.
 
     No entanto, a sua participação no evento é muito importante
     para nós. Nesse sentido, a organizaçõa do evento lhe garante
@@ -30,4 +30,4 @@ body: |
 
     Muito obrigada pela atenção.
     Saudações Livres!
-    Comissão Organizadora do FISL17
+    Comissão Organizadora do FISL18

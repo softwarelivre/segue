@@ -2,19 +2,19 @@
 
 template: corporate_promocode_especial
 language: pt
-subject: "#FISL17 - Código Corporativo"
+subject: "#FISL18 - Código Corporativo"
 
 body: |
     Prezad@ {corporate.incharge_name} da Empresa {customer.name},
 
-    Abaixo segue o seu código corporativo referente a Promoção "Ingressos Corporativos" do FISL17.
+    Abaixo segue o seu código corporativo referente a Promoção "Ingressos Corporativos" do FISL18.
 
     {hash_codes}
 
     PARA UTILIZAÇÃO, É NECESSÁRIO SEGUIR OS SEGUINTES PASSOS:
 
-    1. Entregue um código promocional para o indivíduo que comparecerá no FISL17;
-    2. A pessoa deverá criar uma conta pessoa física (pessoal) e preencher o cadastro no Sistema de Inscrições: http://segue.fisl17.softwarelivre.org
+    1. Entregue um código promocional para o indivíduo que comparecerá no FISL18;
+    2. A pessoa deverá criar uma conta pessoa física (pessoal) e preencher o cadastro no Sistema de Inscrições: http://segue.fisl18.softwarelivre.org
     3. Inserir o código no campo: “Insira aqui o seu código promocional”;
     4. Clicar em “Usar”;
     4.1 O ingresso Corporativo aparecerá com desconto de 100%;
@@ -25,4 +25,4 @@ body: |
 
 
     Saudações livres!
-    Comissão Organizadora do #FISL17
+    Comissão Organizadora do #FISL18
