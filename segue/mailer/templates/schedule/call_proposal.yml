@@ -2,14 +2,14 @@
 
 template: call_proposal
 language: pt
-subject: "FISL17 - proposta de palestra aceita"
+subject: "FISL18 - proposta de palestra aceita"
 
 body: |
 
     Saudações Livres {account.name}
 
       Temos o prazer de informar que sua proposta de palestra
-    para o FISL17 foi aceita! Sabemos que falta pouco tempo
+    para o FISL18 foi aceita! Sabemos que falta pouco tempo
     para o evento, mas de qualquer forma torcemos para ainda
     haja tempo para você agendar sua visita a Porto Alegre
     para brindar-nos com a apresentação de:
@@ -30,4 +30,4 @@ body: |
     Cordialmente
 
     --
-    Coordenação do Temario FISL17
+    Coordenação do Temario FISL18

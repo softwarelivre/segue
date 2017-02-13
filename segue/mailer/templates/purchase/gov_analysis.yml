@@ -2,12 +2,12 @@
 
 template: purchase_gov_analysis
 language: pt
-subject: "#FISL17 - Empenho em análise"
+subject: "#FISL18 - Empenho em análise"
 
 body: |
     Prezad@ {corporate.incharge_name} da Organização {customer.name},
 
-    Recebemos a nota de empenho relacionada a sua solicitação de {purchase.qty} inscrição(ções) nesta modalidade para o FISL 17.
+    Recebemos a nota de empenho relacionada a sua solicitação de {purchase.qty} inscrição(ções) nesta modalidade para o FISL 18.
     Em 5 dias úteis o cadastro e a respectiva nota de empenho serão analisados, e após aprovação,  você receberá o passo-a-passo para a efetivação das inscrições.
 
     Aguarde nosso contato
