@@ -57,3 +57,5 @@ marshmallow==2.6.0
 marshmallow-validators==2.0.0
 marshmallow-sqlalchemy==0.8.0
 Flask-BabelEx==0.9.3
+paypal==1.2.5
+webargs==1.5.3
