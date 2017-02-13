@@ -2,12 +2,12 @@
 
 template: promocode_available
 language: pt
-subject: "#FISL17 - Código para inscrição não utilizado"
+subject: "#FISL18 - Código para inscrição não utilizado"
 
 body: |
     Prezad@ {corporate.incharge_name} da empresa {corporate.name},
 
-    Verificamos que existem códigos que ainda não foram utilizados no sistema de inscrições do Fórum Internacional Software Livre – FISL17.
+    Verificamos que existem códigos que ainda não foram utilizados no sistema de inscrições do Fórum Internacional Software Livre – FISL18.
 
     Segue(m) o(s) códigos não utilizados:
 
@@ -15,8 +15,8 @@ body: |
 
     Siga os seguintes passos:
 
-    1. Entregue o código promocional para o colaborador que comparecerá no FISL17;
-    2. A pessoa deverá criar uma conta pessoa física (pessoal) e preencher o cadastro no Sistema de Inscrições: http://segue.fisl17.softwarelivre.org
+    1. Entregue o código promocional para o colaborador que comparecerá no FISL18;
+    2. A pessoa deverá criar uma conta pessoa física (pessoal) e preencher o cadastro no Sistema de Inscrições: http://segue.fisl18.softwarelivre.org
     2.1. Insira o código no campo: “Insira aqui o seu código promocional”;
     2.2. Clique em “Usar”;
     2.3. O ingresso Corporativo aparecerá com desconto de 100%;
@@ -25,4 +25,4 @@ body: |
     Caso tenha dúvidas, envie um e-mail para: financeiro@espacodeprojetos.com.br.
 
     Saudações livres!
-    Comissão Organizadora do #FISL17
+    Comissão Organizadora do #FISL18

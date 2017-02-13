@@ -2,7 +2,7 @@
 
 template: student_analysis
 language: pt
-subject: "#FISL17 - confirmação de pagamento"
+subject: "#FISL18 - confirmação de pagamento"
 
 body: |
 
@@ -21,4 +21,4 @@ body: |
 
     Saudações livres!
 
-    Comissão Organizadora do #FISL17
+    Comissão Organizadora do #FISL18

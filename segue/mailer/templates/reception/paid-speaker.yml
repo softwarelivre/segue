@@ -2,10 +2,10 @@
 
 template: paid-speaker
 language: pt
-subject: "FISL17 - está chegando a hora!"
+subject: "FISL18 - está chegando a hora!"
 
 body: |
-    O FISL17 começa nessa quarta-feira, dia 13 e sua inscrição está confirmada!
+    O FISL18 começa nessa quarta-feira, dia 13 e sua inscrição está confirmada!
 
     Para acelerar seu atendimento, proceda da seguinte forma:
 
@@ -30,14 +30,14 @@ body: |
 
         {backend_url}/api/fd/reception/{person.purchase.hash_code}
 
-    Participe da Campanha de doação do FISL17!
+    Participe da Campanha de doação do FISL18!
 
     Na secretaria do evento você poderá doar:
 
-    * A partir de R$ 10,00 e receber um boton do FISL17;
-    *R$ 50,00 e receber uma camiseta do FISL17;
-    *R$ 450,00 e receber  um código promocional com 100%, um boton e uma camiseta do FISL17;
+    * A partir de R$ 10,00 e receber um boton do FISL18;
+    *R$ 50,00 e receber uma camiseta do FISL18;
+    *R$ 450,00 e receber  um código promocional com 100%, um boton e uma camiseta do FISL18;
 
     Saudações Livres,
 
-    Comissão Organizadora do #FISL17
+    Comissão Organizadora do #FISL18
