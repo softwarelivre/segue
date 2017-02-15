@@ -20,22 +20,10 @@ def roles_accepted(*roles):
         return decorator
     return wrapper
 
-def permissions_accepted(*permissions):
-    def wrapper(fn):
-        @wraps(fn)
-        def decorator(*args, **kwargs):
-            verify_jwt()
-            if not current_user.has_permission(permissions):
-                logger.info('denied access to endpoint {} to user {}'.format(request.url_rule.endpoint, current_user.id))
-                raise NotAuthorized()
-            return fn(*args, **kwargs)
-        return decorator
-    return wrapper
-
 def admin_only(fn):
     @wraps(fn)
     def wrapped(instance, *args, **kw):
-        if not instance.current_user.has_role('admin'):
+        if instance.current_user.role != 'admin':
             logger.info("denied access to admin-only endpoint: %s", instance.current_user.__dict__)
             raise NotAuthorized()
         return fn(instance, *args, **kw)
@@ -44,7 +32,7 @@ def admin_only(fn):
 def cashier_only(fn):
     @wraps(fn)
     def wrapped(instance, *args, **kw):
-        if not instance.current_user.has_role('admin', 'cashier'):
+        if instance.current_user.role not in ('admin', 'cashier'):
             logger.info("denied access to cashier-only endpoint: %s", instance.current_user.__dict__)
             raise NotAuthorized()
         return fn(instance, *args, **kw)
@@ -53,7 +41,7 @@ def cashier_only(fn):
 def frontdesk_only(fn):
     @wraps(fn)
     def wrapped(instance, *args, **kw):
-        if not instance.current_user.has_role('admin', 'frontdesk', 'cashier'):
+        if instance.current_user.role not in ('admin', 'frontdesk', 'cashier'):
             logger.info("denied access to frontdesk-only endpoint: %s", instance.current_user.__dict__)
             raise NotAuthorized()
         return fn(instance, *args, **kw)

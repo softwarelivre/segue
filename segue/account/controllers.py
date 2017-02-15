@@ -12,7 +12,6 @@ from models import Account, ResetPassword
 from services import AccountService
 from errors import InvalidLogin, EmailAlreadyInUse, NotAuthorized
 from responses import AccountResponse, EmployeesListResponse
-from schema import AccountTokenSchema
 
 
 
@@ -47,8 +46,7 @@ class AccountController(object):
     @jsoned
     def login(self):
         data = request.get_json()
-        return self.service.login(**data)
-
+        return self.service.login(**data), 200
 
     @jwt_only
     @jsoned
