@@ -75,8 +75,9 @@ class Account(JsonSerializable, db.Model):
 
     created      = db.Column(db.DateTime, default=func.now())
     last_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-#    corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id'))
-#    corporate = db.relationship('Corporate', backref='employees', foreign_keys=[corporate_id])
+
+    corporate_id = db.Column(db.Integer, db.ForeignKey('corporate.id'))
+    corporate = db.relationship('Corporate', backref='employees', foreign_keys=[corporate_id])
 
     proposals       = db.relationship("Proposal", backref="owner")
     purchases       = db.relationship("Purchase", backref="customer")
