@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from segue.core import db
 from tests.support.factories import *
-from segue.models import Account, Proposal, ProposalInvite, Track, Room, Slot, Role
+from segue.models import Account, Proposal, ProposalInvite, Track, Room, Slot
 from support import *
 
 def populate(clean=False):
@@ -71,11 +71,9 @@ def populate_reference_data(clean=False):
 
     tracks   = _build_tracks()
     products = _build_products()
-    roles    = _build_roles()
 
     if not Track.query.all():   db.session.add_all(tracks)
     if not Product.query.all(): db.session.add_all(products)
-    if not Role.query.all(): db.session.add_all(roles)
 
     db.session.commit()
     return tracks, products
@@ -189,22 +187,3 @@ def _build_tracks():
         ValidTrackFactory(name_pt='Tópicos Emergentes - Energia Livre',
                           name_en='Trending Topics - Free Energy'),
     ]
-
-
-def _build_roles():
-    def create_one(name, description):
-        role = Role()
-        role.name = name
-        role.description = description
-        return role
-
-    roles = []
-
-    roles.append(create_one('admin', 'Admin'))
-    roles.append(create_one('user', 'User'))
-    roles.append(create_one('corporate', 'Corporate'))
-    roles.append(create_one('cashier', 'Cachier'))
-    roles.append(create_one('frontdesk', 'Frontdesk'))
-    roles.append(create_one('foreign', 'Foreign'))
-
-    return roles

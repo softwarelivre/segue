@@ -1,12 +1,10 @@
 from segue.schema import Field
-from schema import AccountSchema, RoleSchema
-
+from schema import AccountSchema
 
 class AccountResponse(AccountSchema):
 
-    roles = Field.nested(RoleSchema, many=True)
-
     has_valid_purchases = Field.bool()
+
     #TODO REMOVE THIS HACK
     incharge = Field.str()
 

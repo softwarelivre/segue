@@ -12,7 +12,7 @@ import schema
 class AccountJsonSerializer(SQLAlchemyJsonSerializer):
     _serializer_name = 'normal'
     def hide_field(self, child):
-        return child in [ 'password', 'certificates']
+        return child in [ 'password', 'certificates', 'account_roles' ]
 
     def serialize_child(self, child):
         return False
@@ -20,9 +20,9 @@ class AccountJsonSerializer(SQLAlchemyJsonSerializer):
 class SafeAccountJsonSerializer(AccountJsonSerializer):
     _serializer_name = 'safe'
     def hide_field(self, child):
-        return child in [ 'password','email', 'roles', 'phone', 'city', 'document', 'certificates']
+        return child in [ 'password','email', 'role', 'phone', 'city', 'document', 'certificates', 'account_roles' ]
 
-accounts_roles = db.Table('accounts_roles',
+roles_account = db.Table('roles_accounts',
         db.Column('account_id', db.Integer(), db.ForeignKey('account.id')),
         db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
@@ -37,6 +37,7 @@ class Account(JsonSerializable, db.Model):
     password         = db.Column(PasswordType(schemes=['pbkdf2_sha512']))
     disability       = db.Column(db.Enum(*schema.DISABILITY_TYPES, name='disability_types'), default='none')
     disability_info  = db.Column(db.Text)
+    role             = db.Column(db.Enum(*schema.ACCOUNT_ROLES, name='account_roles'))
     document         = db.Column(db.Text, unique=True)
 
     inform          = db.Column(db.Boolean, default=True)
@@ -84,7 +85,7 @@ class Account(JsonSerializable, db.Model):
     corporate_owned = db.relationship('Corporate', back_populates='owner', primaryjoin='Account.id==Corporate.owner_id', uselist=False)
 
 
-    roles = db.relationship('Role', secondary=accounts_roles, backref=db.backref('accounts', lazy='dynamic'))
+    account_roles = db.relationship('Role', secondary=roles_account, backref=db.backref('accounts', lazy='dynamic'))
 
     resets = db.relationship("ResetPassword", backref="account")
 
@@ -108,10 +109,10 @@ class Account(JsonSerializable, db.Model):
     def can_be_acessed_by(self, alleged):
         if not alleged: return False
         if self.id == alleged.id: return True
-        return alleged.has_role('admin','frontdesk','cashier')
+        return alleged.role in ('admin','frontdesk','cashier')
 
     def __repr__(self):
-        return "<[{}]-{}>".format(self.id, self.email)
+        return "<[{}]-{}-({})>".format(self.id, self.email, self.role)
 
     @property
     def can_receive_money(self):
@@ -239,31 +240,21 @@ class Account(JsonSerializable, db.Model):
                 return invite.hash
         return None
 
-    def has_role(self, *roles_names):
-        for r in self.roles:
-            if r.name in roles_names:
+    @property
+    def roles(self):
+        return [role.name for role in self.account_roles]
+
+    def has_role(self, roles):
+        roles_to_verify = ('admin',)
+        if isinstance(roles, tuple):
+            roles_to_verify += roles
+        if isinstance(roles, basestring):
+            roles_to_verify += (roles,)
+
+        for r in roles_to_verify:
+            if r in self.roles:
                 return True
         return False
-
-    def has_permission(self, permission_name):
-        permission = Permission.query.filter(Permission.name==permission_name).first()
-        return (permission and self.has_role(permission.role.name))
-
-    def grant_role(self, role_name, commit=True):
-        role = Role.query.filter(Role.name==role_name).first()
-        if role and not role in self.roles:
-            self.roles.append(role)
-            if commit:
-                db.session.add(self)
-                db.session.commit()
-
-    def revoke_role(self, role_name, commit=True):
-        for role in self.roles:
-            if role.name == role_name:
-                self.roles.remove(role)
-                if commit:
-                    db.session.add(self)
-                    db.session.commit()
 
     @property
     def has_valid_ticket(self):
@@ -306,19 +297,3 @@ class Role(db.Model):
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String)
 
-    permissions = db.relationship('Permission', back_populates='role', lazy='dynamic')
-
-    def __repr__(self):
-        return "Role<{name}>".format(id=self.id, name=self.name)
-
-
-class Permission(JsonSerializable, db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String)
-
-    role = db.relationship('Role', back_populates='permissions')
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
-
-    def __repr__(self):
-        return "Permission<{name}>".format(id=self.id, name=self.name)
