@@ -130,7 +130,7 @@ class PromoCodeSchema(BaseSchema):
     #TODO: CREATE ENGLISH MESSAGE
     discount = Field.float(
             required=True,
-            validate=[Validator.range(min=0.01, max=1.0, error='O valor deve do desconto ser entre 1 e 100')])
+            validate=[Validator.range(min=0.01, max=1.0, error='O valor do desconto deve ser entre 0.01 e 1.0')])
     
     product_id = Field.int(
             required=True)
