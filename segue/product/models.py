@@ -14,7 +14,7 @@ class ProductJsonSerializer(SQLAlchemyJsonSerializer):
 class Product(JsonSerializable, db.Model):
     _serializers      = [ ProductJsonSerializer ]
     id                = db.Column(db.Integer, primary_key=True)
-    kind              = db.Column(db.Enum('worker', 'public', 'speaker', name="product_kinds"))
+    kind              = db.Column(db.Enum('ticket', 'worker', 'public', 'speaker', name="product_kinds"))
     category          = db.Column(db.Text)
     public            = db.Column(db.Boolean, default=True)
     max_purchases     = db.Column(db.Integer, default=0)
