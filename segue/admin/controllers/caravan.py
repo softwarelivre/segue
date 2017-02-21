@@ -46,7 +46,7 @@ class AdminCaravanController(object):
     @jwt_only
     @admin_only
     def get_one(self, caravan_id):
-        result = self.caravans.get_one(caravan_id, by=current_user);
+        result = self.caravans.get_one(caravan_id, by=current_user)
         return Response(result, CaravanResponse).create(), 200
 
     @jsoned
