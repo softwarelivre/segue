@@ -9,7 +9,7 @@ body: |
     Olá {invite.name}!
 
     Você está sendo convidado por **{caravan.owner.name}** para
-    participar de uma caravana para o FISL 18:
+    participar de uma caravana para o FISL:
 
     * nome da caravana: **{caravan.name}**
     * cidade de partida: **{caravan.city}**
