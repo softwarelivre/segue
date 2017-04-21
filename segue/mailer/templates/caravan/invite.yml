@@ -2,7 +2,7 @@
 
 template: caravan_invite
 language: pt
-subject: "{caravan.owner.name} te convidou para o FISL18"
+subject: "{caravan.owner.name} te convidou para o FISL"
 
 body: |
 
