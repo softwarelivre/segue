@@ -2,7 +2,7 @@
 
 template: student_analysis
 language: pt
-subject: "#FISL18 - confirmação de pagamento"
+subject: "FISL - confirmação de pagamento"
 
 body: |
 
@@ -11,7 +11,7 @@ body: |
     **Confirmação de pagamento!**
 
     Seu pagamento foi recebido e processado com sucesso.
-    Estamos análisando a documentação enviada. Este processo pode levar alguns dias.
+    Está em análise a documentação enviada. Este processo levará alguns dias.
 
     Código do ingresso: {purchase.id}
     Quantidade: {purchase.qty}
@@ -19,6 +19,7 @@ body: |
     Valor do ingresso: R$ {product.price}
     Valor total: R$ {purchase.amount}
 
-    Saudações livres!
+    Saudações Livres!
 
-    Comissão Organizadora do #FISL18
+    Associação Software Livre.Org
+

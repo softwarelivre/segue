@@ -2,7 +2,7 @@
 
 template: purchase_confirmation
 language: pt
-subject: "#FISL18 - confirmação de pagamento"
+subject: "FISL - confirmação de pagamento"
 
 body: |
 
@@ -18,6 +18,6 @@ body: |
     Valor do ingresso: R$ {product.price}
     Valor total: R$ {purchase.amount}
 
-    Saudações livres!
+    Saudações Livres!
 
-    Comissão Organizadora do #FISL18
+    Associação Software Livre.Org
