@@ -2,19 +2,19 @@
 
 template: pending-new
 language: pt
-subject: "FISL18 - está chegando a hora!"
+subject: "FISL - está chegando a hora!"
 
 body: |
 
     Olá {person.name}!
 
-    Recebemos sua inscrição para o FISL18, mas
+    Recebemos sua inscrição para o FISL, mas
     ela ainda não consta como paga em nossos
-    registros. O evento começa nesta quarta-feira
-    dia 8, e é possível realizar o pagamento da
+    registros. O evento começa nesta segunda-feira
+    dia 10, e é possível realizar o pagamento da
     inscrição diretamente no local. Para isso,
 
-      - dirija-se ao balcão de NÃO-PAGOS
+      - dirija-se ao balcão de NÃO-PAGAS
       - informe o número de inscrição abaixo
       - efetue o pagamento de sua inscrição
       - o crachá sera entregue pelo atendente
@@ -36,8 +36,7 @@ body: |
 
     {backend_url}/api/fd/reception/{person.purchase.hash_code}
 
-    Cordialmente
 
-    --
-    Organização
+    Saudações Livres!
+
     Associação Software Livre.Org

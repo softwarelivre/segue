@@ -2,7 +2,7 @@
 
 template: notify_slot
 language: pt
-subject: "FISL18 - notificação de horário de palestra"
+subject: "FISL - notificação de horário de palestra"
 
 body: |
 
@@ -26,7 +26,6 @@ body: |
       ATENÇÃO: favor confirmar esta notificação pelo link até
                às {deadline_hours} do dia {deadline_day}
 
-    Cordialmente
+    Saudações Livres!
 
-    --
-    Coordenação do Temario FISL18
+    Associação Software Livre.Org

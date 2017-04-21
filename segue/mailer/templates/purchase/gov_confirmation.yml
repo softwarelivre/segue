@@ -2,19 +2,19 @@
 
 template: purchase_gov_confirmation
 language: pt
-subject: "#FISL18 - Confirmação de Empenho"
+subject: "FISL - Confirmação de Empenho"
 
 body: |
     Prezad@ {corporate.incharge_name} da {customer.name},
 
     O seu cadastro e a respectiva nota de empenho foram analisados e estão aprovados!
-    Por tanto, abaixo segue(m) o(s) código(s) promocional(ais) para cadastro do(s) servidore(s) que participarão do FISL18.
+    Por tanto, abaixo segue(m) o(s) código(s) promocional(ais) para cadastro do(s) servidore(s) que participarão do FISL.
 
     {hash_codes}
 
     Para utilização, é necessário seguir os seguintes passos:
 
-    1. Entregue um código promocional para cada servidor que comparecerá no FISL18;
+    1. Entregue um código promocional para cada servidor que comparecerá no FISL;
 
     2. Cada um deles, deverá criar uma conta pessoal e preencher o cadastro no Sistema de Inscrições: http://segue.fisl18.softwarelivre.org
 
@@ -35,5 +35,6 @@ body: |
     Caso tenha dúvidas, envie um e-mail para: financeiro@espacodeprojetos.com.br
 
 
-    Saudações livres!
-    Comissão Organizadora do #FISL18
+    Saudações Livres!
+
+    Associação Software Livre.Org

@@ -2,7 +2,7 @@
 
 template: corporate_promocode_confirmation
 language: pt
-subject: "#FISL18 - confirmação de inscrição"
+subject: "FISL - confirmação de inscrição"
 
 body: |
     {customer.name},
@@ -13,9 +13,8 @@ body: |
 
     Código do ingresso: {purchase.id}
     Tipo de ingresso: {purchase.description}
-
     Valor do ingresso: R$ {purchase.amount}
 
-    Saudações livres!
+    Saudações Livres!
 
-    Comissão Organizadora do #FISL18
+    Associação Software Livre.Org

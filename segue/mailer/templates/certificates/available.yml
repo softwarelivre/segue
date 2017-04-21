@@ -2,24 +2,20 @@
 
 template: available_certificates
 language: pt
-subject: "FISL18 - certificado de participação disponível"
+subject: "FISL - certificado de participação disponível"
 
 body: |
 
     Olá {account.name}!
 
-    O seu certificado de participação no FISL está
-    disponível para emissão em nosso sistema. Para
-    emiti-lo, por favor acesse o sistema de
-    inscrições utilizando seu e-mail e senha, usando
-    a URL abaixo:
+    O seu certificado de participação no FISL está disponível. 
+    Para emiti-lo, por favor acesse o sistema de inscrições 
+    com seu e-mail e senha, usando o endereço:
 
         {frontend_url}/#/certificate/
 
-    Caso você não lembre ou não saiba sua senha, ou
-    caso a sua conta tenha sido criada por terceiros,
-    por favor utilize o processo de recuperação
-    de senhas, através da URL abaixo
+    Caso você não lembre ou não saiba sua senha, utilize 
+    o processo de recuperação através do endereço:
 
         {frontend_url}/#/forgot/{account.email}
 
