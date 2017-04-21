@@ -2,7 +2,7 @@
 
 template: purchase_gov
 language: pt
-subject: "FISL18 - Recebimento de solicitação"
+subject: "FISL - Recebimento de solicitação"
 
 body: |
     Prezad@ {corporate.incharge_name} da {customer.name},
