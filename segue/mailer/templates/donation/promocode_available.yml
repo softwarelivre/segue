@@ -2,7 +2,7 @@
 
 template: promocode_available
 language: pt
-subject: "#FISL18 - Código para inscrição não utilizado"
+subject: "FISL - Código para inscrição não utilizado"
 
 body: |
     Prezad@ {customer.name},
@@ -19,5 +19,10 @@ body: |
     5. Clique no Botão “Comprar”;
     6. Clique em “Finalizar”.
 
+    Caso não tenha possibilidade de usá-lo:
+
+    - Pode encaminhá-los para o FunFISL, opção que os destinará para pessoas carentes, através da cedência do código promocional que é único, mas transferível, até o limite de códigos existentes.
+
     Saudações livres!
-    Comissão Organizadora do #FISL18
+
+    Associação Software Livre.Org

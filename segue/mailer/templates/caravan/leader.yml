@@ -2,7 +2,7 @@
 
 template: leader_exempt
 language: pt
-subject: ""
+subject: "Parabéns, a {caravan.name} foi aprovada!"
 
 body: |
 
@@ -13,7 +13,7 @@ body: |
     cortesia para o FISL18.
 
     Para fazer uso dessa cortesia, no dia do evento, informe
-    os dados abaixo no balcão de inscritos:
+    os dados a seguir no balcão de inscritos:
 
     * número de inscrição: {purchase.id}
     * nome da caravana: {caravan.name}

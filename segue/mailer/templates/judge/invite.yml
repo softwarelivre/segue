@@ -2,31 +2,29 @@
 
 template: invite_judge
 language: pt
-subject: "Ajude-nos a escolher as palestras do FISL 18!"
+subject: "Ajude-nos a escolher as palestras do FISL"
 
 body: |
 
     Saudações Livres !
 
-    Você foi convidado a participar no torneio (suíço) para escolher
-    as propostas de palestras no FISL18.
+    Você foi convidado a participar do torneio suíço, o qual irá definir
+    as propostas de palestras que irão compor a maior parte da grade do FISL.
 
     Com o seu "token" você terá a oportunidade de votar qual a sua
-    proposta preferida entre duas que serão apresentadas lado a lado.
+    proposta preferida entre duas que lhe serão apresentadas lado a lado.
 
-    Não é preciso ser especialista nos assuntos das duas propostas,
-    basta que leia as propostas e avalie qual das duas prefere.
+    Leia as propostas com atenção e avalie qual das duas considera melhor.
 
-    Também pode optar por escolher ambas.
+    Caso tenha dúvida, você também pode optar por escolher ambas.
 
-    Assim você está ajudando a construir a grade de conteúdos do
-    evento.
+    Assim ,você está ajudando a construir a grade de conteúdos do
+    evento!
 
-    Para começar basta clicar no link abaixo:
+    Para começar, basta clicar no endereço:
 
     {backend_url}/api/judges/{token.hash}
 
     Agradecemos.
 
-    --
     Associação Software Livre.Org

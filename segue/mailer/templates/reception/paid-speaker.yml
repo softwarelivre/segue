@@ -2,14 +2,12 @@
 
 template: paid-speaker
 language: pt
-subject: "FISL18 - está chegando a hora!"
+subject: "FISL - está chegando a hora!"
 
 body: |
-    O FISL18 começa nessa quarta-feira, dia 13 e sua inscrição está confirmada!
-
     Para acelerar seu atendimento, proceda da seguinte forma:
 
-          Dirija-se à secretaria com o seguinte letreiro:
+          No local do evento, dirija-se à secretaria com o seguinte letreiro:
 
                      Palestrantes
 
@@ -30,14 +28,13 @@ body: |
 
         {backend_url}/api/fd/reception/{person.purchase.hash_code}
 
-    Participe da Campanha de doação do FISL18!
+    Participe da Campanha de doação do FISL!
 
     Na secretaria do evento você poderá doar:
+    * A partir de R$ 10,00 e receber um boton do FISL;
+    *R$ 50,00 e receber uma camiseta do FISL;
+    *R$ 450,00 e receber  um código promocional com 100%, um boton e uma camiseta do FISL;
 
-    * A partir de R$ 10,00 e receber um boton do FISL18;
-    *R$ 50,00 e receber uma camiseta do FISL18;
-    *R$ 450,00 e receber  um código promocional com 100%, um boton e uma camiseta do FISL18;
+    Saudações Livres!
 
-    Saudações Livres,
-
-    Comissão Organizadora do #FISL18
+    Associação Software Livre.Org

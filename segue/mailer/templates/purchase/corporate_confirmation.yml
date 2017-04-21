@@ -2,18 +2,18 @@
 
 template: purchase_corporate_confirmation
 language: pt
-subject: "#FISL18 - confirmação de pagamento"
+subject: "FISL - confirmação de pagamento"
 
 body: |
     Prezad@ {corporate.incharge_name} da Empresa {customer.name},
 
-    Recebemos seu pagamento e abaixo segue(m) o(s) código(s) corporativo(s) para cadastro da(s) pessoa(s) que participarão do FISL18.
+    Recebemos seu pagamento e abaixo segue(m) o(s) código(s) corporativo(s) para cadastro da(s) pessoa(s) que participarão do FISL.
 
     {hash_codes}
 
     PARA UTILIZAÇÃO, É NECESSÁRIO SEGUIR OS SEGUINTES PASSOS:
 
-    1. Entregue um código promocional para cada indivíduo que comparecerá no FISL18;
+    1. Entregue um código promocional para cada indivíduo que comparecerá no FISL;
     2. Cada um que receber o código, deverá criar uma conta pessoal e preencher o cadastro no Sistema de Inscrições: http://segue.fisl18.softwarelivre.org
     3. Inserir o código no campo: “Insira aqui o seu código promocional”;
     4. Clicar em “Usar”;
@@ -27,5 +27,6 @@ body: |
     Caso tenha dúvidas, envie um e-mail para: financeiro@espacodeprojetos.com.br
 
 
-    Saudações livres!
-    Comissão Organizadora do #FISL18
+    Saudações Livres!
+
+    Associação Software Livre.Org

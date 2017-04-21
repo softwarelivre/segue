@@ -2,7 +2,7 @@
 
 template: proposal_invite
 language: pt
-subject: "{proposal.owner.name} te convidou para o FISL18"
+subject: "{proposal.owner.name} te convidou para o FISL"
 
 body: |
 
@@ -21,7 +21,7 @@ body: |
 
     {backend_url}/api/proposals/{proposal.id}/invites/{invite.hash}
 
-    **Atenção**: a aceitação deste convite não garante participação
+    Atenção: a aceitação deste convite não garante participação
     como palestrante no evento. Todas propostas de palestras serão
     submetidas a avaliação por parte da comissão organizadora do
     evento, em um processo de avaliação feito em colaboração com
@@ -29,7 +29,7 @@ body: |
     processo de avaliação os proponentes selecionados serão convocados
     para apresentação.
 
-    Atenciosamente,
+    Saudações Livres!
 
-    --
     Associação Software Livre.Org
+

@@ -2,32 +2,25 @@
 
 template: non_selection
 language: pt
-subject: "Obrigado por enviar sua proposta de palestra para o FISL18"
+subject: "Grato por enviar sua proposta de palestra para o FISL18"
 
 body: |
 
     Olá {account.name}!
 
-    Informamos que, infelizmente, nenhuma de suas propostas
-    de palestra para o FISL18 foi selecionada.
+    Informamos que você chegou quase lá, mas nenhuma de suas propostas de palestra foi selecionada pelo sistema de avaliação do FISL.
 
-    No entanto, a sua participação no evento é muito importante
-    para nós. Nesse sentido, a organizaçõa do evento lhe garante
-    a inscrição com o mesmo preço em vigor à época da submissão
-    de suas propostas de palestra.
+    No entanto, a sua participação no evento é muito importante para nós. Nesse sentido, a organização do evento lhe garante a inscrição com o mesmo preço ou valor de doação em vigor à época da submissão de suas propostas de palestra.
 
     Não perca essa oportunidade!
 
-    Para comprar seu ingresso nesses termos, por favor
-    utilize o link abaixo para acessar o sistema de
-    inscrições e emitir o novo boleto.
+    Para conseguir seu ingresso nesses termos, por favor utilize o endereço abaixo para acessar o sistema de inscrições e emitir o seu boleto.
 
     {backend_url}/api/non-selection/{notice.hash}
 
-    O pagamento antecipado (através de boleto) pode ser realizado
-    até o dia 07 de Julho de 2015. Após essa data, o pagamento
-    somente será aceito em dinheiro, na secretaria do evento.
+    O pagamento antecipado (através de boleto ou cartão) pode ser realizado 
+    até o dia “data final pgto-antecipado”.
 
-    Muito obrigada pela atenção.
     Saudações Livres!
-    Comissão Organizadora do FISL18
+
+    Associação Software Livre.Org

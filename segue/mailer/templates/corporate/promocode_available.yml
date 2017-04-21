@@ -2,12 +2,13 @@
 
 template: promocode_available
 language: pt
-subject: "#FISL18 - Código para inscrição não utilizado"
+subject: "FISL - Código para inscrição não utilizado"
 
 body: |
     Prezad@ {corporate.incharge_name} da empresa {corporate.name},
 
-    Verificamos que existem códigos que ainda não foram utilizados no sistema de inscrições do Fórum Internacional Software Livre – FISL18.
+    Verificamos que existem códigos que ainda não foram utilizados no sistema de 
+    inscrições do Fórum Internacional Software Livre – FISL.
 
     Segue(m) o(s) códigos não utilizados:
 
@@ -23,6 +24,13 @@ body: |
     2.4. Clicar no Botão “Comprar”;
     2.5.Clique em “Finalizar”.
     Caso tenha dúvidas, envie um e-mail para: financeiro@espacodeprojetos.com.br.
+
+    Caso não tenha possibilidade de usá-los:
+    
+    - Pode encaminhá-los para o FunFISL, opção que os destinará para pessoas carentes, 
+    através da cedência do código promocional que é único, mas transferível, 
+    até o limite de códigos existentes.
+    
 
     Saudações livres!
     Comissão Organizadora do #FISL18
