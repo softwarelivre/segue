@@ -9,7 +9,7 @@ body: |
     Olá {invite.name}!
 
     Você está sendo convidado por **{proposal.owner.name}** para
-    participar do FISL 18 na condição de co-autor
+    participar do FISL na condição de co-autor
     da proposta de palestra descrita abaixo:
 
     * título: **{proposal.title}**
