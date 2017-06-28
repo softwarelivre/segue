@@ -2,7 +2,7 @@
 
 template: leader_exempt
 language: pt
-subject: "Parabéns, a {caravan.name} foi aprovada!"
+subject: "Parabéns, a '{caravan.name}' foi aprovada!"
 
 body: |
 
