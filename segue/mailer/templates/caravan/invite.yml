@@ -22,9 +22,9 @@ body: |
 
     {backend_url}/api/caravans/{caravan.id}/invites/{invite.hash}
 
-    **Atenção**: a aceitação deste convite não garante participação
-    no evento. Para participar deste evento na condição de caravanista,
-    é necessário efetuar o pagamento da inscrição.
+    ATENÇÃO: a aceitação deste convite não garante participação
+    no evento. Para confirmar sua condição de caravanista,
+    é necessário efetuar o pagamento de inscrição.
 
     Atenciosamente,
 

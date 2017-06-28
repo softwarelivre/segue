@@ -21,7 +21,7 @@ body: |
 
     {backend_url}/api/proposals/{proposal.id}/invites/{invite.hash}
 
-    Atenção: a aceitação deste convite não garante participação
+    ATENÇÃO: a aceitação deste convite não garante participação
     como palestrante no evento. Todas propostas de palestras serão
     submetidas a avaliação por parte da comissão organizadora do
     evento, em um processo de avaliação feito em colaboração com
