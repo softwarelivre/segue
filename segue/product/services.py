@@ -14,7 +14,7 @@ from segue.proposal.services import NonSelectionService
 from models import Product, PromoCodeProduct
 from errors import ProductExpired, NoSuchProduct
 
-DEFAULT_ORDERING = Product.sold_until
+DEFAULT_ORDERING = Product.price
 
 class ProductService(object):
     def __init__(self, db_impl=None, purchases=None, caravans=None, non_selection=None):
