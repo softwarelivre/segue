@@ -124,7 +124,7 @@ class PromoCodeSchema(BaseSchema):
 
     description = Field.str(
         required=True,
-        validate=[Validator.length(min=3, max=20)]
+        validate=[Validator.length(min=3, max=50)]
     )
 
     #TODO: CREATE ENGLISH MESSAGE
