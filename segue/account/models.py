@@ -259,7 +259,7 @@ class Account(JsonSerializable, db.Model):
 
     @property
     def has_valid_ticket(self):
-        return any([p for p in self.purchases if p.satisfied and not p.category.is_ticket])
+        return any([p for p in self.purchases if p.satisfied and p.is_ticket])
 
 
     #TODO: HACK REMOVE LOOK IN RESPONSES
