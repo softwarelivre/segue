@@ -31,12 +31,12 @@ class PromoCodeService(object):
         filter_list = self.filter_strategies.given(**kw)
         return base.filter(*filter_list).order_by(PromoCode.id).all()
 
-    def create(self, data, quantity=None, creator=None, description=None):
+    def create(self, data, quantity=None, creator=None):
         if not 'description' in data: raise MustProvideDescription()
         if not creator: raise MustDefineCreator()
         
         result = []
-        unmodified_description = data['description'] or description
+        unmodified_description = data['description']
         for counter in range(quantity):
             promocode_data = deepcopy(data)
             promocode_data['description'] = u'{description} - {counter}/{total}'.format(

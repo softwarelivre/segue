@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from datetime import timedelta
 from sqlalchemy import and_
 import os
 import xmltodict
@@ -367,10 +368,17 @@ class PaymentService(object):
         from segue.product.models import Product
         promo_product = Product.query.filter(Product.id==purchase.product.promocode_product_id).first()
 
+        data = {
+            'description': promo_product.description,
+            'discount': 1.0,
+            'product_id': purchase.product.promocode_product_id,
+            'start_at': datetime.now().strftime("%d/%m/%Y"),
+            'end_at': (datetime.now() + timedelta(days=128)).strftime("%d/%m/%Y")
+        }
+
         promocodes = self.promocodes.create(
-            promo_product,
+            data,
             creator=purchase.customer,
-            description=promo_product.description,
             quantity=purchase.qty)
 
         self.mailer.notify_corporate_payment(purchase, promocodes)
@@ -379,11 +387,18 @@ class PaymentService(object):
         from segue.product.models import Product
         promo_product = Product.query.filter(Product.id == purchase.product.promocode_product_id).first()
 
+        data = {
+            'description': promo_product.description,
+            'discount': 1.0,
+            'product_id': purchase.product.promocode_product_id,
+            'start_at': datetime.now().strftime("%d/%m/%Y"),
+            'end_at': (datetime.now() + timedelta(days=128)).strftime("%d/%m/%Y")
+        }
+
         promocodes = self.promocodes.create(
-            promo_product,
-            creator=purchase.customer,
-            description=promo_product.description,
-            quantity=purchase.qty)
+            data,
+            quantity=purchase.qty,
+            creator=purchase.customer)
 
         self.mailer.notify_gov_purchase_analysed(purchase, promocodes)
 
@@ -391,10 +406,18 @@ class PaymentService(object):
         from segue.product.models import Product
         promo_product = Product.query.filter(Product.id==purchase.product.promocode_product_id).first()
 
+        data = {
+            'description': promo_product.description,
+            'discount': 1.0,
+            'product_id': purchase.product.promocode_product_id,
+            'start_at': datetime.now().strftime("%d/%m/%Y"),
+            'end_at': (datetime.now() + timedelta(days=128)).strftime("%d/%m/%Y")
+        }
+
         promocodes = self.promocodes.create(
-            promo_product,
-            creator=purchase.customer,
-            description=promo_product.description
+            data,
+            quantity=purchase.qty,
+            creator=purchase.customer
         )
         document,_ = ClaimCheckDocumentService().create(purchase)
         self.mailer.notify_promocode(purchase.customer, promocodes[0], document)
