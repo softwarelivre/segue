@@ -105,7 +105,7 @@ class PurchaseController(object):
         if result and result.discount != 1.0 and self.service.current_mode() != 'online':
             raise BlockedDiscount()
 
-        return PromoCodeResponse(result), 200
+        return Response(result, PromoCodeResponse).create(), 200
 
     @jsoned
     def donations_count(self):
