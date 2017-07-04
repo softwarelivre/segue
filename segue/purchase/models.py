@@ -13,7 +13,7 @@ import re
 class Buyer(JsonSerializable, db.Model):
     _serializers = [ BuyerJsonSerializer ]
     id              = db.Column(db.Integer, primary_key=True)
-    kind            = db.Column(db.Enum('person','company','government','foreing', name="buyer_kinds"))
+    kind            = db.Column(db.Enum('person','company','government','foreign', name="buyer_kinds"))
     name            = db.Column(db.Text)
     document        = db.Column(db.Text)
     extra_document  = db.Column(db.String(length=80))
