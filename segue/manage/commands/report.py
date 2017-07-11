@@ -212,7 +212,7 @@ def adempiere_filter(data):
     return content
 
 def get_description(category, quantity, number):
-    first_paragraph = '{:0>2d} inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 13 a 16 de julho de 2016, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(quantity, category)
+    first_paragraph = '{:0>2d} inscrição categoria {} para o 17º Fórum Internacional Software Livre, a realizar-se de 01 a 04 de outubro de 2017, no Centro de Eventos da PUC, em Porto Alegre/RS. * * *'.format(quantity, category)
     second_paragraph = 'Inscrição nº {}. * * *'.format(number)
     third_paragraph = 'A Associação Software Livre.Org declara para fins de não incidência na fonte do IRPJ, da CSLL, da COFINS e da contribuição para PIS/PASEP ser associação sem fins lucrativos, conforme art. 64 da Lei nº 9.43 0/1996 e atualizações e Instrução Normativa RFB nº 1.234/2012. * * *'
     forth_paragraph = 'Tributos: ISS 5% + COFINS 7,6% = 12,6%.'
