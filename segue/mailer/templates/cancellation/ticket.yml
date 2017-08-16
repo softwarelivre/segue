@@ -1,0 +1,31 @@
+---
+
+template: cancellation_donation
+language: pt
+subject: "FISL - Adiamento"
+
+body: |
+
+    Car@ {account.name},
+    
+    Muito grato por fazer sua inscrição para o FISL18.
+    
+    O FISL18 foi adiado e acontecerá de 11 a 14 de julho de 2018, conforme divulgado em:
+    http://softwarelivre.org/fisl18/mensagem-a-comunidade-brasileira-integrante-do-projeto-software-livre-brasil
+
+    Contamos com sua presença na nova data.  
+    Caso não possa estar conosco e deseje o reembolso de sua inscrição, favor encaminhar comprovante de pagamento da mesma para o e-mail fisl@espacodeprojetos.com.br informando: 
+    Nome Completo, CPF ou CNPJ e dados bancários.
+
+    Nos colocamos a disposição para maiores esclarecimentos nos seguintes canais:
+
+    e-mail: fisl@espacodeprojetos.com.br
+    Telefone: +55 51 3029.9398/ 98186.0120 - das 14h às 17h
+
+    Saudações livres, 
+
+    Coordenação da ASL.Org
+    Software Livre - A tecnologia que liberta
+    Fisl18 - Fórum Internacional Software Livre
+    "Informação e comunicação abertas para a sociedade."
+    11 a 14 de julho de 2018 - Porto Alegre - Brasil
