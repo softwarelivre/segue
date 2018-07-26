@@ -4,6 +4,8 @@ import collections
 from support import *
 import time
 
+from segue.models import *
+
 from segue.frontdesk.services import BadgeService, PeopleService
 
 USAGE = """
@@ -24,28 +26,42 @@ def reception_mail(status, categories="", start=None, end=None):
     errors = []
 
     for person in people.by_range(int(start), int(end)):
-        print "scanning {}{}{}, person {}{}{} - {}{}{} - {}{}{}".format(F.RESET,
+        """print "scanning {}{}{}, person {}{}{} - {}{}{} - {}{}{}".format(F.RESET,
             F.RED, person.id,       F.RESET,
             F.RED, u(person.name),  F.RESET,
             F.RED, person.status,   F.RESET,
             F.RED, person.category, F.RESET
-        )
-        print "... email is {}{}{}".format(F.RED, person.email.__repr__(), F.RESET)
+        )"""
+        #print "... email is {}{}{}".format(F.RED, person.email.__repr__(), F.RESET)
 
         if person.status != status:
-            print "... {}ticket does not have the correct status{}, skipping".format(F.RED, F.RESET)
+            #print "... {}ticket does not have the correct status{}, skipping".format(F.RED, F.RESET)
             continue
 
         elif person.category in wanted_categories or categories == "*":
-            print "... {}category is correct{}, sending".format(F.GREEN, F.RESET)
+            if status == 'pending':
+                CATEGORIES = ('normal','caravan','caravan-leader','promocode','student','speaker','gov-promocode','corporate-promocode')
+                ignore = False
+                account = Account.query.join(Purchase).filter(Account.email==person.email).first()
+                for purchase in account.purchases:
+                    if purchase.status == 'paid' and purchase.category in CATEGORIES:
+                        ignore = True
+                if ignore:
+                    #print("ignorando conta", person.email, person.id, person.category)
+                    continue
+
+            #print "... {}category is correct{}, sending".format(F.GREEN, F.RESET)
             try:
+                #print(person.id, person.status, person.category)
                 people.send_reception_mail(person.id)
-                time.sleep(5)
+                time.sleep(2)
             except Exception, e:
                 errors.append([ person.id, sys.exc_info() ])
 
         else:
-            print "... {}wrong category{}, skipping".format(F.RED, F.RESET)
+            pass
+            #print('skipping', person.id, person.status, person.category)
+            #print "... {}wrong category{}, skipping".format(F.RED, F.RESET)
 
     for id, error in errors:
         print "ERROR for person {}: {}".format(person.id, error)

@@ -48,14 +48,15 @@ def populate(clean=False):
     db.session.add_all(payments)
     db.session.commit()
 
-def populate_slots(start=0,end=0):
+def populate_slots(start=11,end=12):
     init_command()
-    dates = [ datetime(2017,7,5), datetime(2017,7,6), datetime(2016,7,7), datetime(2016,7,8) ]
-    hours = [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
+    #dates = [datetime(2018,7,12), datetime(2018,7,13), datetime(2018,7,14)]
+    dates = [datetime(2018,7,11)]
+    hours = [ 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 , 20]
 
     rooms = Room.query.filter(Room.id.between(int(start), int(end))).all()
     for room in rooms:
-        print "{}creating slots for room {}{}{}...".format(F.RESET, F.RED, room.name, F.RESET)
+        print "{}creating slots for room {}{}{}...".format(F.RESET, F.RED, room.id, F.RESET)
         for date in dates:
             for hour in hours:
                 slot = Slot()
@@ -77,6 +78,20 @@ def populate_reference_data(clean=False):
 
     db.session.commit()
     return tracks, products
+
+def populate_rooms_data(clean=False, qty=7):
+    if clean:
+        Room.query.delete()
+
+    rooms   = _build_rooms(qty)
+
+    if not Track.query.all():   db.session.add_all(rooms)
+
+    db.session.commit()
+    return rooms
+
+def _build_rooms(n_rooms):
+    return [ValidRoomFactory() for i in range(n_rooms)]
 
 def _build_products():
     def _build_one(entry):

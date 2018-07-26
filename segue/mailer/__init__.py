@@ -4,7 +4,7 @@ import glob
 import codecs
 
 from segue.errors import SegueError
-from segue.core import mailer, config
+from segue.core import mailer, config, logger
 from flask_mail import Message, Attachment
 
 class EmailIsNotValid(SegueError): pass
@@ -201,6 +201,16 @@ class MailerService(object):
         message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
         return mailer.send(message.build())
 
+    def notify_contribution(self, purchase, claim_check_file_path):
+        customer = purchase.customer
+        product  = purchase.product
+
+        message = self.message_factory.from_template('donation/contribution')
+        message.given(customer=customer, purchase=purchase, product=product)
+        message.to(customer.name, customer.email)
+        message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
+        return mailer.send(message.build())
+
     def notify_promocode(self, customer, promocode, claim_check_file_path):
         from segue.models import SurveyAnswer
         survey = SurveyAnswer.query\
@@ -214,6 +224,14 @@ class MailerService(object):
         message.to(customer.name, customer.email)
         message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
         return mailer.send(message.build())
+
+    def notify_annuity_payment(self, customer, promocode, claim_check_file_path):
+        message = self.message_factory.from_template('promocode/confirmation_annuity')
+        message.given(customer=customer, promocode=promocode)
+        message.to(customer.name, customer.email)
+        message.append_attachment('recibo.pdf', claim_check_file_path, 'application/pdf')
+        return mailer.send(message.build())
+
 
     def notify_claimcheck(self, purchase, claim_check_file_path):
             customer = purchase.customer
@@ -279,11 +297,27 @@ class MailerService(object):
             notification       = notification,
             deadline_day       = notification.deadline.strftime("%d/%m/%Y"),
             deadline_hours     = notification.deadline.strftime("%H:%M"),
-            presentation_day   = notification.slot.begins.strftime("%d/%m/%Y"),
-            presentation_hours = notification.slot.begins.strftime("%H:%M")
         )
         message.to(notification.account.name, notification.account.email)
         return mailer.send(message.build())
+
+    def call_proposal_slot(self, notification, account, proposal, slot):
+        logger.info('slot')
+        logger.info(slot)
+        message = self.message_factory.from_template('schedule/call_proposal')
+        message.given(
+            notification   = notification,
+            account        = account,
+            proposal       = proposal,
+            room               = slot.room,
+            presentation_day   = slot.begins.strftime("%d/%m/%Y"),
+            presentation_hours = slot.begins.strftime("%H:%M"),
+            deadline_hours = notification.deadline.strftime("%H:%M"),
+            deadline_day   = notification.deadline.strftime("%d/%m/%Y")
+        )
+        message.to(notification.account.name, notification.account.email)
+        return mailer.send(message.build())
+
 
     def non_selection(self, notice):
         message = self.message_factory.from_template('proposal/non_selection')

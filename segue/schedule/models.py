@@ -86,7 +86,7 @@ class CallNotification(Notification):
     __mapper_args__ = { 'polymorphic_identity': 'call' }
 
     def update_target_status(self):
-        self.proposal.status = self.status
+        #self.proposal.status = self.status
         return self.proposal
 
     @property

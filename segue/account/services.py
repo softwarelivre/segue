@@ -137,6 +137,7 @@ class AccountService(object):
 
         account = AccountFactory.from_json(data, schema.whitelist[rules])
         account.role = role
+        logger.error(account)
 
         if not account.document: raise DocumentIsNotDefined()
         if not account.password: account.password = self.hasher.generate()
@@ -146,7 +147,6 @@ class AccountService(object):
         if new_account.role == 'corporate':
             from segue.corporate.services import CorporateService
             CorporateService().create_corporate(new_account, incharge)
-
         return new_account
 
     def _create_or_update(self, account):
@@ -155,6 +155,7 @@ class AccountService(object):
             db.session.commit()
             return account
         except IntegrityError as e:
+            #db.session.rollback()
             #TODO: IMPROVE psycopg2.IntegrityError
             if 'account_email_UK' in e.orig.pgerror:
                 raise EmailAlreadyInUse()
@@ -227,6 +228,4 @@ class AccountService(object):
         if new_account.role == 'corporate':
             from segue.corporate.services import CorporateService
             CorporateService().create_corporate(new_account, incharge)
-
         return new_account
-

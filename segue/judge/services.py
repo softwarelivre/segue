@@ -78,16 +78,38 @@ class RankingService(object):
         unsorted = [ Ranked(proposal, idx_standings) for proposal in tournament.proposals ]
         return sorted(unsorted)
 
-
     def classificate(self, tournament_id, **filters):
+        from segue.proposal.models import Proposal
+        tournament = self.tournaments.get_one(tournament_id)
         standings = self.tournaments.get_standings(tournament_id)
-        proposals = self.proposals.query(**filters)
+       #print("stadings", standings)
+       #Proposal.query.filter(Proposal.status=='confirmed').filter(Proposal.slots!=None)
+        proposals = Proposal.query.filter(Proposal.slots!=None)
+        #proposals = self.proposals.query(**filters)
+        #print("proposals", proposals)
+
+        idx_standings = { player.id: player for player in standings }
+
+        unslotted = [ proposal for proposal in tournament.proposals  if not proposal.slotted]
+ 
+        unsorted = [Ranked(proposal, idx_standings) for proposal in unslotted ]
+
+        return sorted(unsorted)
+"""
+    def classificate(self, tournament_id, **filters):
+        from segue.proposal.models import Proposal
+        standings = self.tournaments.get_standings(tournament_id)
+       #print("stadings", standings)
+       #Proposal.query.filter(Proposal.status=='confirmed').filter(Proposal.slots!=None)
+        proposals = Proposal.query.filter(Proposal.slots!=None)
+        #proposals = self.proposals.query(**filters)
+        #print("proposals", proposals)
 
         idx_standings = { player.id: player for player in standings }
 
         unsorted = [ Ranked(proposal, idx_standings) for proposal in proposals ]
         return sorted(unsorted)
-
+"""
 class JudgeService(object):
     def __init__(self, db_impl=None, hasher=None, tournaments=None):
         self.db          = db_impl or db

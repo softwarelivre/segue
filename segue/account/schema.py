@@ -67,7 +67,7 @@ class AccountSchema(BaseSchema):
         )
         organization = Field.str()
         resume = Field.str(
-            validate=[Validator.length(max=400)]
+            validate=[Validator.length(max=550)]
         )
         occupation = Field.str(
             required=True,

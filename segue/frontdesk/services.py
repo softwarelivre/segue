@@ -84,7 +84,7 @@ class BadgeService(object):
         return True
 
     def make_badge(self, printer, visitor_or_person, organization=None, copies=1, by_user=None):
-        if not visitor_or_person.can_print_badge: raise CannotPrintBadge()
+        #if not visitor_or_person.can_print_badge: raise CannotPrintBadge()
         if printer not in self.printers: raise InvalidPrinter()
         badge = Badge.create(visitor_or_person)
         badge.printer = printer
@@ -121,7 +121,7 @@ class SpeakerService(object):
         db.session.add(purchase)
         db.session.commit()
 
-        logger.info('SpeakerService.create  name={} email={} type={} by={}'.format(account.name,account.email,product.category,by_user))
+        logger.info('SpeakerService.create  email={} type={} by={}'.format(account.email,product.category,by_user))
 
         people = self.peoples.get_one(purchase.id, by_user=None, check_ownership=False, strict=True)
         self.badges.make_badge(printer, people)
@@ -347,9 +347,18 @@ class PeopleService(object):
     def create(self, data, by_user=None, product=None):
         #_validate('create', dict(email=email))
 
-        account = self.accounts.create_people(data)
+        try:
+            logger.error(data)
+            account = self.accounts.create_people(data)
+        except Exception as ex:
+            logger.error(ex)
+
         default_product = product or self.products.chepest_available_for('normal')
         print(default_product)
+        logger.error(account)
+
+        logger.error(default_product)
+
         purchase = Purchase(customer=account, product=default_product)
         purchase.qty = 1
         purchase.amount = default_product.price
@@ -357,6 +366,7 @@ class PeopleService(object):
 
         db.session.add(purchase)
         db.session.commit()
+        logger.error(purchase)
 
         return Person(purchase)
 

@@ -10,8 +10,10 @@ import collections
 
 from segue.core import db, logger, config
 from segue.errors import NotAuthorized
+from segue.account.models import Account
 from segue.product.errors import NoSuchProduct, ProductExpired
 from segue.validation import StudentDocumentValidator
+
 
 from factories import BuyerFactory, PurchaseFactory
 from filters import PurchaseFilterStrategies, PaymentFilterStrategies
@@ -51,7 +53,7 @@ class PurchaseService(object):
         self.mailer = mailer or MailerService()
 
     def by_range(self, start, end):
-        return Purchase.query.filter(Purchase.id.between(start, end)).order_by(Purchase.id)
+        return Purchase.query.join(Account).filter(Purchase.id.between(start, end)).order_by(Purchase.id)
 
     def get_by_hash(self, hash_code, strict=True):
         purchase = Purchase.query.filter(Purchase.hash_code == hash_code).first()
@@ -308,6 +310,7 @@ class PaymentService(object):
 
             return purchase, transition
         except Exception, e:
+            print(e.__dict__)
             logger.error('Exception was thrown while processing payment notification! %s', e)
             raise e
 
@@ -350,6 +353,9 @@ class PaymentService(object):
 
 
     def on_finish_payment(self, purchase):
+        #if purchase.product.id in config.CONTRIBUTION_PRODUCTS_IDS:
+        #    self.on_finish_normal_donation(purchase)
+
         if purchase.category == 'business':
             self.on_finish_corporate(purchase)
         elif purchase.category == 'government':
@@ -419,12 +425,23 @@ class PaymentService(object):
             quantity=purchase.qty,
             creator=purchase.customer
         )
-        document,_ = ClaimCheckDocumentService().create(purchase)
-        self.mailer.notify_promocode(purchase.customer, promocodes[0], document)
+
+        if purchase.product.id in config.ANNUITY_PRODUCT_ID:
+            from segue.purchase.factories import AnnuityClaimCheckFactory
+            document,_ = ClaimCheckDocumentService(claim_check_factory=AnnuityClaimCheckFactory()).create(purchase)
+            self.mailer.notify_annuity_payment(purchase.customer, promocodes[0], document)
+        else:
+            document,_ = ClaimCheckDocumentService().create(purchase)
+            self.mailer.notify_promocode(purchase.customer, promocodes[0], document)          
 
     def on_finish_normal_donation(self, purchase):
-        document = ClaimCheckDocumentService().create(purchase)[0]
-        self.mailer.notify_donation(purchase, document)
+        if purchase.product.id in config.CONTRIBUTION_PRODUCTS_IDS:
+            from segue.purchase.factories import ContributionClaimCheckFactory
+            document,_ = ClaimCheckDocumentService(claim_check_factory=ContributionClaimCheckFactory()).create(purchase)
+            self.mailer.notify_contribution(purchase, document)
+        else:
+            document = ClaimCheckDocumentService().create(purchase)[0]
+            self.mailer.notify_donation(purchase, document)
 
     def on_finish_caravan_rider(self, purchase):
         from segue.caravan.models import Caravan
@@ -459,6 +476,10 @@ class ProcessBoletosService(object):
 
             payment = self.boleto_service.get_by_our_number(entry.get('our_number'))
             if not payment:
+                unknown_payments.append(entry)
+                continue
+
+            if payment.status == 'paid':
                 unknown_payments.append(entry)
                 continue
 

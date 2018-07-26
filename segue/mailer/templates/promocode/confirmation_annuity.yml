@@ -1,0 +1,35 @@
+---
+
+template: promocode_confirmation_annuity
+language: pt
+subject: "ANUIDADE ASL - 2018"
+
+body: |
+    Car@ {customer.name},
+
+    Obrigado pela sua contribuição !
+
+    A Associação Software Livre.Org é o braço executivo através do qual viabilizamos o Projeto Software Livre Brasil, desde 2000. Uma das nossas ações mais conhecidas é o FISL, o nosso Fórum Internacional Software Livre, um dos cinco maiores eventos mundiais de Software Livre e que avança realizando mais uma edição. Também fomos responsáveis, junto com um coletivo de instituições, por duas das edições da Oficina Nacional de Inclusão Digital e Participação Social. Tem também a Rádio Software Livre, a TV Software Livre, a atuação no Marco Civil da Internet, além de vários movimentos promovendo a liberdade tecnológica e o compartilhamento de conhecimento, além de apoiar projetos e associações de software livre por todo o país.
+
+    Para viabilizar tudo isso, captamos recursos junto a governos municipais, estaduais e federal, junto a empresas de grande, médio e pequeno porte e, neste momento de profunda crise, fundamentalmente através de doações de pessoas como você, que reconhece a importância estratégica, a necessidade e continuidade desse trabalho.
+
+    Agora chegou a vez de buscarmos a liberdade não só do software, mas do Projeto Software Livre Brasil, do Fórum Internacional Software Livre e de todas as ações promovidas pela ASL.Org, como o apoio às Startups Livres!
+    Por isso, também é  fundamental a manutenção da contribuição  associativa anual dos sócios da ASL, cujo pagamento garante a geração de sua inscrição no FISL:
+        
+        {promocode.hash_code} 
+
+    Para utilização, é necessário seguir os seguintes passos:
+
+        1. Entregue um código promocional para cada servidor que comparecerá no FISL;
+        2. Cada um deles, deverá criar uma conta pessoal e preencher o cadastro no Sistema de Inscrições: http://segue.fisl18.softwarelivre.org
+        3. Inserir o código no campo: “Insira aqui o seu código promocional”;
+        4. Clicar em “Usar”;
+        4.1 O ingresso aparecerá com desconto de 100%;
+        5. Clicar no Botão “Comprar”;
+        6. Clique em “Finalizar”.
+
+    Seguindo os passos acima, a inscrição será efetivada e será enviado um e-mail de confirmação!
+
+    Saudações livres!
+
+    Associação Software Livre.Org

@@ -21,7 +21,6 @@ class TalkController(object):
     def get_one(self, talk_id=None):
         result = self.service.get_one(talk_id)
         if not result: raise NoSuchTalk()
-        if not result.is_talk: raise NoSuchTalk()
         return TalkDetailResponse.create(result), 200
 
 class NonSelectionController(object):

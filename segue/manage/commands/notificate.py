@@ -51,7 +51,8 @@ def certificates(start=0, end=sys.maxint):
 def non_selection(start=0, end=sys.maxint):
     init_command()
 
-    accounts = AccountService().by_range(int(start), int(end)).all()
+    #accounts = AccountService().by_range(int(start), int(end)).all()
+    accounts = AccountService().by_range(int(4468), int(4468)).all()
     service = NonSelectionService()
 
     results = { True: 0, False: 0 }
@@ -70,7 +71,7 @@ def non_selection(start=0, end=sys.maxint):
 
         if qualifies:
             print "{}sending{}...".format(F.GREEN, F.RESET),
-            service.create_and_send(account)
+        service.create_and_send(account)
 
         print F.GREEN+"OK"+F.RESET
 
@@ -81,6 +82,8 @@ def non_selection(start=0, end=sys.maxint):
     print "   not qualified: {}{}{}".format(F.GREEN, results[False], F.RESET)
 
 def notify_proposals(tags=None, deadline=None, start=0, end=sys.maxint):
+    import time
+
     init_command()
     if not tags:
         print "must specify tag names"
@@ -92,7 +95,8 @@ def notify_proposals(tags=None, deadline=None, start=0, end=sys.maxint):
 
     operations = defaultdict(lambda: 0)
 
-    for proposal in proposals:
+    for idx, proposal in enumerate(proposals):
+        if idx == 0: continue
         if proposal.id < int(start): continue;
         if proposal.id > int(end): continue;
 
@@ -109,6 +113,7 @@ def notify_proposals(tags=None, deadline=None, start=0, end=sys.maxint):
             print "{}{}{} got raised!".format(F.RED, e.__class__.__name__, F.RESET)
             name = e.__class__.__name__
             operations[name] += 1
+        time.sleep(10)
 
     print "==[ RESULTS ]========================="
     print "{}{}{} notifications got sent".format(F.GREEN, operations.pop('OK', 0), F.RESET)
@@ -117,6 +122,11 @@ def notify_proposals(tags=None, deadline=None, start=0, end=sys.maxint):
 
 
 def notify_slots(deadline=None, start=0, end=sys.maxint):
+    import time
+
+    from segue.schedule.models import Slot, CallNotification, SlotNotification, Notification  
+    from segue.proposal.models import Proposal, ProposalTag
+
     init_command()
     if not deadline:
         print "must specify deadline"
@@ -124,15 +134,17 @@ def notify_slots(deadline=None, start=0, end=sys.maxint):
 
     deadline = datetime.strptime(deadline, "%Y-%m-%d %H:%M:%S")
 
-    all_slots = SlotService().query(status='dirty')
+    all_slots = Slot.query.join(Proposal).join(ProposalTag).join(CallNotification, Proposal.id == CallNotification.proposal_id).filter(ProposalTag.name=='mark-1').filter(Notification.status=='confirmed').all()
+
+    #all_slots = SlotService().query(status='dirty')
     all_slots.sort(key=lambda x: x.id)
     notification = NotificationService()
 
     operations = defaultdict(lambda: 0)
 
     for slot in all_slots:
-        if slot.id < int(start): continue;
-        if slot.id > int(end): continue;
+        if slot.id < int(start): continue
+        if slot.id > int(end): continue
 
         try:
             print "{} issuing notify_slot for proposal [{}{}{}] - {}{}{} = {}{}{} @ {}{}{} (to: {}{}{})...".format(F.RESET,
@@ -143,9 +155,12 @@ def notify_slots(deadline=None, start=0, end=sys.maxint):
                     F.RED, slot.talk.owner.email, F.RESET
             ),
             notification.notify_slot(slot.id, deadline)
+            return 
+
             print F.GREEN + "OK" + F.RESET
             operations["OK"] += 1
         except SegueError, e:
+            print(e)
             print "{}{}{} got raised!".format(F.RED, e.__class__.__name__, F.RESET)
             name = e.__class__.__name__
             operations[name] += 1

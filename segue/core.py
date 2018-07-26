@@ -48,5 +48,6 @@ ma = Marshmallow()
 
 jwt_required = flask_jwt.jwt_required
 
+
 def u(value):
     return (value or '').encode("utf-8")

@@ -1,0 +1,12 @@
+---
+
+template: contribution_confirmation
+language: pt
+subject: "Confirmação de contribuição - ASL.Org"
+
+body: |
+    Car@ {customer.name}, obrigado por participar do FISL!
+
+    Saudações livres!
+
+    Associação Software Livre.Org

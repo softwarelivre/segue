@@ -4,7 +4,7 @@ from segue.document.services import DocumentService
 
 import schema
 from datetime import datetime, timedelta
-from models import Buyer, Purchase, Payment, Transition, ExemptPurchase, ClaimCheck
+from models import Buyer, Purchase, Payment, Transition, ExemptPurchase, ClaimCheck, AnnuityClaimCheck, ContributionClaimCheck
 
 class BuyerFactory(Factory):
     model = Buyer
@@ -122,3 +122,23 @@ class DonationClaimCheckFactory(Factory):
         date = datetime.now()
         hash_code = self.hasher.generate()
         return ClaimCheck(purchase, date=date, hash_code=hash_code)
+
+class AnnuityClaimCheckFactory(Factory):
+
+    def __init__(self, hasher=None):
+        self.hasher = hasher or Hasher(10)
+
+    def create(self, purchase):
+        date = datetime.now()
+        hash_code = self.hasher.generate()
+        return AnnuityClaimCheck(purchase, date=date, hash_code=hash_code)
+
+class ContributionClaimCheckFactory(Factory):
+
+    def __init__(self, hasher=None):
+        self.hasher = hasher or Hasher(10)
+
+    def create(self, purchase):
+        date = datetime.now()
+        hash_code = self.hasher.generate()
+        return ContributionClaimCheck(purchase, date=date, hash_code=hash_code)

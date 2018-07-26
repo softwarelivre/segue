@@ -11,18 +11,18 @@ class GuideResponse(BaseResponse):
         self.purchase  = payment.purchase
         self.buyer     = payment.purchase.buyer
         if isinstance(payment, PromoCodePayment):
-            self.promocode = PromoCodeResponse.create(payment.promocode)
+            self.promocode = PromoCodeResponse().dump(payment.promocode)
         payments       = payment.purchase.valid_payments
         for p in payments:
             if isinstance(p, PromoCodePayment):
-                self.promocode = PromoCodeResponse.create(p.promocode)
+                self.promocode = PromoCodeResponse().dump(p.promocode)
                 break
 
 class PromoCodeResponse(BaseSchema):
     id = Field.int()
     hash_code = Field.str()
     product = Field.nested(ProductSchema)
-    discount = Field.int()
+    discount = Field.float()
     description = Field.str()
 
 

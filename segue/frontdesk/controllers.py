@@ -5,7 +5,7 @@ from flask import request, abort, redirect
 from flask.ext.jwt import current_user
 from segue.decorators import jwt_only, frontdesk_only, jsoned, accepts_html, cashier_only
 
-from services import BadgeService, PeopleService, VisitorService, ReportService, SpeakerService
+from services import BadgeService, PeopleService, VisitorService, ReportService, SpeakerService, PrinterService
 from responses import PersonResponse, BadgeResponse, BuyerResponse, ProductResponse, PaymentResponse, ReceptionResponse, VisitorResponse, EmployeerResponse, EmployeeResponse
 
 class VisitorController(object):
@@ -243,6 +243,17 @@ class PersonController(object):
     @jwt_only
     @frontdesk_only
     @jsoned
+    def create_donation_badge(self, person_id):
+        printer = request.get_json().get('printer',None)
+        if not printer: abort(400)
+        person = self.people.get_one(person_id, by_user=self.current_user)
+        badge = self.badges.make_badge(printer, person, by_user=self.current_user)
+        return {},200
+
+
+    @jwt_only
+    @frontdesk_only
+    @jsoned
     def list_employees(self, person_id):
         # TODO: REMOVE
         from segue.responses import Response
@@ -274,12 +285,44 @@ class SpeakerController(object):
     @frontdesk_only
     @jsoned
     def create(self):
+        from segue.account.services import AccountService
+        from segue.product.services import ProductService
+        from segue.purchase.services import PurchaseService
+        from segue.core import logger
+        from segue.frontdesk.models import Person
+
+
+        accounts = AccountService()
+        products = ProductService()
+        purchases = PurchaseService()
+        badges = BadgeService()
+        people = PeopleService()
+
         data = request.get_json()
         printer = data.pop('printer') or abort(400)
         ticket = data.pop('ticket') or abort(400)
 
-        speaker = self.speakers.create(ticket=ticket, printer=printer, by_user=self.current_user, **data)
-        return PersonResponse.create(speaker), 200
+        product = products.chepest_available_for(ticket)
+
+        account = None
+        if 'email' in data:
+            account = accounts.get_by_email(data['email'])
+
+        if account is None:
+            account = accounts.create_people(data)
+
+        purchase = purchases.give_ticket(account, product, commit=False)
+        db.session.add(account)
+        db.session.add(purchase)
+        db.session.commit()
+
+        logger.info('Creating account in FrontDesk email={} type={} by={}'.format(account.email,product.category, self.current_user))
+
+        people = people.get_one(purchase.id, by_user=None, check_ownership=False, strict=True)
+        badges.make_badge(printer, people)
+
+        person = Person(purchase)
+        return PersonResponse.create(person), 200
 
 
 class BadgeController(object):

@@ -2,7 +2,7 @@ from datetime import datetime
 import random
 from sqlalchemy import and_, or_
 
-from ..core import db, config
+from ..core import db, config 
 from ..errors import NotAuthorized
 from ..hasher import Hasher
 from ..filters import FilterStrategies
@@ -53,11 +53,17 @@ class NonSelectionService(object):
         return NonSelectionNotice.query.filter(NonSelectionNotice.hash == hash_code).first()
 
     def products_for(self, account):
-        products = ProponentProduct.query \
-                                   .filter(ProponentProduct.sold_until >= datetime.now()) \
-                                   .order_by(ProponentProduct.original_deadline) \
-                                   .all()
-        return [ p for p in products if p.check_eligibility({}, account) ]
+        products = ProponentProduct.query.all()
+        return products
+       # return [ p for p in products if p.check_eligibility({}, account) ]
+
+
+#    def products_for(self, account):
+#        products = ProponentProduct.query \
+#                                   .filter(ProponentProduct.sold_until >= datetime.now()) \
+##                                   .order_by(ProponentProduct.original_deadline) \
+#                                   .all()
+#        return [ p for p in products if p.check_eligibility({}, account) ]
 
 class ProposalService(object):
     def __init__(self, db_impl=None, deadline=None, accounts=None, notifications=None):
@@ -105,12 +111,19 @@ class ProposalService(object):
         filter_list = self.filter_strategies.given(**kw)
         return base.filter(*filter_list).count()
 
+    def confirmed_and_slotted(self):
+        return Proposal.query.filter(Proposal.status=='confirmed').filter(Proposal.slots!=None)
+
+    def confirmed_and_not_slotted(self):
+        return Proposal.query.filter(Proposal.status=='confirmed').filter(Proposal.slots==None)
+
     def lookup(self, as_user=None, **kw):
         needle = kw.pop('q',None)
         limit  = kw.pop('limit',None)
         queryset = Proposal.query
         if 'slotted' in kw:
             queryset = self.filter_strategies.join_for_slotted(queryset)
+        queryset = self.filter_strategies.joins_for(queryset)
         filter_list = self.filter_strategies.needle(needle, as_user, **kw)
         return queryset.filter(*filter_list).limit(limit).all()
 
@@ -215,7 +228,7 @@ class InviteService(object):
         return invite
 
     def answer(self, hash_code, accepted=True, by=None):
-        self.deadline.enforce()
+        #self.deadline.enforce()
 
         invite = self.get_by_hash(hash_code)
         if not invite:
