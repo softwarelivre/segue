@@ -5,7 +5,7 @@ from flask import request
 from segue.core import config, cache
 from segue.decorators import jsoned, accepts_html
 
-from responses import RoomResponse, SlotResponse, NotificationResponse
+from responses import RoomResponse, SlotResponse, NotificationResponse, ScheduleSummaryResponse
 from services import RoomService, SlotService, NotificationService
 
 class RoomController(object):
@@ -17,17 +17,52 @@ class RoomController(object):
         result = self.service.get_one(room_id) or flask.abort(404)
         return RoomResponse.create(result), 200
 
-    @cache.cached(timeout=60 * 10)
+    @cache.cached(timeout=60)
     @jsoned
     def list_all(self):
         result = self.service.query()
         return RoomResponse.create(result), 200
+    
+    @cache.cached(timeout=60)
+    @jsoned
+    def summary(self):
+        from sqlalchemy import func, cast, DATE      
+        from segue.models import Slot, Proposal, Room
+        from itertools import chain
+
+        event_days = ['2018-07-11', '2018-07-12', '2018-07-13', '2018-07-14']
+        rooms = Room.query.all()
+
+        summary = []
+
+        for room in rooms:
+            summary_by_day = []
+            for day in event_days:
+                slots = Slot.query.join(Proposal).filter(Slot.room_id==room.id).filter(cast(Slot.begins, DATE)==day).all()
+               
+                update_dates = []
+                update_dates.extend([slot.last_updated for slot in slots if slot.last_updated])
+                update_dates.extend([slot.talk.last_updated for slot in slots if slot.talk.last_updated])
+                
+                last_updated = max(update_dates) if update_dates else None
+
+                summary_by_day.append({'day': day,'last_updated': last_updated})
+            
+            room_summary = {
+                'room_id': room.id,
+                'room_name': room.name,
+                'days': summary_by_day
+            }
+            summary.append(room_summary)
+
+        return ScheduleSummaryResponse.create(summary), 200       
+
 
 class SlotController(object):
     def __init__(self, service=None):
         self.service = service or SlotService()
 
-    @cache.cached(timeout=60 * 3)
+    @cache.cached(timeout=60)
     @jsoned
     def of_room(self, room_id, day=None):
         if day:

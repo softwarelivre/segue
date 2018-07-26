@@ -14,6 +14,7 @@ class RoomBlueprint(flask.Blueprint):
         super(RoomBlueprint, self).__init__('rooms', __name__, url_prefix='/rooms')
         self.controller = RoomController()
         self.add_url_rule('',                     methods=['GET'], view_func=self.controller.list_all)
+        self.add_url_rule('/summary',             methods=['GET'], view_func=self.controller.summary)
         self.add_url_rule('/<int:room_id>',       methods=['GET'], view_func=self.controller.get_one)
 
 class SlotBlueprint(flask.Blueprint):

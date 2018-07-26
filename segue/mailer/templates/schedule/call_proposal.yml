@@ -14,8 +14,14 @@ body: |
     haja tempo para você agendar sua visita a Porto Alegre
     para brindar-nos com a apresentação de:
 
-        título: {proposal.title}
-        trilha: {proposal.track.name_pt}
+      título: {proposal.title}
+      trilha: {proposal.track.name_pt}
+
+      Para facilitar, agendamos sua apresentação no seguinte horário e sala:
+
+      data: {presentation_day}
+      hora: {presentation_hours}
+      sala: {room.name} ({room.capacity} pessoas)
 
       É imprescindível que você confirme sua vinda para o
     evento. Em caso de estar impossibilitado(a), outras propostas
@@ -26,6 +32,9 @@ body: |
 
       ATENÇÃO: favor confirmar a sua presença até
                às {deadline_hours} do dia {deadline_day}
+      
+      Caso seja necessária a troca de horário ou dia de sua apresentação, 
+    entre em contato conosco através do e-mail fisl@luizbasso.com.br.
 
     Saudações Livres!
 

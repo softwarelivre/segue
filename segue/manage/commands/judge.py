@@ -5,16 +5,20 @@ from segue.judge.services import JudgeService, TournamentService, RankingService
 from segue.judge.errors import JudgeAlreadyExists
 from segue.proposal.services import ProposalService
 from support import *;
+
+import random
 import time
 
-def invite_judges(filename, count=5, tid=0, wait=30):
+def invite_judges(filename, count=3, tid=0, wait=15):
     init_command()
-    content = open(filename, 'r').read()
+    entries = [entry.replace("\n","") for entry in open(filename, 'r').readlines()]
 
     judge_service = JudgeService()
     mailer_service = MailerService()
 
-    for entry in content.split("\n"):
+    selection = entries
+    #selection = random.sample(entries, 200)
+    for entry in selection:
         if not len(entry): continue
         print "{}creating token for {}{}{}...".format(F.RESET, F.GREEN, entry, F.RESET),
         try:

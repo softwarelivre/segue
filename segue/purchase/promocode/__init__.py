@@ -49,6 +49,7 @@ class PromoCodeService(object):
             p = PromoCodeFactory.from_json(promocode_data, PromoCodeSchema())
             p.creator = creator
             
+            
             db.session.add(p)
             result.append(p)
             
@@ -73,14 +74,13 @@ class PromoCodeService(object):
             raise PromoCodeAlreadyUsed()
 
     def available_promocodes(self, hash_code, by=None):
-        today = datetime.datetime.now().date()
-        subquery = db.session.query(PromoCodePayment.promocode_id)
-        return (PromoCode.query
-                    .filter(PromoCode.hash_code==hash_code)
-                    .filter(PromoCode.start_at<=today)
-                    .filter(PromoCode.end_at>=today)
-                    .filter(~PromoCode.id.in_(subquery))
-                    .all())
+        promocodes = PromoCode.query.filter(PromoCode.hash_code==hash_code).all()
+        available_promocodes = []
+        for promocode in promocodes:
+            if not promocode.used:
+                available_promocodes.append(promocode)
+
+        return available_promocodes
         
     def get_one(self, promocode_id):
         return PromoCode.query.filter(PromoCode.id==promocode_id).first()

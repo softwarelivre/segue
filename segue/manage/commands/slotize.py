@@ -8,6 +8,14 @@ from segue.judge.services import RankingService
 from segue.schedule.services import SlotService
 from support import *;
 
+from segue.core import u
+
+def available_slots():
+    from segue.schedule.models import Slot
+    
+    multiuso_id = 8
+    return Slot.query.filter(Slot.blocked == False, Slot.talk == None, Slot.room_id != multiuso_id).all()
+
 def slotize(tid=0, commit=False):
     init_command()
 
@@ -15,9 +23,10 @@ def slotize(tid=0, commit=False):
     slotted = filter(lambda x:     x.slotted, total)
     pending = filter(lambda x: not x.slotted, total)
 
-    ranking = RankingService().classificate(int(tid), status='confirmed', slotted=False)
-    free_slots = SlotService().available_slots()
+    #ranking = RankingService().classificate(int(tid), status='confirmed', slotted=False)
+    ranking = RankingService().classificate(int(tid), slotted=False)
 
+    free_slots = available_slots()
     sorted_slots = sorted(free_slots, key=slot_value, reverse=True)
 
     print "=========== STARTING SLOTIZE ============="
@@ -27,6 +36,9 @@ def slotize(tid=0, commit=False):
     print "TOTAL FREE SLOTS: {}{}{}".format(F.GREEN, len(free_slots), F.RESET)
 
     for idx, ranked in enumerate(ranking):
+        if idx > len(sorted_slots) - 1:
+            continue
+
         slot = sorted_slots[idx]
         print "{}{}{}: proposal with rank {}{}{} gets slot {}{}{} at room {}{}{} (value={}{}{})".format(
                 F.RED, idx, F.RESET,
@@ -41,14 +53,18 @@ def slotize(tid=0, commit=False):
 
 def slot_value(slot):
     value = 0
-    if slot.room.capacity > 200:
+
+    if slot.room.capacity >= 200:
         value += 1
-    if slot.begins.hour in (13,14,15):
-        value += 1
-    elif slot.begins.hour in (16,17):
-        value += 2
-    elif slot.begins.hour in (10,18,19):
-        value -= 1
-    if slot.begins.day == 13:
-        value -= 1
+
+    if slot.begins.hour in (10, 12, 14, 16):
+        if slot.begins.hour == 10:
+          value += 4
+        if slot.begins.hour == 12:
+          value += 3
+        if slot.begins.hour == 14:
+          value += 2
+        if slot.begins.hour == 16:
+          value += 1
+
     return value

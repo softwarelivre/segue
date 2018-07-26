@@ -30,4 +30,4 @@ class CashPaymentService(object):
         of_this_cashier = CashTransition.cashier == cashier
         with_this_date  = CashTransition.created.between(start_of_day, end_of_day)
         query = CashPayment.query.join(CashTransition).filter(of_this_cashier, with_this_date)
-        return query.all()
+        return query.order_by(CashTransition.created).all()

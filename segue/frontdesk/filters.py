@@ -5,7 +5,7 @@ from segue.account.models import Account
 class FrontDeskFilterStrategies(FilterStrategies):
     def by_customer_id(self, value, as_user=None):
         if isinstance(value, basestring) and not value.isdigit(): return
-        return Purchase.id == value
+        return Purchase.id == int(value)
 
     def by_customer_name(self, value, as_user=None):
         if isinstance(value, basestring) and value.isdigit(): return

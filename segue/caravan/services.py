@@ -34,7 +34,7 @@ class CaravanService(object):
 
     def _check_ownership(self, caravan, alleged):
         if isinstance(caravan, int): caravan = self.get_one(caravan)
-        return caravan and alleged and (caravan.owner_id == alleged.id or alleged.has_role('admin'))
+        return caravan and alleged and (caravan.owner_id == alleged.id or alleged.has_role('admin') or alleged.role == 'admin')
 
     def get_by_owner(self, owner_id, by=None):
         result = Caravan.query.filter(Caravan.owner_id == owner_id).first()

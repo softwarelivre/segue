@@ -132,8 +132,7 @@ class ZipCodeValidator(object):
 class StudentDocumentValidator(object):
 
     URL = 'https://www.documentodoestudante.com.br/validador/validardne'
-    VALID_REGEX = 'UNE atesta'
-    INVALID_REGEX = 'Documento do estudante inválido'
+    VALID_REGEX = 'regularmente matriculado\(a\)'
     DATE_FORMAT = '%d/%m/%Y'
 
     def __init__(self, number, born_date):
@@ -147,12 +146,12 @@ class StudentDocumentValidator(object):
         response = self._do_request()
         if re.search(StudentDocumentValidator.VALID_REGEX, response):
             self.valid = True
-        if re.search(StudentDocumentValidator.INVALID_REGEX, response):
+        else:
             self.valid = False
 
     def _do_request(self):
         try:
-            return requests.get(StudentDocumentValidator.URL, params=self.params).content
+            return requests.get(StudentDocumentValidator.URL, params=self.params, verify=False).content
         except Exception as ex:
             logger.error('Error while doing the request for the student document validation ', ex.message)
             print ex

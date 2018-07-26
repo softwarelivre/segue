@@ -1,5 +1,6 @@
 from segue.errors import SegueError
 
+
 class NoMatchAvailable(SegueError):
     code = 400
     def to_json(self):
@@ -8,7 +9,7 @@ class NoMatchAvailable(SegueError):
 class InvalidJudge(SegueError):
     code = 400
     def to_json(self):
-        return { 'message': 'This hash code is not valid' }
+        return { 'message':'Torneio encerrado'}
 
 class JudgeAlreadyExists(SegueError):
     code = 400

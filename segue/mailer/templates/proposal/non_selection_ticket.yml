@@ -1,0 +1,24 @@
+---
+
+template: non_selection_ticket
+language: pt
+subject: "Grato por enviar sua proposta de palestra para o FISL"
+
+body: |
+
+    Prezad@ {nome}!
+
+    Informamos que você chegou quase lá, mas nenhuma de suas propostas de palestra foi selecionada pelo sistema de avaliação do FISL.
+
+    No entanto, a sua participação no evento é muito importante para nós. Nesse sentido, a organização  está lhe concedendo um desconto de 50% na inscrição para a modalidade de Ingresso Individual.
+
+    Não perca essa oportunidade!
+
+    Para conseguir seu ingresso nesses termos, por favor utilize o Código {promocode.hash_code} no sistema de inscrições https://segue.fisl18.softwarelivre.org/.
+
+    O desconto poderá ser utilizado na compra online (antecipada) e no evento, para tal você deve levar o seu código.
+    Saudações Livres!
+
+    Nos vemos no FISL!!!
+
+    Associação Software Livre.Org

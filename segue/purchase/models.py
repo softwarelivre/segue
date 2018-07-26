@@ -286,3 +286,48 @@ class ClaimCheck(object):
     @property
     def template_file(self):
         return 'purchase/templates/donationclaimcheck.svg'
+
+class AnnuityClaimCheck(object):
+
+    def __init__(self, purchase, date=None, hash_code=None):
+        self.purchase = purchase
+        self.date = date or datetime.now()
+        self.hash_code = hash_code
+
+    @property
+    def template_vars(self):
+        # CAST INT AND YEAR TO STR TO AVOID PROBLEMS WITH METHOD ESCAPE FROM svg_to_pdf
+        return {'PURCHASE_ID': str(self.purchase.id),
+                'NAME': self.purchase.customer.name,
+                'DOCUMENT': self.purchase.customer.document,
+                'AMOUNT': '{:.02f}'.format(float(self.purchase.amount)),
+                'DAY': '{:02d}'.format(self.date.day),
+                'MONTH': '{:02d}'.format(self.date.month),
+                'YEAR': str(self.date.year)}
+
+    @property
+    def template_file(self):
+        return 'purchase/templates/annuityclaimcheck.svg'
+
+
+class ContributionClaimCheck(object):
+
+    def __init__(self, purchase, date=None, hash_code=None):
+        self.purchase = purchase
+        self.date = date or datetime.now()
+        self.hash_code = hash_code
+
+    @property
+    def template_vars(self):
+        # CAST INT AND YEAR TO STR TO AVOID PROBLEMS WITH METHOD ESCAPE FROM svg_to_pdf
+        return {'PURCHASE_ID': str(self.purchase.id),
+                'NAME': self.purchase.customer.name,
+                'DOCUMENT': self.purchase.customer.document,
+                'AMOUNT': '{:.02f}'.format(float(self.purchase.amount)),
+                'DAY': '{:02d}'.format(self.date.day),
+                'MONTH': '{:02d}'.format(self.date.month),
+                'YEAR': str(self.date.year)}
+
+    @property
+    def template_file(self):
+        return 'purchase/templates/contributionclaimcheck.svg'

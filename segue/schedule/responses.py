@@ -37,6 +37,7 @@ class TalkShortResponse(BaseResponse):
         self.owner_email = talk.owner.email
         self.track = talk.track.name_pt
         self.last_updated = talk.last_updated
+        self.status = talk.status
         self.coauthors = list(set([ x.name for x in talk.coauthors ]))
 
 class NotificationResponse(BaseResponse):
@@ -55,3 +56,17 @@ class NotificationResponse(BaseResponse):
             self.proposal = notification.slot.talk
         elif self.kind == 'call':
             self.proposal = notification.proposal
+
+class RoomSummaryByDayResponse(BaseResponse):
+    def __init__(self, room_id, room_summary):
+        self.day = room_summary['day']
+        self.last_update = room_summary['last_updated']
+
+        self.add_link('slots', room_summary, 'slots.of_room', room_id=room_id, day=room_summary['day'])
+
+class ScheduleSummaryResponse(BaseResponse):
+    def __init__(self, summary):
+        self.room_id = summary['room_id']
+        self.room_name = summary['room_name']
+        self.days = [RoomSummaryByDayResponse.create(summary['room_id'], day) for day in summary['days']]
+

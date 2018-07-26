@@ -8,7 +8,7 @@ class PurchaseFilterStrategies(FilterStrategies):
         return self.by_customer_id(user.id)
 
     def by_id(self, value):
-        return Purchase.id == value
+        return Purchase.id == int(value)
 
     def by_status(self, value):
         return Purchase.status == value
@@ -17,7 +17,7 @@ class PurchaseFilterStrategies(FilterStrategies):
         return Purchase.product_id == value
 
     def by_customer_id(self, value, as_user=None):
-        return Purchase.customer_id == value
+        return Purchase.customer_id == int(value)
 
     def by_customer_name(self, value):
         return Account.name.ilike('%' + value + '%')

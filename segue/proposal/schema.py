@@ -11,7 +11,7 @@ ACCEPTED_LANGUAGES = ['pt', 'en', 'es']
 class ProposalSchema(BaseSchema):
     title = Field.str(
         required=True,
-        validate=[Validator.length(min=5, max=80)]
+        validate=[Validator.length(min=5, max=85)]
     )
     full = Field.str(
         required=True,

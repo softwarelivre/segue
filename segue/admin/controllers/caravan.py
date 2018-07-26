@@ -42,9 +42,9 @@ class AdminCaravanController(object):
         self.caravans.exempt_leader(caravan_id)
         return {}, 200
 
-    @jsoned
     @jwt_only
     @admin_only
+    @jsoned
     def get_one(self, caravan_id):
         result = self.caravans.get_one(caravan_id, by=current_user)
         return Response(result, CaravanResponse).create(), 200
@@ -67,7 +67,7 @@ class AdminCaravanController(object):
         data = request.get_json()
         owner_id = data.get('owner_id', None) or abort(404)
         owner = self.accounts.get_one(owner_id, check_ownership=False)
-        result = self.caravans.modify(caravan_id, data, owner, by=self.current_user)
+        result = self.caravans.modify(caravan_id, data, owner, by=owner)
         return result, 200
 
 

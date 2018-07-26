@@ -156,12 +156,23 @@ class NotificationService(object):
         notification.deadline = deadline
         notification.status   = 'pending'
         notification.hash     = self.hasher.generate()
-        target = notification.update_target_status()
+        #target = notification.update_target_status()
 
-        if do_send:
-            self.mailer.call_proposal(notification)
+        slots = proposal.slots.all()
 
-        db.session.add(target)
+
+
+
+        if do_send and len(slots) > 0:
+            self.mailer.call_proposal_slot(
+                notification,
+                proposal.owner,
+                proposal, 
+                slots[0])
+        else:
+            print('palestra sem slots', proposal)
+
+        #db.session.add(target)
         db.session.add(notification)
         db.session.commit()
 
@@ -170,7 +181,7 @@ class NotificationService(object):
     def notify_slot(self, slot_id, deadline):
         slot = self.slots.get_one(slot_id, strict=True)
         if not slot.talk: raise SlotIsEmpty()
-        if slot.status != 'dirty': raise SlotNotDirty()
+        #if slot.status != 'dirty': raise SlotNotDirty()
 
         already_answered = slot.notifications.filter(Notification.account == slot.talk.owner, Notification.status != 'pending').count() > 0
         if already_answered: raise NotificationAlreadyAnswered()

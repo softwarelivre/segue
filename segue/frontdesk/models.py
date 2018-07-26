@@ -267,11 +267,9 @@ class Person(object):
     def eligible_donation_products(self):
         products = []
 
-        for product in Product.query.filter(Product.category=='donation').order_by(Product.price).all():
+        for product in Product.query.filter(Product.category=='donation').filter(Product.can_pay_cash==True).order_by(Product.description).all():
             try:
-                if product.sold_until > datetime.now():
-                    continue
-                elif product.check_eligibility({}, self.purchase.customer):
+                if product.check_eligibility({}, self.purchase.customer):
                     products.append(product)
             except SegueError, e:
                 pass
@@ -280,10 +278,11 @@ class Person(object):
 
     @property
     def eligible_products(self):
+        from segue.core import logger
+
         if self.is_valid_ticket: return []
         if not self.can_change_product: return []
         products = []
-
         for product in Product.query.all():
             try:
                 if not product.can_pay_cash:
@@ -300,4 +299,4 @@ class Person(object):
             elif cheapest[product.category].price > product.price:
                 cheapest[product.category] = product
 
-        return sorted(cheapest.values(), key=lambda p: p.price)
+        return sorted(products, key=lambda p: p.price)
