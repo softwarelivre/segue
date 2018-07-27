@@ -367,6 +367,8 @@ class PaymentService(object):
                 self.on_finish_normal_donation(purchase)
         elif purchase.kind == 'caravan-rider':
             self.on_finish_caravan_rider(purchase)
+        elif purchase.category == 'member':
+            self.on_finish_membership(purchase)
         else:
             self.mailer.notify_payment(purchase)
 
@@ -408,6 +410,29 @@ class PaymentService(object):
 
         self.mailer.notify_gov_purchase_analysed(purchase, promocodes)
 
+    def on_finish_membership(self, purchase):
+        from segue.product.models import Product
+        from segue.purchase.factories import AnnuityClaimCheckFactory
+
+        promo_product = Product.query.filter(Product.id==purchase.product.promocode_product_id).first()
+
+        data = {
+            'description': promo_product.description,
+            'discount': 1.0,
+            'product_id': purchase.product.promocode_product_id,
+            'start_at': datetime.now().strftime("%d/%m/%Y"),
+            'end_at': (datetime.now() + timedelta(days=128)).strftime("%d/%m/%Y")
+        }
+
+        promocodes = self.promocodes.create(
+            data,
+            quantity=purchase.qty,
+            creator=purchase.customer
+        )
+
+        document,_ = ClaimCheckDocumentService(claim_check_factory=AnnuityClaimCheckFactory()).create(purchase)
+        self.mailer.notify_annuity_payment(purchase.customer, promocodes[0], document)
+ 
     def on_finish_promocode_donation(self, purchase):
         from segue.product.models import Product
         promo_product = Product.query.filter(Product.id==purchase.product.promocode_product_id).first()
@@ -426,13 +451,8 @@ class PaymentService(object):
             creator=purchase.customer
         )
 
-        if purchase.product.id in config.ANNUITY_PRODUCT_ID:
-            from segue.purchase.factories import AnnuityClaimCheckFactory
-            document,_ = ClaimCheckDocumentService(claim_check_factory=AnnuityClaimCheckFactory()).create(purchase)
-            self.mailer.notify_annuity_payment(purchase.customer, promocodes[0], document)
-        else:
-            document,_ = ClaimCheckDocumentService().create(purchase)
-            self.mailer.notify_promocode(purchase.customer, promocodes[0], document)          
+        document,_ = ClaimCheckDocumentService().create(purchase)
+        self.mailer.notify_promocode(purchase.customer, promocodes[0], document)          
 
     def on_finish_normal_donation(self, purchase):
         if purchase.product.id in config.CONTRIBUTION_PRODUCTS_IDS:

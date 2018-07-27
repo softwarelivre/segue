@@ -120,8 +120,6 @@ class CorporatePromoCodeProduct(PromoCodeProduct):
             return False
         return True
 
-
-
     def extra_purchase_fields_for(self, buyer_data):
         import decimal
         qty = buyer_data.get('purchase_qty', 0)
@@ -206,3 +204,7 @@ class DonationProduct(Product):
                 extra_fields['amount'] = buyer_data['amount']
 
         return extra_fields
+
+
+class MemberShipProduct(Product):
+    __mapper_args__ = { 'polymorphic_identity': 'member' }
