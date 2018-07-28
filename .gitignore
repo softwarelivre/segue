@@ -21,3 +21,4 @@ TODO
 segue/certificate/templates/*.svg
 .remote-sync.json
 .idea
+data/
